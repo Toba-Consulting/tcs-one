@@ -5,9 +5,11 @@ Bundle-SymbolicName: id.tcs.module;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.adempiere.plugin.utils;bundle-version="5.1.0",
- org.adempiere.base;bundle-version="5.1.0"
+ org.adempiere.base;bundle-version="5.1.0",
+ org.eclipse.osgi.services;bundle-version="3.6.0"
 Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
 Bundle-ActivationPolicy: lazy
 Import-Package: org.adempiere.webui.factory,
  org.adempiere.webui.panel
-Service-Component: OSGI-INF/tcscalloutfactory.xml
+Service-Component: OSGI-INF/tcscalloutfactory.xml,OSGI-INF/tcsvalidatorfactory.xml,
+ OSGI-INF/tcsprocessfactory.xml

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="id.tcs.module.processfactory">
+   <service>
+      <provide interface="org.adempiere.base.IProcessFactory"/>
+   </service>
+   <implementation class="id.tcs.module.factory.TCS_ProcessFactory"/>
+</scr:component>
