@@ -1,4 +1,4 @@
-package id.taowi.custom.factory;
+package id.tsc.module.factory;
 
 import org.adempiere.base.IProcessFactory;
 import org.compiere.process.ProcessCall;

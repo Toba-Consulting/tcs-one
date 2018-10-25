@@ -15,7 +15,7 @@
  * or via info@compiere.org or http://www.compiere.org/license.html           *
  *****************************************************************************/
 
-package id.taowi.custom.factory;
+package id.tcs.module.factory;
 
 import java.lang.reflect.Constructor;
 import java.sql.ResultSet;

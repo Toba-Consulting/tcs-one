@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="id.taowi.custom.calloutfactory">
-   <implementation class="id.taowi.custom.factory.TCS_CalloutFactory"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="id.tcs.module.calloutfactory">
+   <implementation class="id.tcs.module.factory.TCS_CalloutFactory"/>
    <service>
       <provide interface="org.adempiere.base.IProcessFactory"/>
    </service>
