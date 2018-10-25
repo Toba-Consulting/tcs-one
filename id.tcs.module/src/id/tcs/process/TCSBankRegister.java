@@ -53,8 +53,8 @@ public class TCSBankRegister extends SvrProcess{
 		balance = DB.getSQLValueBD(get_TrxName(), sb.toString(), p_C_BankAccount_ID);
 		
 		cleanTable();							//Remove Table(View Requirement)[TEMPORARY] TODO Remove This Later!
-		createTitleLine();						//Reconciled Transactions Header
 		createInitialBalanceLine(balance);		//Start Balance
+		createTitleLine();						//Reconciled Transactions Header
 		createReconciledLines(balance);			//Reconciled Transactions
 		
 		//Get Last Balance After CreateLines
@@ -117,13 +117,13 @@ public class TCSBankRegister extends SvrProcess{
 		
 		MBankAccount bankAcc = new MBankAccount(getCtx(), p_C_BankAccount_ID, get_TrxName());
 		String currencyName = bankAcc.getC_Currency().getISO_Code();
-		String bankAccountName = bankAcc.getName();
+		String bankAccountName = bankAcc.get_ValueAsString("name");
 		StringBuffer sb = new StringBuffer("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
 				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, BankAccountName, CurrencyName, Reference, Sequence, voucher, DocumentNo, BP_value, BP_name, DateFrom, DateTo) ");
 				
 		sb.append("select bs.AD_Client_ID, bs.AD_Org_ID, bs.IsActive, bs.Created, bs.CreatedBy, bs.Updated, bs.UpdatedBy, bs.c_bankaccount_id, ")
-		.append("bsl.c_bankstatementline_id, bsl.dateacct, bs.Description, ")
+		.append("bsl.c_bankstatementline_id, bsl.dateacct, bsl.Description, ")
 		.append("CASE ")
 		.append("when bsl.stmtamt>0 ")
 		.append("then bsl.stmtamt ")
