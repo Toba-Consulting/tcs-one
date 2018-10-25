@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Custom
+Bundle-SymbolicName: id.taowi.custom;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.adempiere.plugin.utils;bundle-version="5.1.0",
+ org.adempiere.base;bundle-version="5.1.0"
+Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
+Bundle-ActivationPolicy: lazy
+Import-Package: org.adempiere.webui.factory,
+ org.adempiere.webui.panel
+Service-Component: OSGI-INF/tcscalloutfactory.xml
