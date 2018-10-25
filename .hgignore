@@ -1,0 +1,2 @@
+syntax: glob
+id.tcs.module/bin/id/taowi/custom/factory/*.class
