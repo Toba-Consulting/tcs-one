@@ -179,7 +179,7 @@ public class TCSBankRegister extends SvrProcess{
 		
 		MBankAccount bankAcc = new MBankAccount(getCtx(), p_C_BankAccount_ID, get_TrxName());
 		String currencyName = bankAcc.getC_Currency().getISO_Code();
-		String bankAccountName = bankAcc.getName();
+		String bankAccountName = bankAcc.get_ValueAsString("name");
 		StringBuffer sb = new StringBuffer("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
 				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, BankAccountName, CurrencyName, Reference, Sequence, voucher, DocumentNo, BP_value, BP_name, DateFrom, DateTo) ");
