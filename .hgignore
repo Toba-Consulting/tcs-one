@@ -2,3 +2,4 @@ syntax: glob
 id.tcs.module/bin/id/taowi/custom/factory/*.class
 id.tcs.module/bin/id/tcs/module/factory/*.class
 id.tcs.module/bin/id/tcs/process/*.class
+id.tcs.module/bin/id/tcs/model/*.class
