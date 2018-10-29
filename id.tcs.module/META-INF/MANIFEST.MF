@@ -11,5 +11,5 @@ Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
 Bundle-ActivationPolicy: lazy
 Import-Package: org.adempiere.webui.factory,
  org.adempiere.webui.panel
-Service-Component: OSGI-INF/tcscalloutfactory.xml,OSGI-INF/tcsvalidatorfactory.xml,
- OSGI-INF/tcsprocessfactory.xml
+Service-Component: OSGI-INF/tcscalloutfactory.xml,OSGI-INF/tcsvalidatorfactory.xml,OSGI-INF/tcsprocessfactory.xml,
+ OSGI-INF/tcsmodelfactory.xml
