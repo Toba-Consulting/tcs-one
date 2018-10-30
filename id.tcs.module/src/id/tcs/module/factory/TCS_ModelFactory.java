@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import org.adempiere.base.IModelFactory;
 import org.compiere.model.I_C_AllocationHdr;
+import org.compiere.model.I_C_BankStatement;
 import org.compiere.model.I_C_Payment;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
@@ -45,6 +46,7 @@ public class TCS_ModelFactory implements IModelFactory {
 	{
 		mapTableModels.put(I_C_Payment.Table_Name, "id.tcs.model.TCS_MPayment");
 		mapTableModels.put(I_TCS_AllocateCharge.Table_Name, "id.tcs.model.MTCS_AllocateCharge");
+		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
 	}
 	
 	@Override
