@@ -13,7 +13,7 @@ public class TCS_FormFactory implements IFormFactory{
 
 	@Override
 	public ADForm newFormInstance(String formName) {
-		if(formName.startsWith("id.slu.webui.apps.form")){
+		if(formName.startsWith("id.tcs.webui.apps.form")){
 			Object form = null;
 			Class<?> clazz = null;
 			ClassLoader loader = getClass().getClassLoader();

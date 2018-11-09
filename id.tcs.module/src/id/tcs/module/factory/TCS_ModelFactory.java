@@ -47,6 +47,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(I_C_Payment.Table_Name, "id.tcs.model.TCS_MPayment");
 		mapTableModels.put(I_TCS_AllocateCharge.Table_Name, "id.tcs.model.MTCS_AllocateCharge");
 		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
+		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
 	}
 	
 	@Override
