@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Fragment
+Bundle-SymbolicName: id.tcs.fragment
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: org.adempiere.ui.zk;bundle-version="5.1.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: id.tcs.webui.dashboard
+Bundle-ClassPath: zul/,
+ .
