@@ -3,3 +3,6 @@ id.tcs.module/bin/id/taowi/custom/factory/*.class
 id.tcs.module/bin/id/tcs/module/factory/*.class
 id.tcs.module/bin/id/tcs/process/*.class
 id.tcs.module/bin/id/tcs/model/*.class
+id.tcs.module/bin/id/tcs/validator/*.class
+id.tcs.module/bin/id/tcs/webui/apps/form/*.class
+id.tcs.fragment/bin/id/tcs/webui/dashboard/*.class
