@@ -679,7 +679,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 				BigDecimal tempReceiptAmt = receiptAmount.get(i);
 				
 				if(!chargeID.isEmpty()){
-					if(tempReceiptAmt.compareTo(Env.ZERO)!=0 && chargeID.get(0)>0 && chargeAmount.compareTo(Env.ZERO)<0){
+					if(tempReceiptAmt.compareTo(Env.ZERO)!=0 && chargeID.get(i)>0 && chargeAmount.compareTo(Env.ZERO)<0){
 						X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 						match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
 						
