@@ -57,7 +57,9 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 			//
 			
 			//Charge
-			int chargeID = 0;
+//			int chargeID = 0;
+			ArrayList<Integer> chargeID = new ArrayList<Integer>();
+			
 			BigDecimal chargeAmount = Env.ZERO;
 			//
 			
@@ -89,17 +91,20 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 				}			
 				else if(line.getC_Invoice_ID()==0 && line.getC_Payment_ID()>0 && line.getC_Payment().getC_DocType().getDocBaseType().equals("APP")){				//3
 					paymentID.add(line.getC_Payment_ID());
-					paymentAmount.add(line.getAmount().abs());
+					//negate because in allocationline, the payment amount is negated, so its negated here as well
+					paymentAmount.add(line.getAmount().negate());
 					pay++;
 				}
 				else if(line.getC_Invoice_ID()==0 && line.getC_Payment_ID()>0 && line.getC_Payment().getC_DocType().getDocBaseType().equals("ARR")){				//4
 					receiptID.add(line.getC_Payment_ID());
-					receiptAmount.add(line.getAmount().abs().negate());
+					receiptAmount.add(line.getAmount().negate());
 					rec++;
 				}
 				else if(line.getC_Charge_ID()>0){																						//5
-					chargeID = line.getC_Charge_ID();
-					chargeAmount = line.getAmount();
+					//chargeID = line.getC_Charge_ID();
+					chargeID.add(line.getC_Charge_ID());
+					//chargeAmount = line.getAmount();
+					chargeAmount = chargeAmount.add(line.getAmount());
 					charge++;
 				}else if(line.getAmount().compareTo(Env.ZERO)!=0){
 					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
@@ -347,59 +352,60 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 				{
 					totalMinAmount = totalMinAmount.add(minAmount.get(k));
 				}
-				
-				if(totalMinAmount.compareTo(Env.ZERO)==0 && chargeID>0 && tempInvoiceAmt.compareTo(Env.ZERO)>0 && chargeAmount.compareTo(Env.ZERO)>0){					
-					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
-					match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
-					
-					match.set_CustomColumn("C_Invoice_ID", plusInvoiceID.get(i));
-					match.set_CustomColumn("DiscountAmt", pDiscountAmt.get(i));
-					match.set_CustomColumn("WriteOffAmt", pWriteOffAmt.get(i));
-					
-					MInvoice pInvoice = new MInvoice(getCtx(), plusInvoiceID.get(i), get_TrxName());
-					match.set_CustomColumn("C_DocType_ID", pInvoice.getC_DocType_ID());
-					
-					//match.set_CustomColumn("P_Invoice_ID", plusInvoiceID.get(i));
-					//match.set_CustomColumn("P_Amount", tempInvoiceAmt);
-					match.set_CustomColumn("C_Charge_ID", chargeID);
-					//match.set_CustomColumn("N_Amount", tempInvoiceAmt.abs().negate());
-					
-					match.set_CustomColumn("AllocationAmt", tempInvoiceAmt.abs());
-					match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
-					match.saveEx();
-					
-					chargeAmount = chargeAmount.add(tempInvoiceAmt);
-					
-					pDiscountAmt.set(i, Env.ZERO);
-					pWriteOffAmt.set(i, Env.ZERO);
-					
-				} else if(!plusInvoiceID.isEmpty() && minInvoiceID.isEmpty() && chargeID>0){
-					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
-					match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
-					match.set_CustomColumn("C_Invoice_ID", plusInvoiceID.get(i));
-					match.set_CustomColumn("DiscountAmt", pDiscountAmt.get(i));
-					match.set_CustomColumn("WriteOffAmt", pWriteOffAmt.get(i));
-					
-					MInvoice pInvoice = new MInvoice(getCtx(), plusInvoiceID.get(i), get_TrxName());
-					match.set_CustomColumn("C_DocType_ID", pInvoice.getC_DocType_ID());
-					//match.set_CustomColumn("P_Invoice_ID", plusInvoiceID.get(i));
-					//match.set_CustomColumn("P_Amount", tempInvoiceAmt);
-					match.set_CustomColumn("C_Charge_ID", chargeID);
-					//match.set_CustomColumn("N_Amount", tempInvoiceAmt.abs().negate());
-					
-					//MInvoice pInvoice = new MInvoice(getCtx(), plusInvoiceID.get(i), get_TrxName());
-					//match.set_CustomColumn("P_DocType_ID", pInvoice.getC_DocType_ID());
-					
-					match.set_CustomColumn("AllocationAmt", chargeAmount.abs());
-					match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
-					match.saveEx();
-					
-					chargeAmount = chargeAmount.add(tempInvoiceAmt);
-					
-					pDiscountAmt.set(i, Env.ZERO);
-					pWriteOffAmt.set(i, Env.ZERO);
-					
-				} /*else if(plusInvoiceID.isEmpty() && !minInvoiceID.isEmpty() && chargeID>0){
+				if(!chargeID.isEmpty()){
+					if(totalMinAmount.compareTo(Env.ZERO)==0 && chargeID.get(0)>0 && tempInvoiceAmt.compareTo(Env.ZERO)>0 && chargeAmount.compareTo(Env.ZERO)>0){					
+						X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
+						match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
+						
+						match.set_CustomColumn("C_Invoice_ID", plusInvoiceID.get(i));
+						match.set_CustomColumn("DiscountAmt", pDiscountAmt.get(i));
+						match.set_CustomColumn("WriteOffAmt", pWriteOffAmt.get(i));
+						
+						MInvoice pInvoice = new MInvoice(getCtx(), plusInvoiceID.get(i), get_TrxName());
+						match.set_CustomColumn("C_DocType_ID", pInvoice.getC_DocType_ID());
+						
+						//match.set_CustomColumn("P_Invoice_ID", plusInvoiceID.get(i));
+						//match.set_CustomColumn("P_Amount", tempInvoiceAmt);
+						match.set_CustomColumn("C_Charge_ID", chargeID.get(0));
+						//match.set_CustomColumn("N_Amount", tempInvoiceAmt.abs().negate());
+						
+						match.set_CustomColumn("AllocationAmt", tempInvoiceAmt.abs());
+						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
+						match.saveEx();
+						
+						chargeAmount = chargeAmount.add(tempInvoiceAmt);
+						
+						pDiscountAmt.set(i, Env.ZERO);
+						pWriteOffAmt.set(i, Env.ZERO);
+						
+					} else if(!plusInvoiceID.isEmpty() && minInvoiceID.isEmpty() && chargeID.get(i)>0){
+						X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
+						match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
+						match.set_CustomColumn("C_Invoice_ID", plusInvoiceID.get(i));
+						match.set_CustomColumn("DiscountAmt", pDiscountAmt.get(i));
+						match.set_CustomColumn("WriteOffAmt", pWriteOffAmt.get(i));
+						
+						MInvoice pInvoice = new MInvoice(getCtx(), plusInvoiceID.get(i), get_TrxName());
+						match.set_CustomColumn("C_DocType_ID", pInvoice.getC_DocType_ID());
+						//match.set_CustomColumn("P_Invoice_ID", plusInvoiceID.get(i));
+						//match.set_CustomColumn("P_Amount", tempInvoiceAmt);
+						match.set_CustomColumn("C_Charge_ID", chargeID.get(0));
+						//match.set_CustomColumn("N_Amount", tempInvoiceAmt.abs().negate());
+						
+						//MInvoice pInvoice = new MInvoice(getCtx(), plusInvoiceID.get(i), get_TrxName());
+						//match.set_CustomColumn("P_DocType_ID", pInvoice.getC_DocType_ID());
+						
+						match.set_CustomColumn("AllocationAmt", chargeAmount.abs());
+						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
+						match.saveEx();
+						
+						chargeAmount = chargeAmount.add(tempInvoiceAmt);
+						
+						pDiscountAmt.set(i, Env.ZERO);
+						pWriteOffAmt.set(i, Env.ZERO);
+						
+					}
+				}/*else if(plusInvoiceID.isEmpty() && !minInvoiceID.isEmpty() && chargeID>0){
 					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 					match.set_CustomColumn("C_AllocationHdr_ID", get_ID());
 					match.set_CustomColumn("N_Invoice_ID", minInvoiceID.get(0));
@@ -564,51 +570,52 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 				{
 					totalReceiptAmount = totalReceiptAmount.add(minAmount.get(k));
 				}
-							
-				if(totalReceiptAmount.compareTo(Env.ZERO)==0 && chargeID>0 && tempPaymentAmt.compareTo(Env.ZERO)>0 && chargeAmount.compareTo(Env.ZERO)>0){					
-					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
-					match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
-					
-					//payment
-					match.set_CustomColumn("C_Payment_ID", paymentID.get(i));
-					
-					MPayment pPayment = new MPayment(getCtx(), paymentID.get(i), get_TrxName());
-					match.set_CustomColumn("C_DocType_ID", pPayment.getC_DocType_ID());
-					//match.set_CustomColumn("P_Payment_ID", paymentID.get(i));
-					//match.set_CustomColumn("P_Amount", tempPaymentAmt);
-					
-					//charge
-					match.set_CustomColumn("C_Charge_ID", chargeID);
-					//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
-					
-					match.set_CustomColumn("AllocationAmt", tempPaymentAmt.abs());
-					match.set_ValueOfColumn("DateAllocated", hdr.getCreated());				
-					match.saveEx();
-					
-					chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt.abs());
-										
-				} else if(!paymentID.isEmpty() && receiptID.isEmpty() && chargeID>0){
-					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
-					match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
-					
-					//payment
-					match.set_CustomColumn("C_Payment_ID", paymentID.get(i));
-					
-					MPayment pPayment = new MPayment(getCtx(), paymentID.get(i), get_TrxName());
-					match.set_CustomColumn("C_DocType_ID", pPayment.getC_DocType_ID());
-					//match.set_CustomColumn("P_Payment_ID", paymentID.get(i));
-					//match.set_CustomColumn("P_Amount", tempPaymentAmt);
-					
-					//charge
-					match.set_CustomColumn("C_Charge_ID", chargeID);
-					//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
-					
-					match.set_CustomColumn("AllocationAmt", tempPaymentAmt.abs());
-					match.set_ValueOfColumn("DateAllocated", hdr.getCreated());				
-					match.saveEx();
-					
-					chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt.abs());
+				if(!chargeID.isEmpty()){			
+					if(totalReceiptAmount.compareTo(Env.ZERO)==0 && chargeID.get(0)>0 && tempPaymentAmt.compareTo(Env.ZERO)>0 && chargeAmount.compareTo(Env.ZERO)>0){					
+						X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
+						match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
 						
+						//payment
+						match.set_CustomColumn("C_Payment_ID", paymentID.get(i));
+						
+						MPayment pPayment = new MPayment(getCtx(), paymentID.get(i), get_TrxName());
+						match.set_CustomColumn("C_DocType_ID", pPayment.getC_DocType_ID());
+						//match.set_CustomColumn("P_Payment_ID", paymentID.get(i));
+						//match.set_CustomColumn("P_Amount", tempPaymentAmt);
+						
+						//charge
+						match.set_CustomColumn("C_Charge_ID", chargeID.get(i));
+						//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
+						
+						match.set_CustomColumn("AllocationAmt", tempPaymentAmt.abs());
+						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());				
+						match.saveEx();
+						
+						chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt.abs());
+											
+					} else if(!paymentID.isEmpty() && receiptID.isEmpty() && chargeID.get(i)>0){
+						X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
+						match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
+						
+						//payment
+						match.set_CustomColumn("C_Payment_ID", paymentID.get(i));
+						
+						MPayment pPayment = new MPayment(getCtx(), paymentID.get(i), get_TrxName());
+						match.set_CustomColumn("C_DocType_ID", pPayment.getC_DocType_ID());
+						//match.set_CustomColumn("P_Payment_ID", paymentID.get(i));
+						//match.set_CustomColumn("P_Amount", tempPaymentAmt);
+						
+						//charge
+						match.set_CustomColumn("C_Charge_ID", chargeID.get(i));
+						//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
+						
+						match.set_CustomColumn("AllocationAmt", tempPaymentAmt.abs());
+						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());				
+						match.saveEx();
+						
+						chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt.abs());
+							
+					}
 				}/* else if(paymentID.isEmpty() && !receiptID.isEmpty() && chargeID>0){
 					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 					match.set_CustomColumn("C_AllocationHdr_ID", get_ID());
@@ -632,35 +639,36 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 			for(int i=0; i<minI; i++)
 			{
 				BigDecimal tempnInvoiceAmt = minAmount.get(i);
-				
-				if(tempnInvoiceAmt.compareTo(Env.ZERO)<0 && chargeID>0 && chargeAmount.compareTo(Env.ZERO)<0){
-					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
-					match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
-					
-					//invoice
-					match.set_CustomColumn("C_Invoice_ID", minInvoiceID.get(i));
-					match.set_CustomColumn("DiscountAmt", nDiscountAmt.get(i));
-					match.set_CustomColumn("WriteOffAmt", nWriteOffAmt.get(i));
-					
-					MInvoice nInvoice = new MInvoice(getCtx(), minInvoiceID.get(i), get_TrxName());
-					match.set_CustomColumn("C_DocType_ID", nInvoice.getC_DocType_ID());
-					
-					//match.set_CustomColumn("N_Invoice_ID", minInvoiceID.get(i));
-					//match.set_CustomColumn("N_Amount", tempnInvoiceAmt.abs().negate());
-					
-					//charge
-					match.set_CustomColumn("C_Charge_ID", chargeID);
-					//match.set_CustomColumn("P_Amount", tempnInvoiceAmt.abs());
-					
-					match.set_CustomColumn("AllocationAmt", tempnInvoiceAmt.abs());
-					match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
-					match.saveEx();
-					
-					chargeAmount = chargeAmount.add(tempnInvoiceAmt);
-					
-					nDiscountAmt.set(0, Env.ZERO);
-					nWriteOffAmt.set(0, Env.ZERO);
-					
+				if(!chargeID.isEmpty()){
+					if(tempnInvoiceAmt.compareTo(Env.ZERO)<0 && chargeID.get(0)>0 && chargeAmount.compareTo(Env.ZERO)<0){
+						X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
+						match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
+						
+						//invoice
+						match.set_CustomColumn("C_Invoice_ID", minInvoiceID.get(i));
+						match.set_CustomColumn("DiscountAmt", nDiscountAmt.get(i));
+						match.set_CustomColumn("WriteOffAmt", nWriteOffAmt.get(i));
+						
+						MInvoice nInvoice = new MInvoice(getCtx(), minInvoiceID.get(i), get_TrxName());
+						match.set_CustomColumn("C_DocType_ID", nInvoice.getC_DocType_ID());
+						
+						//match.set_CustomColumn("N_Invoice_ID", minInvoiceID.get(i));
+						//match.set_CustomColumn("N_Amount", tempnInvoiceAmt.abs().negate());
+						
+						//charge
+						match.set_CustomColumn("C_Charge_ID", chargeID.get(0));
+						//match.set_CustomColumn("P_Amount", tempnInvoiceAmt.abs());
+						
+						match.set_CustomColumn("AllocationAmt", tempnInvoiceAmt.abs());
+						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
+						match.saveEx();
+						
+						chargeAmount = chargeAmount.add(tempnInvoiceAmt);
+						
+						nDiscountAmt.set(0, Env.ZERO);
+						nWriteOffAmt.set(0, Env.ZERO);
+						
+					}
 				}
 			}
 			//End nInvoice Loop	
@@ -670,29 +678,30 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 			{
 				BigDecimal tempReceiptAmt = receiptAmount.get(i);
 				
-				if(tempReceiptAmt.compareTo(Env.ZERO)!=0 && chargeID>0 && chargeAmount.compareTo(Env.ZERO)<0){
-					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
-					match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
-					
-					//receipt
-					match.set_CustomColumn("C_Payment_ID", receiptID.get(i));
-					
-					MPayment nPayment = new MPayment(getCtx(), receiptID.get(i), get_TrxName());
-					match.set_CustomColumn("C_DocType_ID", nPayment.getC_DocType_ID());
-					//match.set_CustomColumn("N_Payment_ID", receiptID.get(i));
-					//match.set_CustomColumn("N_Amount", tempReceiptAmt.abs().negate());
-					
-					//charge
-					match.set_CustomColumn("C_Charge_ID", chargeID);
-					//match.set_CustomColumn("P_Amount", tempReceiptAmt.abs());
-					
-					
-					match.set_CustomColumn("AllocationAmt", tempReceiptAmt.abs());
-					match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
-					match.saveEx();	
-					
-					chargeAmount = chargeAmount.abs().negate().add(tempPaymentAmt.abs());
-					
+				if(!chargeID.isEmpty()){
+					if(tempReceiptAmt.compareTo(Env.ZERO)!=0 && chargeID.get(0)>0 && chargeAmount.compareTo(Env.ZERO)<0){
+						X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
+						match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
+						
+						//receipt
+						match.set_CustomColumn("C_Payment_ID", receiptID.get(i));
+						
+						MPayment nPayment = new MPayment(getCtx(), receiptID.get(i), get_TrxName());
+						match.set_CustomColumn("C_DocType_ID", nPayment.getC_DocType_ID());
+						//match.set_CustomColumn("N_Payment_ID", receiptID.get(i));
+						//match.set_CustomColumn("N_Amount", tempReceiptAmt.abs().negate());
+						
+						//charge
+						match.set_CustomColumn("C_Charge_ID", chargeID.get(i));
+						//match.set_CustomColumn("P_Amount", tempReceiptAmt.abs());
+						
+						
+						match.set_CustomColumn("AllocationAmt", tempReceiptAmt.negate());
+						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
+						match.saveEx();	
+						
+						chargeAmount = chargeAmount.abs().negate().add(tempPaymentAmt.abs());
+					}
 				}
 			}
 			//End Receipt Loop
