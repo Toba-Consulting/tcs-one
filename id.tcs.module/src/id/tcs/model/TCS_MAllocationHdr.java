@@ -100,7 +100,7 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 			}
 			else if(line.getC_Invoice_ID()==0 && line.getC_Payment_ID()>0 && line.getC_Payment().getC_DocType().getDocBaseType().equals("ARR")){				//4
 				receiptID.add(line.getC_Payment_ID());
-				receiptAmount.add(line.getAmount().negate());
+				receiptAmount.add(line.getAmount());
 				rec++;
 			}
 			else if(line.getC_Charge_ID()>0){																						//5
@@ -128,7 +128,7 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 				match.set_CustomColumn("Match_DocType_ID", payment.getC_DocType_ID());
 
 				match.set_ValueOfColumn("DateAllocated", getCreated());
-				match.set_CustomColumn("AllocationAmt", line.getAmount().abs());					
+				match.set_CustomColumn("AllocationAmt", line.getAmount());					
 				match.saveEx();
 				matched++;
 				
@@ -372,7 +372,7 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 				match.set_CustomColumn("C_Charge_ID", chargeID);
 				//match.set_CustomColumn("N_Amount", tempInvoiceAmt.abs().negate());
 				
-				match.set_CustomColumn("AllocationAmt", tempInvoiceAmt.abs());
+				match.set_CustomColumn("AllocationAmt", tempInvoiceAmt);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
 				match.saveEx();
 				
@@ -399,7 +399,7 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 				//MInvoice pInvoice = new MInvoice(getCtx(), plusInvoiceID.get(i), get_TrxName());
 				//match.set_CustomColumn("P_DocType_ID", pInvoice.getC_DocType_ID());
 				
-				match.set_CustomColumn("AllocationAmt", chargeAmount.abs());
+				match.set_CustomColumn("AllocationAmt", chargeAmount);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
 				match.saveEx();
 				
@@ -661,7 +661,7 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 				match.set_CustomColumn("C_Charge_ID", chargeID.get(i));
 				//match.set_CustomColumn("P_Amount", tempnInvoiceAmt.abs());
 				
-				match.set_CustomColumn("AllocationAmt", tempnInvoiceAmt.abs());
+				match.set_CustomColumn("AllocationAmt", tempnInvoiceAmt);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
 				match.saveEx();
 				
@@ -696,7 +696,7 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 				//match.set_CustomColumn("P_Amount", tempReceiptAmt.abs());
 				
 				
-				match.set_CustomColumn("AllocationAmt", tempReceiptAmt.negate());
+				match.set_CustomColumn("AllocationAmt", tempReceiptAmt);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
 				match.saveEx();	
 				
