@@ -205,6 +205,11 @@ public class TCS_AllocationReset extends SvrProcess
 	{
 	//	m_trx.start();
 		boolean success = false;
+		//@David
+		//Delete Match Allocation Before AllocationHdr
+		String sql = "DELETE FROM T_MatchAllocation WHERE C_AllocationHdr_ID=?;";
+		DB.executeUpdate(sql, hdr.getC_AllocationHdr_ID(), null);
+		//@David End
 		if (hdr.delete(true, m_trx.getTrxName()))
 		{
 			if (log.isLoggable(Level.FINE)) log.fine(hdr.toString());
