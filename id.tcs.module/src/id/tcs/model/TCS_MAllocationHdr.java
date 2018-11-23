@@ -128,7 +128,7 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 				match.set_CustomColumn("Match_DocType_ID", payment.getC_DocType_ID());
 
 				match.set_ValueOfColumn("DateAllocated", getCreated());
-				match.set_CustomColumn("AllocationAmt", line.getAmount());					
+				match.set_CustomColumn("AllocationAmt", line.getAmount().abs());					
 				match.saveEx();
 				matched++;
 				

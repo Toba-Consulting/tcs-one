@@ -125,7 +125,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 					match.set_CustomColumn("Match_DocType_ID", payment.getC_DocType_ID());
 
 					match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
-					match.set_CustomColumn("AllocationAmt", line.getAmount());					
+					match.set_CustomColumn("AllocationAmt", line.getAmount().abs());					
 					match.saveEx();
 					matched++;
 					
