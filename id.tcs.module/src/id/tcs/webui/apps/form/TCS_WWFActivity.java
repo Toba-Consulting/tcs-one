@@ -262,7 +262,7 @@ public class TCS_WWFActivity extends ADForm implements EventListener<Event>
 		north.setSplittable(true);
 		ZKUpdateUtil.setVflex(listbox, "1");
 		ZKUpdateUtil.setHflex(listbox, "1");
-		ZKUpdateUtil.setHeight(north, "50%");
+		ZKUpdateUtil.setHeight(north, "25%");
 		layout.appendChild(north);
 		north.setStyle("background-color: transparent");
 		listbox.addEventListener(Events.ON_SELECT, this);
