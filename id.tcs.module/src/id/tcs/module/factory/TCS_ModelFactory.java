@@ -30,7 +30,7 @@ import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 import id.tcs.model.I_TCS_AllocateCharge;
-import id.tcs.model.TCS_MAllocationHdr;
+import org.compiere.model.TCS_MAllocationHdr;
 
 
 
@@ -49,7 +49,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(I_TCS_AllocateCharge.Table_Name, "id.tcs.model.MTCS_AllocateCharge");
 		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
 		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
-		mapTableModels.put(TCS_MAllocationHdr.Table_Name, "id.tcs.model.TCS_MAllocationHdr");
+		mapTableModels.put(TCS_MAllocationHdr.Table_Name, "org.compiere.model.TCS_MAllocationHdr");
 	}
 	
 	@Override
