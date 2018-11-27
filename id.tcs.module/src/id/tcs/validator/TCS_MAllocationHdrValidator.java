@@ -30,7 +30,7 @@ public class TCS_MAllocationHdrValidator {
 	public static String afterComplete(MAllocationHdr allocationHdr){
 		
 		TCS_MAllocationHdr docAllocationHdr = new TCS_MAllocationHdr(Env.getCtx(), allocationHdr.getC_AllocationHdr_ID(), allocationHdr.get_TrxName());
-		if (docAllocationHdr.isReversal()) {
+		if (!docAllocationHdr.isReversal()) {
 			docAllocationHdr.createMatchAllocation();			
 		}
 		
