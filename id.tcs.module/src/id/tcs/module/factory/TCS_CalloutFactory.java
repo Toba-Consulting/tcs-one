@@ -1,5 +1,11 @@
 package id.tcs.module.factory;
 
+import id.tcs.callout.TCS_CalloutAdvRequestLine;
+import id.tcs.callout.TCS_CalloutAdvSettlement;
+import id.tcs.callout.TCS_CalloutAdvSettlementLine;
+import id.tcs.callout.TCS_CalloutDestSettlement;
+import id.tcs.callout.TCS_CalloutInvoiceLine;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +19,31 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 	public IColumnCallout[] getColumnCallouts(String tableName,
 			String columnName) {
 		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
-		/*
-		if (tableName.equals("C_Payment")){
-			list.add(new SLU_CalloutPayment());
+		
+		if (tableName.equals("TCS_AdvSettlement")){
+			list.add(new TCS_CalloutAdvSettlement());
 		}
-		*/
+		
+		if (tableName.equals("TCS_DestSettlement")){
+			list.add(new TCS_CalloutDestSettlement());
+		}
+		
+		if (tableName.equals("TCS_AdvSettlementLine")){
+			list.add(new TCS_CalloutAdvSettlementLine());
+		}
+		
+		if (tableName.equals("TCS_AdvRequestLine")){
+			list.add(new TCS_CalloutAdvRequestLine());
+		}
+		
+		if (tableName.equals("TCS_AdvSettlementLine")){
+			list.add(new TCS_CalloutAdvSettlementLine());
+		}
+		
+		if (tableName.equals("C_InvoiceLine")){
+			list.add(new TCS_CalloutInvoiceLine());
+		}
+		
 		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];
 	}
 

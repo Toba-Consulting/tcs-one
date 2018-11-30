@@ -3,15 +3,19 @@ package id.tcs.module.factory;
 import org.adempiere.base.event.AbstractEventHandler;
 import org.adempiere.base.event.IEventTopics;
 import org.adempiere.base.event.LoginEventData;
-
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.I_C_Order;
 import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MInvoice;
+import org.compiere.model.MPayment;
 import org.compiere.model.X_AD_WF_Activity;
 import org.compiere.util.CLogger;
 import org.compiere.wf.MWFActivity;
 import org.osgi.service.event.Event;
 
+import id.tcs.model.TCS_MPayment;
+import id.tcs.validator.TCS_InvoiceValidator;
+import id.tcs.validator.TCS_PaymentValidator;
 import id.tcs.validator.TCS_WFActivityValidator;
 import id.tcs.validator.TCS_MAllocationHdrValidator;
 
@@ -27,6 +31,10 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MAllocationHdr.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MAllocationHdr.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MAllocationHdr.Table_Name);		
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MPayment.Table_Name);		
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MPayment.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MInvoice.Table_Name);		
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MInvoice.Table_Name);
 		log.info("PROJECT MANAGEMENT EVENT MANAGER // INITIALIZED");
 	}
 
@@ -49,6 +57,12 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		}
 		else if(getPO(event).get_TableName().equals(MAllocationHdr.Table_Name)) {
 			msg = TCS_MAllocationHdrValidator.executeEvent(event, getPO(event));
+		}
+		else if(getPO(event).get_TableName().equals(MPayment.Table_Name)) {
+			msg = TCS_PaymentValidator.executeEvent(event, getPO(event));
+		}
+		else if(getPO(event).get_TableName().equals(MInvoice.Table_Name)) {
+			msg = TCS_InvoiceValidator.executeEvent(event, getPO(event));
 		}
 		
 		if (msg.length() > 0)
