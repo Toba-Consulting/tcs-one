@@ -1674,7 +1674,8 @@ public void createMatchAllocation(){
 			
 			for(int j = 0;j<receiptID.size();j++){
 				
-				if(j==0 && receiptAmount.get(j).compareTo(Env.ZERO)<0){
+				//if(j==0 && receiptAmount.get(j).compareTo(Env.ZERO)<0){
+				if(j==0 && receiptAmount.get(j).compareTo(Env.ZERO)>0){
 					//match
 					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 					match.set_CustomColumn("C_AllocationHdr_ID", get_ID());
@@ -1730,9 +1731,11 @@ public void createMatchAllocation(){
 				}
 				
 				
-				if(j!=0 && tempPaymentAmt.compareTo(Env.ZERO)>0 
-						&& receiptAmount.get(j).compareTo(Env.ZERO)<0){
-					//match
+				//if(j!=0 && tempPaymentAmt.compareTo(Env.ZERO)>0 
+				//		&& receiptAmount.get(j).compareTo(Env.ZERO)<0){
+				if(j!=0 && tempPaymentAmt.compareTo(Env.ZERO)<0 
+						&& receiptAmount.get(j).compareTo(Env.ZERO)>0){
+										//match
 					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 					match.set_CustomColumn("C_AllocationHdr_ID", get_ID());
 					
