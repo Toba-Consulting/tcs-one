@@ -6,16 +6,18 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MDocType;
 import org.compiere.model.MPeriod;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.Query;
 import org.compiere.process.DocAction;
+import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
 import org.compiere.util.Env;
 
-public class TCS_MAdvSettlement extends X_TCS_AdvSettlement implements DocAction{
+public class TCS_MAdvSettlement extends X_TCS_AdvSettlement implements DocAction, DocOptions{
 
 	/**	Process Message 			*/
 	private String		m_processMsg = null;
@@ -184,6 +186,13 @@ public class TCS_MAdvSettlement extends X_TCS_AdvSettlement implements DocAction
 	public boolean voidIt() {
 		// TODO Auto-generated method stub
 		// Before Void
+		if (getC_Invoice_ID()!=0) {
+			throw new AdempiereException("Invoice Atas Settlement ini Masih Ada");
+		}
+		if (getC_Payment_ID()!=0) {
+			throw new AdempiereException("Payment Atas Settlement ini Masih Ada");
+		}
+		
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_VOID);
 		if (m_processMsg != null)
 			return false;		
@@ -260,4 +269,30 @@ public class TCS_MAdvSettlement extends X_TCS_AdvSettlement implements DocAction
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public int customizeValidActions(String docStatus, Object processing,
+			String orderType, String isSOTrx, int AD_Table_ID,
+			String[] docAction, String[] options, int index) {
+
+		if (options == null)
+			throw new IllegalArgumentException("Option array parameter is null");
+		if (docAction == null)
+			throw new IllegalArgumentException("Doc action array parameter is null");
+
+		// If a document is drafted or invalid, the users are able to complete, prepare or void
+		if (docStatus.equals(DocumentEngine.STATUS_Drafted) || docStatus.equals(DocumentEngine.STATUS_Invalid)) {
+			options[index++] = DocumentEngine.ACTION_Complete;
+			options[index++] = DocumentEngine.ACTION_Void;
+
+			// If the document is already completed, we also want to be able to reactivate or void it instead of only closing it
+		} else if (docStatus.equals(DocumentEngine.STATUS_Completed)) {
+			options[index++] = DocumentEngine.ACTION_Void;
+		}
+
+		return index;
+		
+	}
+	
+	
 }

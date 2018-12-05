@@ -8,12 +8,15 @@ import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MDocType;
 import org.compiere.model.MPayment;
+
 import id.tcs.model.TCS_MAdvRequest;
 import id.tcs.model.TCS_MAdvSettlement;
+
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
+import org.compiere.util.Msg;
 
 public class TCS_AdvanceReturnReceipt extends SvrProcess {
 
@@ -48,7 +51,17 @@ public class TCS_AdvanceReturnReceipt extends SvrProcess {
 	@Override
 	protected String doIt() throws Exception {
 		TCS_MAdvSettlement settlement = new TCS_MAdvSettlement(getCtx(), getRecord_ID(), get_TrxName());
-		;
+
+		if (!settlement.getDocStatus().equals("CO") && !settlement.getDocStatus().equals("CL")) {
+			return "Settlement Belum Dicomplete";
+		}
+		if (settlement.getC_Invoice_ID()<=0) {
+			throw new AdempiereException("Invoice Atas Settlement Ini Belum Terbuat");
+		}
+		if (settlement.getAmountReturned().compareTo(Env.ZERO)<=0) {
+			throw new AdempiereException("Amount Returned <= 0");			
+		}
+		
 		TCS_MAdvRequest request = (TCS_MAdvRequest) settlement.getTCS_AdvRequest();
 
 		BigDecimal requestAmt = request.getGrandTotal();
@@ -93,11 +106,6 @@ public class TCS_AdvanceReturnReceipt extends SvrProcess {
 */
 
 		//Advance Reqeust C_Payment to Settlement Return C_Payment
-		MAllocationLine requestLine = new MAllocationLine(alloc, settlement.getAmountReturned().negate(), Env.ZERO,
-				Env.ZERO, Env.ZERO);
-		requestLine.setDocInfo(settlement.getC_BPartner_ID(), 0, 0);
-		requestLine.setPaymentInfo(request.getC_Payment_ID(), 0);
-		requestLine.saveEx();
 
 		MAllocationLine returnLine = new MAllocationLine(alloc, settlement.getAmountReturned(), Env.ZERO,
 				Env.ZERO, Env.ZERO);
@@ -105,10 +113,20 @@ public class TCS_AdvanceReturnReceipt extends SvrProcess {
 		returnLine.setPaymentInfo(payment.getC_Payment_ID(), 0);
 		returnLine.saveEx();
 
+		MAllocationLine requestLine = new MAllocationLine(alloc, settlement.getAmountReturned().negate(), Env.ZERO,
+				Env.ZERO, Env.ZERO);
+		requestLine.setDocInfo(settlement.getC_BPartner_ID(), 0, 0);
+		requestLine.setPaymentInfo(request.getC_Payment_ID(), 0);
+		requestLine.saveEx();
+
 		alloc.processIt(DocAction.ACTION_Complete);
 		alloc.saveEx();
+		
+		String message = Msg.parseTranslation(getCtx(), "@GeneratedPayment@ - " + payment.getDocumentNo());
+		addBufferLog(0, null, null, message, payment.get_Table_ID(),
+				payment.get_ID());
 
-		return null;
+		return "Success";
 	}
 
 }

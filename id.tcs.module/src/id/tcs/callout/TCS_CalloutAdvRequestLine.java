@@ -88,12 +88,18 @@ public class TCS_CalloutAdvRequestLine implements IColumnCallout{
 		String sql="TCS_TripFacility_ID= "+tripFacility.getTCS_TripFacility_ID()+
 				" AND C_Charge_ID="+mTab.getValue("C_Charge_ID")+
 				" AND HC_Base_ID="+baseCity.getHC_Base_ID()+
-				" AND Level="+position.getLevelNo();
+				" AND LevelNo="+position.getLevelNo();
 
 		int facilityLines[] = new Query(Env.getCtx(),"TCS_FacilityLine",sql,null).getIDs();
 	
 		if (facilityLines.length<1) {
-			return "Belum Ada Trip Facility Line";
+			
+			//@David Allow Record Without Facilit Line
+			//return "Belum Ada Trip Facility Line";
+			
+			mTab.setValue("TCS_FacilityLine_ID", null);
+			mTab.setValue("PriceEntered", Env.ZERO);
+			return"";
 		}
 		if (facilityLines.length>1) {
 			return "Trip Facility Line Yang Ditemukan Lebih Dari 1";

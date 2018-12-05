@@ -32,7 +32,7 @@ public class X_TCS_FacilityLine extends PO implements I_TCS_FacilityLine, I_Pers
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181128L;
+	private static final long serialVersionUID = 20181204L;
 
     /** Standard Constructor */
     public X_TCS_FacilityLine (Properties ctx, int TCS_FacilityLine_ID, String trxName)
@@ -125,18 +125,18 @@ public class X_TCS_FacilityLine extends PO implements I_TCS_FacilityLine, I_Pers
 		return ii.intValue();
 	}
 
-	/** Set Level.
-		@param Level Level	  */
-	public void setLevel (int Level)
+	/** Set Level no.
+		@param LevelNo Level no	  */
+	public void setLevelNo (int LevelNo)
 	{
-		set_Value (COLUMNNAME_Level, Integer.valueOf(Level));
+		set_Value (COLUMNNAME_LevelNo, Integer.valueOf(LevelNo));
 	}
 
-	/** Get Level.
-		@return Level	  */
-	public int getLevel () 
+	/** Get Level no.
+		@return Level no	  */
+	public int getLevelNo () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_Level);
+		Integer ii = (Integer)get_Value(COLUMNNAME_LevelNo);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

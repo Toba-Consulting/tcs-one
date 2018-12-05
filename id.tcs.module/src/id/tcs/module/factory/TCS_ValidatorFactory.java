@@ -13,7 +13,11 @@ import org.compiere.util.CLogger;
 import org.compiere.wf.MWFActivity;
 import org.osgi.service.event.Event;
 
+import id.tcs.model.TCS_MAdvRequest;
+import id.tcs.model.TCS_MAdvSettlement;
 import id.tcs.model.TCS_MPayment;
+import id.tcs.validator.TCS_AdvRequestValidator;
+import id.tcs.validator.TCS_AdvSettlementValidator;
 import id.tcs.validator.TCS_InvoiceValidator;
 import id.tcs.validator.TCS_PaymentValidator;
 import id.tcs.validator.TCS_WFActivityValidator;
@@ -35,6 +39,7 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MPayment.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MInvoice.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MInvoice.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_VOID, TCS_MAdvSettlement.Table_Name);
 		log.info("PROJECT MANAGEMENT EVENT MANAGER // INITIALIZED");
 	}
 
@@ -63,6 +68,12 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		}
 		else if(getPO(event).get_TableName().equals(MInvoice.Table_Name)) {
 			msg = TCS_InvoiceValidator.executeEvent(event, getPO(event));
+		}
+		else if(getPO(event).get_TableName().equals(TCS_MAdvRequest.Table_Name)) {
+			msg = TCS_AdvRequestValidator.executeEvent(event, getPO(event));
+		}
+		else if(getPO(event).get_TableName().equals(TCS_MAdvSettlement.Table_Name)) {
+			msg = TCS_AdvSettlementValidator.executeEvent(event, getPO(event));
 		}
 		
 		if (msg.length() > 0)

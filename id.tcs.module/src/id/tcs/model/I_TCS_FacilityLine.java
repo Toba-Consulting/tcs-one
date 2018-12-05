@@ -119,14 +119,14 @@ public interface I_TCS_FacilityLine
 	  */
 	public boolean isActive();
 
-    /** Column name Level */
-    public static final String COLUMNNAME_Level = "Level";
+    /** Column name LevelNo */
+    public static final String COLUMNNAME_LevelNo = "LevelNo";
 
-	/** Set Level	  */
-	public void setLevel (int Level);
+	/** Set Level no	  */
+	public void setLevelNo (int LevelNo);
 
-	/** Get Level	  */
-	public int getLevel();
+	/** Get Level no	  */
+	public int getLevelNo();
 
     /** Column name Price */
     public static final String COLUMNNAME_Price = "Price";

@@ -50,6 +50,9 @@ public class TCS_AdvanceAPPrepayment extends SvrProcess {
 		
 		if (request.getC_Payment_ID()!=0)
 			return "Process gagal.. Advance Request sudah diproses";
+		if (!request.getDocStatus().equals("CO") && !request.getDocStatus().equals("CL")) {
+			return "Request Belum Dicomplete";
+		}
 		
 		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
 		payment.setAD_Org_ID(request.getAD_Org_ID());
@@ -75,7 +78,8 @@ public class TCS_AdvanceAPPrepayment extends SvrProcess {
 				payment.get_ID());
 		request.setC_Payment_ID(payment.getC_Payment_ID());
 		request.saveEx();
-		return null;
+		
+		return "Success";
 	}
 
 }

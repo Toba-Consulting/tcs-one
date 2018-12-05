@@ -24,6 +24,7 @@ import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
+import org.compiere.util.Msg;
 
 public class TCS_AdvanceSettlementInvoice extends SvrProcess {
 	int p_C_DocType_ID = 0;
@@ -52,11 +53,19 @@ public class TCS_AdvanceSettlementInvoice extends SvrProcess {
 	@Override
 	protected String doIt() throws Exception {
 		TCS_MAdvSettlement settlement = new TCS_MAdvSettlement(getCtx(), getRecord_ID(), get_TrxName());
+		
+		if (!settlement.getDocStatus().equals("CO") && !settlement.getDocStatus().equals("CL")) {
+			return "Settlement Belum Dicomplete";
+		}
 		if(settlement.getC_Invoice_ID()>0)
 			throw new AdempiereException("Invoice sudah terbuat sebelumnya, silahkan cek kembali !");
 		
 		TCS_MAdvRequest request = (TCS_MAdvRequest) settlement.getTCS_AdvRequest();
 
+		if (request.getC_Payment_ID()<=0) {
+			throw new AdempiereException("Payment Di Request Masih Belum Terbuat");
+		}
+		
 		MInvoice inv = new MInvoice(getCtx(), 0, get_TrxName());
 		int C_BPartner_Location_ID = new Query(getCtx(), MBPartnerLocation.Table_Name, "C_BPartner_ID =?",
 				get_TrxName()).setOnlyActiveRecords(true).setParameters(new Object[] { request.getC_BPartner_ID() })
@@ -134,6 +143,10 @@ public class TCS_AdvanceSettlementInvoice extends SvrProcess {
 			alloc.saveEx();
 
 			request.saveEx();
-			return null;
+			
+			String message = Msg.parseTranslation(getCtx(), "@GeneratedInvoice@ - " + inv.getDocumentNo());
+			addBufferLog(0, null, null, message, inv.get_Table_ID(),
+					inv.get_ID());
+			return "Success";
 		}	
 }

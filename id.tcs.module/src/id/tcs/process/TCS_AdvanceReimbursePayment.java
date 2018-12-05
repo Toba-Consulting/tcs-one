@@ -8,12 +8,15 @@ import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MDocType;
 import org.compiere.model.MPayment;
+
 import id.tcs.model.TCS_MAdvRequest;
 import id.tcs.model.TCS_MAdvSettlement;
+
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
+import org.compiere.util.Msg;
 
 public class TCS_AdvanceReimbursePayment extends SvrProcess {
 
@@ -50,6 +53,17 @@ public class TCS_AdvanceReimbursePayment extends SvrProcess {
 		TCS_MAdvSettlement settlement = new TCS_MAdvSettlement(getCtx(), getRecord_ID(), get_TrxName());
 		TCS_MAdvRequest request = (TCS_MAdvRequest) settlement.getTCS_AdvRequest();
 
+		if (!settlement.getDocStatus().equals("CO") && !settlement.getDocStatus().equals("CL")) {
+			return "Settlement Belum Dicomplete";
+		}
+		
+		if (settlement.getC_Invoice_ID()<=0) {
+			throw new AdempiereException("Invoice Atas Settlement Ini Belum Terbuat");
+		}
+		
+		if (settlement.getAmountReimbursed().compareTo(Env.ZERO)<=0) {
+			throw new AdempiereException("Amount Reimbursed <= 0");			
+		}
 		BigDecimal requestAmt = request.getGrandTotal();
 		if (settlement.getGrandTotal().compareTo(requestAmt) <= 0)
 			throw new AdempiereException("Nilai Settlement lebih kecil dari nilai Request");
@@ -96,7 +110,11 @@ public class TCS_AdvanceReimbursePayment extends SvrProcess {
 		alloc.processIt(DocAction.ACTION_Complete);
 		alloc.saveEx();
 		
-		return null;
+		String message = Msg.parseTranslation(getCtx(), "@GeneratedPayment@ - " + payment.getDocumentNo());
+		addBufferLog(0, null, null, message, payment.get_Table_ID(),
+				payment.get_ID());
+
+		return "Success";
 	}
 
 }
