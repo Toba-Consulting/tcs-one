@@ -7,9 +7,10 @@ import java.util.logging.Level;
 import org.adempiere.base.IDocFactory;
 import org.compiere.acct.Doc;
 import org.compiere.acct.TCS_Doc_Invoice;
+import org.compiere.acct.TCS_Doc_Payment;
 import org.compiere.model.MAcctSchema;
-import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MPayment;
 import org.compiere.model.MTable;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
@@ -68,6 +69,9 @@ public class TCS_DocFactory implements IDocFactory {
 		
 		if(tableName.equals(MInvoice.Table_Name))
 			return new TCS_Doc_Invoice(as, rs, trxName);
+		
+		if(tableName.equals(MPayment.Table_Name))
+			return new TCS_Doc_Payment(as, rs, trxName);
 		
 		return null;
 
