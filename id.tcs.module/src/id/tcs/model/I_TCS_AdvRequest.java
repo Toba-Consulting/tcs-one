@@ -325,6 +325,15 @@ public interface I_TCS_AdvRequest
 	/** Get Process Now	  */
 	public boolean isProcessing();
 
+    /** Column name RequestGrandTotal */
+    public static final String COLUMNNAME_RequestGrandTotal = "RequestGrandTotal";
+
+	/** Set Grand Total (80%)	  */
+	public void setRequestGrandTotal (BigDecimal RequestGrandTotal);
+
+	/** Get Grand Total (80%)	  */
+	public BigDecimal getRequestGrandTotal();
+
     /** Column name TCS_AdvRequest_ID */
     public static final String COLUMNNAME_TCS_AdvRequest_ID = "TCS_AdvRequest_ID";
 

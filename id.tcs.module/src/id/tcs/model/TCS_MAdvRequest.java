@@ -265,6 +265,10 @@ public class TCS_MAdvRequest extends X_TCS_AdvRequest implements DocAction, DocO
 		
 		setDays(getDifferenceStartFinishDate(DateTo,DateFrom));
 		
+		BigDecimal pct = new BigDecimal(80);
+		BigDecimal requestGrandTotal=getGrandTotal().multiply(pct).divide(Env.ONEHUNDRED, 2, RoundingMode.HALF_UP);
+		setRequestGrandTotal(requestGrandTotal);
+		
 		return true;
 	}
 	

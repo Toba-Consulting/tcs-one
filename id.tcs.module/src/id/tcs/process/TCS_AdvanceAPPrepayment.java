@@ -66,7 +66,7 @@ public class TCS_AdvanceAPPrepayment extends SvrProcess {
 		payment.setDateAcct(p_DateAcct);
 		payment.setC_BPartner_ID(request.getC_BPartner_ID());
 		payment.setDescription(request.getDescription() == null ? "" : request.getDescription());
-		payment.setAmount(request.getC_Currency_ID(), request.getGrandTotal());
+		payment.setAmount(request.getC_Currency_ID(), request.getRequestGrandTotal());
 		payment.setC_ConversionType_ID(request.getC_ConversionType_ID());
 		payment.setIsPrepayment(true);
 		payment.saveEx();

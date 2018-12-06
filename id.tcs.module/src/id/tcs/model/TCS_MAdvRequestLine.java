@@ -59,7 +59,7 @@ public class TCS_MAdvRequestLine extends X_TCS_AdvRequestLine{
 		
 		String sql="SELECT SUM(Amt) FROM TCS_AdvRequestLine arl "+
 				"JOIN TCS_DestRequest dr ON dr.TCS_DestRequest_ID=arl.TCS_DestRequest_ID "+
-				"WHERE rs.TCS_AdvRequest_ID=? ;";
+				"WHERE dr.TCS_AdvRequest_ID=? ;";
 		BigDecimal grandTotal=DB.getSQLValueBD(get_TrxName(), sql, advRequest.getTCS_AdvRequest_ID());
 		advRequest.setGrandTotal(grandTotal);
 		advRequest.saveEx();

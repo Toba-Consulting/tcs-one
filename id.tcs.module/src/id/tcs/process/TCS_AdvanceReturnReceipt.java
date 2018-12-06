@@ -64,7 +64,7 @@ public class TCS_AdvanceReturnReceipt extends SvrProcess {
 		
 		TCS_MAdvRequest request = (TCS_MAdvRequest) settlement.getTCS_AdvRequest();
 
-		BigDecimal requestAmt = request.getGrandTotal();
+		BigDecimal requestAmt = request.getRequestGrandTotal();
 
 		if (settlement.getGrandTotal().compareTo(requestAmt) >= 0)
 			throw new AdempiereException("Nilai Settlement lebih besar dari nilai Request");

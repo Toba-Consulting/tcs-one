@@ -33,7 +33,7 @@ public class X_TCS_AdvRequest extends PO implements I_TCS_AdvRequest, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181128L;
+	private static final long serialVersionUID = 20181205L;
 
     /** Standard Constructor */
     public X_TCS_AdvRequest (Properties ctx, int TCS_AdvRequest_ID, String trxName)
@@ -513,6 +513,23 @@ public class X_TCS_AdvRequest extends PO implements I_TCS_AdvRequest, I_Persiste
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+
+	/** Set Grand Total (80%).
+		@param RequestGrandTotal Grand Total (80%)	  */
+	public void setRequestGrandTotal (BigDecimal RequestGrandTotal)
+	{
+		set_Value (COLUMNNAME_RequestGrandTotal, RequestGrandTotal);
+	}
+
+	/** Get Grand Total (80%).
+		@return Grand Total (80%)	  */
+	public BigDecimal getRequestGrandTotal () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_RequestGrandTotal);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set TCS_AdvRequest.

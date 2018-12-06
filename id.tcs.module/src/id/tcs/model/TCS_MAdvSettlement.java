@@ -122,7 +122,7 @@ public class TCS_MAdvSettlement extends X_TCS_AdvSettlement implements DocAction
 		
 		if (getTCS_AdvRequest_ID()!=0) {
 			TCS_MAdvRequest request = new TCS_MAdvRequest(getCtx(), getTCS_AdvRequest_ID(), get_TrxName());
-			requestAmt=request.getGrandTotal();
+			requestAmt=request.getRequestGrandTotal();
 			request.setisSettled(true);
 			request.saveEx();
 		}

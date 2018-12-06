@@ -64,7 +64,7 @@ public class TCS_AdvanceReimbursePayment extends SvrProcess {
 		if (settlement.getAmountReimbursed().compareTo(Env.ZERO)<=0) {
 			throw new AdempiereException("Amount Reimbursed <= 0");			
 		}
-		BigDecimal requestAmt = request.getGrandTotal();
+		BigDecimal requestAmt = request.getRequestGrandTotal();
 		if (settlement.getGrandTotal().compareTo(requestAmt) <= 0)
 			throw new AdempiereException("Nilai Settlement lebih kecil dari nilai Request");
 
