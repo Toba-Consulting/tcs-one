@@ -1,12 +1,15 @@
 package id.tcs.process;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
+import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
@@ -14,6 +17,8 @@ import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MPayment;
 import org.compiere.model.Query;
 
+import id.tcs.model.HC_MBase;
+import id.tcs.model.HC_MBaseCity;
 import id.tcs.model.TCS_MAdvRequest;
 import id.tcs.model.TCS_MAdvSettlement;
 import id.tcs.model.TCS_MAdvSettlementLine;
@@ -79,6 +84,46 @@ public class TCS_AdvanceSettlementInvoice extends SvrProcess {
 		inv.setC_BPartner_ID(request.getC_BPartner_ID());
 		inv.setC_Currency_ID(settlement.getC_Currency_ID());
 		inv.setC_ConversionType_ID(settlement.getC_ConversionType_ID());
+
+		//Description
+		MBPartner bp = new MBPartner(getCtx(), settlement.getC_BPartner_ID(), get_TrxName());
+		
+		StringBuilder invDesc = new StringBuilder();
+		
+
+		if (bp.getName2()!=null) 
+			invDesc.append("Penyelesaian Perjalanan Dinas "+bp.getName2()+" ");
+		else
+			invDesc.append("Penyelesaian Perjalanan Dinas "+bp.getName()+" ");
+		
+		Date dateFrom = new Date(settlement.getDateFrom().getTime());
+		Date dateTo = new Date(settlement.getDateTo().getTime());
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		String dateFromDMY = sdf.format(dateFrom);
+		String dateToDMY = sdf.format(dateTo);
+		invDesc.append(dateFromDMY+" s/d "+dateToDMY+" ke : ");
+		
+		String where="TCS_AdvSettlement_ID="+settlement.getTCS_AdvSettlement_ID();
+		int [] destSettlementIDs=new Query(getCtx(), TCS_MDestSettlement.Table_Name, where, get_TrxName())
+			.setOrderBy(TCS_MDestSettlement.COLUMNNAME_DateFrom).getIDs();
+		
+		boolean firstDest=false;
+		for (int DestSettlementID : destSettlementIDs) {
+			
+			TCS_MDestSettlement dest = new TCS_MDestSettlement(getCtx(), DestSettlementID, get_TrxName());
+			HC_MBaseCity cityTo = new HC_MBaseCity(getCtx(), dest.getHC_BaseCityTo_ID(), get_TrxName());
+			
+			if (!firstDest) {
+				invDesc.append(cityTo.getName());
+				firstDest=true;
+			}
+			else if (!dest.isReturnTrip())
+				invDesc.append(", "+cityTo.getName());	
+			
+		}
+		inv.setDescription(invDesc.toString());
+		//Description End		
+		
 		inv.saveEx();
 		
 		settlement.setC_Invoice_ID(inv.getC_Invoice_ID());

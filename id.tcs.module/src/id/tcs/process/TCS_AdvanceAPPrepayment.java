@@ -1,10 +1,19 @@
 package id.tcs.process;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
+import org.compiere.model.MBPartner;
 import org.compiere.model.MPayment;
+import org.compiere.model.Query;
+
+import id.tcs.model.HC_MBaseCity;
 import id.tcs.model.TCS_MAdvRequest;
+import id.tcs.model.TCS_MDestRequest;
+import id.tcs.model.TCS_MDestSettlement;
+
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
@@ -69,6 +78,47 @@ public class TCS_AdvanceAPPrepayment extends SvrProcess {
 		payment.setAmount(request.getC_Currency_ID(), request.getRequestGrandTotal());
 		payment.setC_ConversionType_ID(request.getC_ConversionType_ID());
 		payment.setIsPrepayment(true);
+		
+		//Description
+		MBPartner bp = new MBPartner(getCtx(), request.getC_BPartner_ID(), get_TrxName());
+		
+		StringBuilder payDesc = new StringBuilder();
+		
+
+		if (bp.getName2()!=null) 
+			payDesc.append("Uang Muka Perjalanan Dinas "+bp.getName2()+" ");
+		else
+			payDesc.append("Uang Muka Perjalanan Dinas "+bp.getName()+" ");
+		
+		Date dateFrom = new Date(request.getDateFrom().getTime());
+		Date dateTo = new Date(request.getDateTo().getTime());
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		String dateFromDMY = sdf.format(dateFrom);
+		String dateToDMY = sdf.format(dateTo);
+		payDesc.append(dateFromDMY+" s/d "+dateToDMY+" ke : ");
+		
+		String where="TCS_AdvRequest_ID="+request.getTCS_AdvRequest_ID();
+		int [] destRequestIDs=new Query(getCtx(), TCS_MDestRequest.Table_Name, where, get_TrxName())
+			.setOrderBy(TCS_MDestSettlement.COLUMNNAME_DateFrom).getIDs();
+		
+		boolean firstDest=false;
+		for (int DestRequestID : destRequestIDs) {
+			
+			TCS_MDestRequest dest = new TCS_MDestRequest(getCtx(), DestRequestID, get_TrxName());
+			HC_MBaseCity cityTo = new HC_MBaseCity(getCtx(), dest.getHC_BaseCityTo_ID(), get_TrxName());
+			
+			if (!firstDest) {
+				payDesc.append(cityTo.getName());
+				firstDest=true;
+			}
+			else if (!dest.isReturnTrip())
+				payDesc.append(", "+cityTo.getName());	
+			
+		}
+		payment.setDescription(payDesc.toString());
+		//Description End		
+
+		
 		payment.saveEx();
 		payment.processIt(DocAction.ACTION_Complete);
 		payment.saveEx();

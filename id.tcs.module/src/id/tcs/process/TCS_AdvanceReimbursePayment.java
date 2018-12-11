@@ -1,16 +1,22 @@
 package id.tcs.process;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
+import org.compiere.model.MBPartner;
 import org.compiere.model.MDocType;
 import org.compiere.model.MPayment;
+import org.compiere.model.Query;
 
+import id.tcs.model.HC_MBaseCity;
 import id.tcs.model.TCS_MAdvRequest;
 import id.tcs.model.TCS_MAdvSettlement;
+import id.tcs.model.TCS_MDestSettlement;
 
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
@@ -82,6 +88,46 @@ public class TCS_AdvanceReimbursePayment extends SvrProcess {
 		payment.setDescription(request.getDescription() == null ? "" : request.getDescription());
 		payment.setAmount(request.getC_Currency_ID(), settlement.getAmountReimbursed());
 		payment.setC_ConversionType_ID(request.getC_ConversionType_ID());
+		
+		//Description
+		MBPartner bp = new MBPartner(getCtx(), settlement.getC_BPartner_ID(), get_TrxName());
+		
+		StringBuilder payDesc = new StringBuilder();
+		
+
+		if (bp.getName2()!=null) 
+			payDesc.append("Penyelesaian Perjalanan Dinas "+bp.getName2()+" ");
+		else
+			payDesc.append("Penyelesaian Perjalanan Dinas "+bp.getName()+" ");
+		
+		Date dateFrom = new Date(settlement.getDateFrom().getTime());
+		Date dateTo = new Date(settlement.getDateTo().getTime());
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		String dateFromDMY = sdf.format(dateFrom);
+		String dateToDMY = sdf.format(dateTo);
+		payDesc.append(dateFromDMY+" s/d "+dateToDMY+" ke : ");
+		
+		String where="TCS_AdvSettlement_ID="+settlement.getTCS_AdvSettlement_ID();
+		int [] destSettlementIDs=new Query(getCtx(), TCS_MDestSettlement.Table_Name, where, get_TrxName())
+			.setOrderBy(TCS_MDestSettlement.COLUMNNAME_DateFrom).getIDs();
+		
+		boolean firstDest=false;
+		for (int DestSettlementID : destSettlementIDs) {
+			
+			TCS_MDestSettlement dest = new TCS_MDestSettlement(getCtx(), DestSettlementID, get_TrxName());
+			HC_MBaseCity cityTo = new HC_MBaseCity(getCtx(), dest.getHC_BaseCityTo_ID(), get_TrxName());
+			
+			if (!firstDest) {
+				payDesc.append(cityTo.getName());
+				firstDest=true;
+			}
+			else if (!dest.isReturnTrip())
+				payDesc.append(", "+cityTo.getName());	
+			
+		}
+		payment.setDescription(payDesc.toString());
+		//Description End		
+
 		
 		payment.saveEx();
 		payment.processIt(DocAction.ACTION_Complete);
