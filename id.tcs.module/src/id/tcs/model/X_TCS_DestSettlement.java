@@ -31,7 +31,7 @@ public class X_TCS_DestSettlement extends PO implements I_TCS_DestSettlement, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181129L;
+	private static final long serialVersionUID = 20181207L;
 
     /** Standard Constructor */
     public X_TCS_DestSettlement (Properties ctx, int TCS_DestSettlement_ID, String trxName)
@@ -154,6 +154,30 @@ public class X_TCS_DestSettlement extends PO implements I_TCS_DestSettlement, I_
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set is Return Trip.
+		@param isReturnTrip 
+		Menandakan destinasi sebagai rute pulang ke tempat asal
+	  */
+	public void setisReturnTrip (boolean isReturnTrip)
+	{
+		set_Value (COLUMNNAME_isReturnTrip, Boolean.valueOf(isReturnTrip));
+	}
+
+	/** Get is Return Trip.
+		@return Menandakan destinasi sebagai rute pulang ke tempat asal
+	  */
+	public boolean isReturnTrip () 
+	{
+		Object oo = get_Value(COLUMNNAME_isReturnTrip);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Processed.

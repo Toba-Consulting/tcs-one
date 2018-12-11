@@ -141,6 +141,19 @@ public interface I_TCS_DestSettlement
 	  */
 	public boolean isActive();
 
+    /** Column name isReturnTrip */
+    public static final String COLUMNNAME_isReturnTrip = "isReturnTrip";
+
+	/** Set is Return Trip.
+	  * Menandakan destinasi sebagai rute pulang ke tempat asal
+	  */
+	public void setisReturnTrip (boolean isReturnTrip);
+
+	/** Get is Return Trip.
+	  * Menandakan destinasi sebagai rute pulang ke tempat asal
+	  */
+	public boolean isReturnTrip();
+
     /** Column name Processed */
     public static final String COLUMNNAME_Processed = "Processed";
 
