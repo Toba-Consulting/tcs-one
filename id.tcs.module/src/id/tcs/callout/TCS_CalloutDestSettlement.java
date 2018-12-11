@@ -21,12 +21,14 @@ public class TCS_CalloutDestSettlement implements IColumnCallout{
 			mTab.setValue("DateTo", destRequest.getDateTo());
 			mTab.setValue("HC_BaseCityFrom_ID", destRequest.getHC_BaseCityFrom_ID());
 			mTab.setValue("HC_BaseCityTo_ID", destRequest.getHC_BaseCityTo_ID());
+			mTab.setValue("IsReturnTrip", destRequest.isReturnTrip());
 		}
 		else{
 			mTab.setValue("DateFrom", null);
 			mTab.setValue("DateTo", null);
 			mTab.setValue("HC_BaseCityFrom_ID", null);
 			mTab.setValue("HC_BaseCityTo_ID", null);
+			mTab.setValue("IsReturnTrip", "N");
 		}
 		
 		return "";
