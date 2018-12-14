@@ -64,6 +64,9 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 		ArrayList<Integer> chargeID = new ArrayList<Integer>();
 		
 		BigDecimal chargeAmount = Env.ZERO;
+		
+		//ChargeDescription
+		ArrayList<String> chargeDescription = new ArrayList<String>();
 		//
 		
 		int plusI = 0, minI = 0, pay = 0, rec = 0, charge = 0, count = 0, matched = 0;
@@ -106,6 +109,7 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 			else if(line.getC_Charge_ID()>0){																						//5
 				//chargeID = line.getC_Charge_ID();
 				chargeID.add(line.getC_Charge_ID());
+				chargeDescription.add(line.get_ValueAsString(COLUMNNAME_Description));
 				//chargeAmount = line.getAmount();
 				chargeAmount = chargeAmount.add(line.getAmount());
 				charge++;
@@ -128,7 +132,9 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 				match.set_CustomColumn("Match_DocType_ID", payment.getC_DocType_ID());
 
 				match.set_ValueOfColumn("DateAllocated", getCreated());
-				match.set_CustomColumn("AllocationAmt", line.getAmount().abs());					
+				match.set_CustomColumn("AllocationAmt", line.getAmount().abs());
+				
+				match.set_CustomColumn("Description", invoice.getDescription());
 				match.saveEx();
 				matched++;
 				
@@ -588,6 +594,7 @@ public class TCS_MAllocationHdr extends MAllocationHdr{
 					
 					//charge
 					match.set_CustomColumn("C_Charge_ID", chargeID.get(0));
+					match.set_CustomColumn("Description", chargeDescription.get(i));
 					//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
 					
 					match.set_CustomColumn("AllocationAmt", tempPaymentAmt);

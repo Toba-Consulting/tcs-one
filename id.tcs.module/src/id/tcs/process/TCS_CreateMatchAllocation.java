@@ -63,6 +63,10 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 			BigDecimal chargeAmount = Env.ZERO;
 			//
 			
+			//ChargeDescription
+			ArrayList<String> chargeDescription = new ArrayList<String>();
+			//
+			
 			int plusI = 0, minI = 0, pay = 0, rec = 0, charge = 0, count = 0, matched = 0;
 					
 			//Line loop to get record
@@ -103,6 +107,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 				else if(line.getC_Charge_ID()>0){																						//5
 					//chargeID = line.getC_Charge_ID();
 					chargeID.add(line.getC_Charge_ID());
+					chargeDescription.add(line.get_ValueAsString("Description"));
 					//chargeAmount = line.getAmount();
 					chargeAmount = chargeAmount.add(line.getAmount());
 					charge++;
@@ -125,7 +130,9 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 					match.set_CustomColumn("Match_DocType_ID", payment.getC_DocType_ID());
 
 					match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
-					match.set_CustomColumn("AllocationAmt", line.getAmount().abs());					
+					match.set_CustomColumn("AllocationAmt", line.getAmount().abs());
+					
+					match.set_CustomColumn("Description", line.get_Value("Description"));
 					match.saveEx();
 					matched++;
 					
@@ -585,6 +592,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 						
 						//charge
 						match.set_CustomColumn("C_Charge_ID", chargeID.get(i));
+						match.set_CustomColumn("Description", chargeDescription.get(i));
 						//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
 						
 						match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
