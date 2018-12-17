@@ -297,6 +297,8 @@ public class TCS_MAdvRequest extends X_TCS_AdvRequest implements DocAction, DocO
 				RoundingMode.HALF_UP);
 		diff = diff.divide(dayinhours, 0,
 				RoundingMode.CEILING);
+		//Add 1 Day
+		diff=diff.add(Env.ONE);
 		return diff.toBigInteger().intValue();
 	}
 

@@ -2,7 +2,9 @@ package id.tcs.model;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -294,5 +296,42 @@ public class TCS_MAdvSettlement extends X_TCS_AdvSettlement implements DocAction
 		
 	}
 	
+	@Override
+	protected boolean beforeSave(boolean newRecord) {
+		
+		Timestamp DateFrom=getDateFrom();
+		Timestamp DateTo=getDateTo();
+
+		if (DateTo.before(DateFrom)) {
+			throw new AdempiereException("Date To tidak boleh lebih awal dari Date From");
+		}
+
+		setDays(getDifferenceStartFinishDate(DateTo,DateFrom));
+
+		return true;
+	}
+	
+	public int getDifferenceStartFinishDate(Timestamp finishtime,
+			Timestamp starttime) {
+		BigDecimal diff = Env.ZERO;
+		long different = finishtime.getTime() - starttime.getTime();
+
+		int diffSeconds = (int) (long) different / 1000 % 60;
+		int diffMinutestoSeconds = (int) (long) (different / (60 * 1000) % 60) * 60;
+		int diffHourstoSeconds = (int) (long) (different / (60 * 60 * 1000) % 24) * 3600;
+		int diffDaysSeconds = (int) (long) (different / (24 * 60 * 60 * 1000)) * 24 * 3600;
+		int totalseconds = diffSeconds + diffMinutestoSeconds
+				+ diffHourstoSeconds + diffDaysSeconds;
+		BigDecimal hoursinseconds = new BigDecimal(3600);
+		BigDecimal dayinhours = new BigDecimal(24);
+		
+		diff = new BigDecimal(totalseconds).divide(hoursinseconds, 4,
+				RoundingMode.HALF_UP);
+		diff = diff.divide(dayinhours, 0,
+				RoundingMode.CEILING);
+		//Add 1 Day
+		diff=diff.add(Env.ONE);
+		return diff.toBigInteger().intValue();
+	}
 	
 }
