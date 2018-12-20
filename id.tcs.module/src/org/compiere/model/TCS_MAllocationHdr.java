@@ -16,6 +16,7 @@
  *****************************************************************************/
 package org.compiere.model;
 
+import id.tcs.model.X_TCS_AllocateCharge;
 import id.tcs.model.X_T_MatchAllocation;
 
 import java.io.File;
@@ -1302,7 +1303,8 @@ public void createMatchAllocation(){
 	//
 	
 	//ChargeDescription
-	ArrayList<String> chargeDescription = new ArrayList<String>();
+	//Commented By David
+	//ArrayList<String> chargeDescription = new ArrayList<String>();
 	//
 	
 	int plusI = 0, minI = 0, pay = 0, rec = 0, charge = 0, count = 0, matched = 0;
@@ -1345,7 +1347,8 @@ public void createMatchAllocation(){
 		else if(line.getC_Charge_ID()>0){																						//5
 			//chargeID = line.getC_Charge_ID();
 			chargeID.add(line.getC_Charge_ID());
-			chargeDescription.add(line.get_ValueAsString(COLUMNNAME_Description));
+			//Commented By David
+			//matchDescription.add(line.get_ValueAsString(COLUMNNAME_Description));
 			//chargeAmount = line.getAmount();
 			chargeAmount = chargeAmount.add(line.getAmount());
 			charge++;
@@ -1369,8 +1372,11 @@ public void createMatchAllocation(){
 
 			match.set_ValueOfColumn("DateAllocated", getCreated());
 			match.set_CustomColumn("AllocationAmt", line.getAmount().abs());
-			
-			match.set_CustomColumn("Description", invoice.getDescription());
+
+//Commented By David
+//Change Way To Set Description			
+//			match.set_CustomColumn("Description", invoice.getDescription());
+			match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 			match.saveEx();
 			matched++;
 			
@@ -1456,6 +1462,7 @@ public void createMatchAllocation(){
 						match.set_CustomColumn("AllocationAmt", tempInvoiceAmt);
 					
 					match.set_ValueOfColumn("DateAllocated", getCreated());
+					match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 					match.saveEx();
 					
 					//match1
@@ -1487,6 +1494,7 @@ public void createMatchAllocation(){
 					
 					
 					match1.set_ValueOfColumn("DateAllocated", getCreated());
+					match1.set_ValueOfColumn("Description", getMatchAllocationDescription(match1));
 					match1.saveEx();
 					//
 					pDiscountAmt.set(i, Env.ZERO);
@@ -1530,6 +1538,7 @@ public void createMatchAllocation(){
 						match.set_CustomColumn("AllocationAmt", tempInvoiceAmt);
 					
 					match.set_ValueOfColumn("DateAllocated", getCreated());
+					match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 					match.saveEx();
 					
 					//match1				
@@ -1566,6 +1575,7 @@ public void createMatchAllocation(){
 						match1.set_CustomColumn("AllocationAmt", tempInvoiceAmt);
 					
 					match1.set_ValueOfColumn("DateAllocated", getCreated());
+					match1.set_ValueOfColumn("Description", getMatchAllocationDescription(match1));
 					match1.saveEx();
 					//
 					pDiscountAmt.set(i, Env.ZERO);
@@ -1616,6 +1626,7 @@ public void createMatchAllocation(){
 				
 				match.set_CustomColumn("AllocationAmt", tempInvoiceAmt);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
+				match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 				match.saveEx();
 				
 				chargeAmount = chargeAmount.add(tempInvoiceAmt);
@@ -1643,6 +1654,7 @@ public void createMatchAllocation(){
 				
 				match.set_CustomColumn("AllocationAmt", chargeAmount);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
+				match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 				match.saveEx();
 				
 				chargeAmount = chargeAmount.add(tempInvoiceAmt);
@@ -1709,7 +1721,8 @@ public void createMatchAllocation(){
 					else
 						match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
 												
-					match.set_ValueOfColumn("DateAllocated", getCreated());							
+					match.set_ValueOfColumn("DateAllocated", getCreated());	
+					match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 					match.saveEx();
 					
 					//match1
@@ -1734,7 +1747,8 @@ public void createMatchAllocation(){
 					else
 						match1.set_CustomColumn("AllocationAmt", tempPaymentAmt);
 												
-					match1.set_ValueOfColumn("DateAllocated", getCreated());							
+					match1.set_ValueOfColumn("DateAllocated", getCreated());	
+					match1.set_ValueOfColumn("Description", getMatchAllocationDescription(match1));
 					match1.saveEx();
 				}
 				
@@ -1794,6 +1808,7 @@ public void createMatchAllocation(){
 						match1.set_CustomColumn("AllocationAmt", tempPaymentAmt);
 												
 					match1.set_ValueOfColumn("DateAllocated", getCreated());
+					match1.set_ValueOfColumn("Description", getMatchAllocationDescription(match1));
 					match1.saveEx();
 				}
 				
@@ -1833,11 +1848,13 @@ public void createMatchAllocation(){
 				
 				//charge
 				match.set_CustomColumn("C_Charge_ID", chargeID.get(i));
-				match.set_CustomColumn("Description", chargeDescription.get(i));
+				//Commented By David
+				//match.set_CustomColumn("Description", matchDescription.get(i));
 				//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
 				
 				match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
-				match.set_ValueOfColumn("DateAllocated", getCreated());				
+				match.set_ValueOfColumn("DateAllocated", getCreated());	
+				match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 				match.saveEx();
 				
 				chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt);
@@ -1859,7 +1876,8 @@ public void createMatchAllocation(){
 				//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
 				
 				match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
-				match.set_ValueOfColumn("DateAllocated", getCreated());				
+				match.set_ValueOfColumn("DateAllocated", getCreated());
+				match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 				match.saveEx();
 				
 				chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt);
@@ -1909,6 +1927,7 @@ public void createMatchAllocation(){
 				
 				match.set_CustomColumn("AllocationAmt", tempnInvoiceAmt);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
+				match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 				match.saveEx();
 				
 				chargeAmount = chargeAmount.add(tempnInvoiceAmt);
@@ -1945,6 +1964,7 @@ public void createMatchAllocation(){
 				
 				match.set_CustomColumn("AllocationAmt", tempReceiptAmt);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
+				match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 				match.saveEx();	
 				
 				chargeAmount = chargeAmount.abs().negate().add(tempPaymentAmt.abs());
@@ -1966,4 +1986,69 @@ public void createMatchAllocation(){
 	pWriteOffAmt.clear();
 	nWriteOffAmt.clear();
 }
+
+	private String getMatchAllocationDescription(X_T_MatchAllocation match){
+		
+		/* Case:
+		 * 1. Payment Allocate Charge, Get Description From TCS_AllocateCharge
+		 * 2. Invoice Allocate Charge, Get Description From C_AllocationHdr
+		 * 3. Payment Allocate Invoice, Get Description From C_Invoice
+		 * 4. Invoice Allocate Invoice, Get Description From Match_Invoice
+		 * 5. Payment Allocate Payment, Get Description From Match_Payment
+		 */
+		
+		int C_Invoice_ID=match.getC_Invoice_ID();
+		int C_Payment_ID=match.getC_Payment_ID();
+		int Match_Invoice_ID=match.getMatch_Invoice_ID();
+		int Match_Payment_ID=match.getMatch_Payment_ID();
+		int C_Charge_ID=match.getC_Charge_ID();
+		
+		//Case 1
+		if (C_Payment_ID>0 && C_Charge_ID>0) {
+			String sql="C_Payment_ID="+C_Payment_ID+" AND C_Charge_ID="+C_Charge_ID+" AND AD_Client_ID="+Env.getAD_Client_ID(getCtx());
+			int allocateCharge_ID = new Query(getCtx(), X_TCS_AllocateCharge.Table_Name, sql, get_TrxName()).firstId();
+			if (allocateCharge_ID>0) {
+				X_TCS_AllocateCharge allocateCharge = new X_TCS_AllocateCharge(getCtx(), allocateCharge_ID, get_TrxName());
+				return allocateCharge.getDescription();
+			}
+			else{
+				MPayment pay = new MPayment(getCtx(), C_Payment_ID, get_TrxName());
+				return pay.getDescription();
+			}
+		}
+
+		//Case 2
+		else if (C_Invoice_ID>0 && C_Charge_ID>0) {
+			
+			int C_AllocationHdr_ID=match.getC_AllocationHdr_ID();
+			if (C_AllocationHdr_ID>0) {
+				MAllocationHdr allocHdr = new MAllocationHdr(getCtx(), C_AllocationHdr_ID, get_TrxName());
+				return allocHdr.getDescription();
+			}
+		}
+
+		//Case 3
+		else if (C_Payment_ID>0 && C_Invoice_ID>0) {
+			
+			MInvoice inv = new MInvoice(getCtx(), C_Invoice_ID, get_TrxName());
+			return inv.getDescription();
+		}
+
+		//Case 4
+		else if (C_Invoice_ID>0 && Match_Invoice_ID>0) {
+			
+			MInvoice inv = new MInvoice(getCtx(), Match_Invoice_ID, get_TrxName());
+			return inv.getDescription();
+		}
+
+		//Case 5
+		else if (C_Payment_ID>0 && Match_Payment_ID>0) {
+			
+			MPayment pay = new MPayment(getCtx(), Match_Payment_ID, get_TrxName());
+			return pay.getDescription();
+		}
+		
+		return "";
+			
+	}
 }   //  MAllocation
