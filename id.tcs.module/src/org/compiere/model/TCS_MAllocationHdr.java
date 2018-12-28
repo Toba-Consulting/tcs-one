@@ -16,6 +16,7 @@
  *****************************************************************************/
 package org.compiere.model;
 
+import id.tcs.model.MTCS_AllocateCharge;
 import id.tcs.model.X_TCS_AllocateCharge;
 import id.tcs.model.X_T_MatchAllocation;
 
@@ -1298,7 +1299,7 @@ public void createMatchAllocation(){
 	//Charge
 //	int chargeID = 0;
 	ArrayList<Integer> chargeID = new ArrayList<Integer>();
-	
+	ArrayList<Integer> allocateChargeID = new ArrayList<Integer>();
 	BigDecimal chargeAmount = Env.ZERO;
 	//
 	
@@ -1347,6 +1348,7 @@ public void createMatchAllocation(){
 		else if(line.getC_Charge_ID()>0){																						//5
 			//chargeID = line.getC_Charge_ID();
 			chargeID.add(line.getC_Charge_ID());
+			allocateChargeID.add(line.get_ValueAsInt("TCS_AllocateCharge_ID"));
 			//Commented By David
 			//matchDescription.add(line.get_ValueAsString(COLUMNNAME_Description));
 			//chargeAmount = line.getAmount();
@@ -1854,7 +1856,14 @@ public void createMatchAllocation(){
 				
 				match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
 				match.set_ValueOfColumn("DateAllocated", getCreated());	
-				match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+				
+				if (allocateChargeID.get(i)>0) {
+					MTCS_AllocateCharge allocateCharge = new MTCS_AllocateCharge(getCtx(), allocateChargeID.get(i), get_TrxName());
+					match.set_ValueOfColumn("Description", allocateCharge.getDescription());								
+				}
+				else
+					match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+				
 				match.saveEx();
 				
 				chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt);
@@ -1877,7 +1886,14 @@ public void createMatchAllocation(){
 				
 				match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
-				match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+				
+				if (allocateChargeID.get(i)>0) {
+					MTCS_AllocateCharge allocateCharge = new MTCS_AllocateCharge(getCtx(), allocateChargeID.get(i), get_TrxName());
+					match.set_ValueOfColumn("Description", allocateCharge.getDescription());								
+				}
+				else
+					match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+				
 				match.saveEx();
 				
 				chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt);
@@ -1964,7 +1980,13 @@ public void createMatchAllocation(){
 				
 				match.set_CustomColumn("AllocationAmt", tempReceiptAmt);
 				match.set_ValueOfColumn("DateAllocated", getCreated());
-				match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+				if (allocateChargeID.get(i)>0) {					
+					MTCS_AllocateCharge allocateCharge = new MTCS_AllocateCharge(getCtx(), allocateChargeID.get(i), get_TrxName());
+					match.set_ValueOfColumn("Description", allocateCharge.getDescription());
+				}
+				else
+					match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+				
 				match.saveEx();	
 				
 				chargeAmount = chargeAmount.abs().negate().add(tempPaymentAmt.abs());
