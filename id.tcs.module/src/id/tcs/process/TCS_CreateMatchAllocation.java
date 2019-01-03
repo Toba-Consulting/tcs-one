@@ -8,10 +8,13 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
 import org.compiere.model.Query;
+import org.compiere.model.TCS_MAllocationHdr;
+import org.compiere.model.TCS_MAllocationLine;
 import org.compiere.process.DocAction;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 
+import id.tcs.model.MTCS_AllocateCharge;
 import id.tcs.model.X_TCS_AllocateCharge;
 import id.tcs.model.X_T_MatchAllocation;
 
@@ -33,11 +36,16 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 		
 		for(int AllocationID : AllocationIDs)
 		{
-			MAllocationHdr hdr = new MAllocationHdr(getCtx(), AllocationID, get_TrxName());
+			TCS_MAllocationHdr hdr = new TCS_MAllocationHdr(getCtx(), AllocationID, get_TrxName());
+			
+
+			
+			//Split Up ID and Amount Based On Amount, as ArrayList
 			
 			//Invoice
 			ArrayList<Integer> plusInvoiceID = new ArrayList<Integer>();
 			ArrayList<Integer> minInvoiceID = new ArrayList<Integer>();
+			
 			
 			ArrayList<BigDecimal> plusAmount = new ArrayList<BigDecimal>();
 			ArrayList<BigDecimal> minAmount = new ArrayList<BigDecimal>();
@@ -60,12 +68,13 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 			//Charge
 //			int chargeID = 0;
 			ArrayList<Integer> chargeID = new ArrayList<Integer>();
-			
+			ArrayList<Integer> allocateChargeID = new ArrayList<Integer>();
 			BigDecimal chargeAmount = Env.ZERO;
 			//
 			
 			//ChargeDescription
-			ArrayList<String> chargeDescription = new ArrayList<String>();
+			//Commented By David
+			//ArrayList<String> chargeDescription = new ArrayList<String>();
 			//
 			
 			int plusI = 0, minI = 0, pay = 0, rec = 0, charge = 0, count = 0, matched = 0;
@@ -78,7 +87,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 			//5. If Line is Charge
 			//6. If Line have both Invoice ID and Payment ID and Payment is AP Payment
 			//7. If Line have both Invoice ID and Payment ID and Payment is AR Receipt
-			for(MAllocationLine line : hdr.getLines(true)){
+			for(TCS_MAllocationLine line : hdr.getLines(true)){
 				
 				if(line.getC_Payment_ID()==0 && line.getC_Invoice_ID()>0 && line.getAmount().compareTo(Env.ZERO)>0){					//1
 					plusInvoiceID.add(line.getC_Invoice_ID());
@@ -108,7 +117,9 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 				else if(line.getC_Charge_ID()>0){																						//5
 					//chargeID = line.getC_Charge_ID();
 					chargeID.add(line.getC_Charge_ID());
-					chargeDescription.add(line.get_ValueAsString("Description"));
+					allocateChargeID.add(line.get_ValueAsInt("TCS_AllocateCharge_ID"));
+					//Commented By David
+					//matchDescription.add(line.get_ValueAsString(COLUMNNAME_Description));
 					//chargeAmount = line.getAmount();
 					chargeAmount = chargeAmount.add(line.getAmount());
 					charge++;
@@ -132,9 +143,10 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 
 					match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
 					match.set_CustomColumn("AllocationAmt", line.getAmount().abs());
-					
-//Change Way Of Getting Description					
-//					match.set_CustomColumn("Description", line.get_Value("Description"));
+
+		//Commented By David
+		//Change Way To Set Description			
+//					match.set_CustomColumn("Description", invoice.getDescription());
 					match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 					match.saveEx();
 					matched++;
@@ -402,6 +414,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 						
 						MInvoice pInvoice = new MInvoice(getCtx(), plusInvoiceID.get(i), get_TrxName());
 						match.set_CustomColumn("C_DocType_ID", pInvoice.getC_DocType_ID());
+						
 						//match.set_CustomColumn("P_Invoice_ID", plusInvoiceID.get(i));
 						//match.set_CustomColumn("P_Amount", tempInvoiceAmt);
 						match.set_CustomColumn("C_Charge_ID", chargeID.get(0));
@@ -419,9 +432,8 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 						
 						pDiscountAmt.set(i, Env.ZERO);
 						pWriteOffAmt.set(i, Env.ZERO);
-						
-					}
-				}/*else if(plusInvoiceID.isEmpty() && !minInvoiceID.isEmpty() && chargeID>0){
+					}	
+				} /*else if(plusInvoiceID.isEmpty() && !minInvoiceID.isEmpty() && chargeID>0){
 					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 					match.set_CustomColumn("C_AllocationHdr_ID", get_ID());
 					match.set_CustomColumn("N_Invoice_ID", minInvoiceID.get(0));
@@ -453,7 +465,8 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 					
 					for(int j = 0;j<receiptID.size();j++){
 						
-						if(j==0 && receiptAmount.get(j).compareTo(Env.ZERO)<0){
+						//if(j==0 && receiptAmount.get(j).compareTo(Env.ZERO)<0){
+						if(j==0 && receiptAmount.get(j).compareTo(Env.ZERO)>0){
 							//match
 							X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 							match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
@@ -479,7 +492,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 							else
 								match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
 														
-							match.set_ValueOfColumn("DateAllocated", hdr.getCreated());							
+							match.set_ValueOfColumn("DateAllocated", hdr.getCreated());	
 							match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 							match.saveEx();
 							
@@ -505,15 +518,17 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 							else
 								match1.set_CustomColumn("AllocationAmt", tempPaymentAmt);
 														
-							match1.set_ValueOfColumn("DateAllocated", hdr.getCreated());							
+							match1.set_ValueOfColumn("DateAllocated", hdr.getCreated());	
 							match1.set_ValueOfColumn("Description", getMatchAllocationDescription(match1));
 							match1.saveEx();
 						}
 						
 						
-						if(j!=0 && tempPaymentAmt.compareTo(Env.ZERO)>0 
-								&& receiptAmount.get(j).compareTo(Env.ZERO)<0){
-							//match
+						//if(j!=0 && tempPaymentAmt.compareTo(Env.ZERO)>0 
+						//		&& receiptAmount.get(j).compareTo(Env.ZERO)<0){
+						if(j!=0 && tempPaymentAmt.compareTo(Env.ZERO)<0 
+								&& receiptAmount.get(j).compareTo(Env.ZERO)>0){
+												//match
 							X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 							match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
 							
@@ -539,7 +554,6 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 								match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
 														
 							match.set_ValueOfColumn("DateAllocated", hdr.getCreated());							
-							match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
 							match.saveEx();
 							
 							//match1
@@ -590,8 +604,8 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 				{
 					totalReceiptAmount = totalReceiptAmount.add(minAmount.get(k));
 				}
-				if(!chargeID.isEmpty()){			
-					if(totalReceiptAmount.compareTo(Env.ZERO)==0 && chargeID.get(0)>0 && tempPaymentAmt.compareTo(Env.ZERO)>0 && chargeAmount.compareTo(Env.ZERO)>0){					
+				if(!chargeID.isEmpty()){
+					if(totalReceiptAmount.compareTo(Env.ZERO)==0 && chargeID.get(i)>0 && tempPaymentAmt.compareTo(Env.ZERO)>0 && chargeAmount.compareTo(Env.ZERO)>0){					
 						X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 						match.set_CustomColumn("C_AllocationHdr_ID", hdr.get_ID());
 						
@@ -605,15 +619,23 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 						
 						//charge
 						match.set_CustomColumn("C_Charge_ID", chargeID.get(i));
-						match.set_CustomColumn("Description", chargeDescription.get(i));
+						//Commented By David
+						//match.set_CustomColumn("Description", matchDescription.get(i));
 						//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
 						
 						match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
-						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());				
-						match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());	
+						
+						if (allocateChargeID.get(i)>0) {
+							MTCS_AllocateCharge allocateCharge = new MTCS_AllocateCharge(getCtx(), allocateChargeID.get(i), get_TrxName());
+							match.set_ValueOfColumn("Description", allocateCharge.getDescription());								
+						}
+						else
+							match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+						
 						match.saveEx();
 						
-						chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt.abs());
+						chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt);
 											
 					} else if(!paymentID.isEmpty() && receiptID.isEmpty() && chargeID.get(i)>0){
 						X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
@@ -632,13 +654,19 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 						//match.set_CustomColumn("N_Amount", tempPaymentAmt.abs().negate());
 						
 						match.set_CustomColumn("AllocationAmt", tempPaymentAmt);
-						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());				
-						match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
+						
+						if (allocateChargeID.get(i)>0) {
+							MTCS_AllocateCharge allocateCharge = new MTCS_AllocateCharge(getCtx(), allocateChargeID.get(i), get_TrxName());
+							match.set_ValueOfColumn("Description", allocateCharge.getDescription());								
+						}
+						else
+							match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+						
 						match.saveEx();
 						
-						chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt.abs());
-							
-					}
+						chargeAmount = chargeAmount.abs().subtract(tempPaymentAmt);
+					}	
 				}/* else if(paymentID.isEmpty() && !receiptID.isEmpty() && chargeID>0){
 					X_T_MatchAllocation match = new X_T_MatchAllocation(getCtx(), 0, get_TrxName());
 					match.set_CustomColumn("C_AllocationHdr_ID", get_ID());
@@ -691,7 +719,6 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 						
 						nDiscountAmt.set(0, Env.ZERO);
 						nWriteOffAmt.set(0, Env.ZERO);
-						
 					}
 				}
 			}
@@ -722,7 +749,13 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 						
 						match.set_CustomColumn("AllocationAmt", tempReceiptAmt);
 						match.set_ValueOfColumn("DateAllocated", hdr.getCreated());
-						match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+						if (allocateChargeID.get(i)>0) {					
+							MTCS_AllocateCharge allocateCharge = new MTCS_AllocateCharge(getCtx(), allocateChargeID.get(i), get_TrxName());
+							match.set_ValueOfColumn("Description", allocateCharge.getDescription());
+						}
+						else
+							match.set_ValueOfColumn("Description", getMatchAllocationDescription(match));
+						
 						match.saveEx();	
 						
 						chargeAmount = chargeAmount.abs().negate().add(tempPaymentAmt.abs());
@@ -743,7 +776,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 			nDiscountAmt.clear();
 			pWriteOffAmt.clear();
 			nWriteOffAmt.clear();
-		}
+}
 			
 			return null;
 	}
