@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.Env;
-import org.compiere.util.KeyNamePair;
 
 /** Generated Model for TCS_ExpenseLine
  *  @author iDempiere (generated) 
@@ -33,7 +32,7 @@ public class X_TCS_ExpenseLine extends PO implements I_TCS_ExpenseLine, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181130L;
+	private static final long serialVersionUID = 20190102L;
 
     /** Standard Constructor */
     public X_TCS_ExpenseLine (Properties ctx, int TCS_ExpenseLine_ID, String trxName)
@@ -107,9 +106,9 @@ public class X_TCS_ExpenseLine extends PO implements I_TCS_ExpenseLine, I_Persis
 	public void setC_BPartner_ID (int C_BPartner_ID)
 	{
 		if (C_BPartner_ID < 1) 
-			set_Value (COLUMNNAME_C_BPartner_ID, null);
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, null);
 		else 
-			set_Value (COLUMNNAME_C_BPartner_ID, Integer.valueOf(C_BPartner_ID));
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, Integer.valueOf(C_BPartner_ID));
 	}
 
 	/** Get Business Partner .
@@ -123,14 +122,6 @@ public class X_TCS_ExpenseLine extends PO implements I_TCS_ExpenseLine, I_Persis
 		return ii.intValue();
 	}
 
-    /** Get Record ID/ColumnName
-        @return ID/ColumnName pair
-      */
-    public KeyNamePair getKeyNamePair() 
-    {
-        return new KeyNamePair(get_ID(), String.valueOf(getC_BPartner_ID()));
-    }
-
 	public org.compiere.model.I_C_Charge getC_Charge() throws RuntimeException
     {
 		return (org.compiere.model.I_C_Charge)MTable.get(getCtx(), org.compiere.model.I_C_Charge.Table_Name)
@@ -143,9 +134,9 @@ public class X_TCS_ExpenseLine extends PO implements I_TCS_ExpenseLine, I_Persis
 	public void setC_Charge_ID (int C_Charge_ID)
 	{
 		if (C_Charge_ID < 1) 
-			set_Value (COLUMNNAME_C_Charge_ID, null);
+			set_ValueNoCheck (COLUMNNAME_C_Charge_ID, null);
 		else 
-			set_Value (COLUMNNAME_C_Charge_ID, Integer.valueOf(C_Charge_ID));
+			set_ValueNoCheck (COLUMNNAME_C_Charge_ID, Integer.valueOf(C_Charge_ID));
 	}
 
 	/** Get Charge.
@@ -179,6 +170,30 @@ public class X_TCS_ExpenseLine extends PO implements I_TCS_ExpenseLine, I_Persis
 		return bd;
 	}
 
+	/** Set Processed.
+		@param Processed 
+		The document has been processed
+	  */
+	public void setProcessed (boolean Processed)
+	{
+		set_Value (COLUMNNAME_Processed, Boolean.valueOf(Processed));
+	}
+
+	/** Get Processed.
+		@return The document has been processed
+	  */
+	public boolean isProcessed () 
+	{
+		Object oo = get_Value(COLUMNNAME_Processed);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Quantity.
 		@param Qty 
 		Quantity
@@ -199,8 +214,8 @@ public class X_TCS_ExpenseLine extends PO implements I_TCS_ExpenseLine, I_Persis
 		return bd;
 	}
 
-	/** Set TCS_ExpenseLine.
-		@param TCS_ExpenseLine_ID TCS_ExpenseLine	  */
+	/** Set Expense Line.
+		@param TCS_ExpenseLine_ID Expense Line	  */
 	public void setTCS_ExpenseLine_ID (int TCS_ExpenseLine_ID)
 	{
 		if (TCS_ExpenseLine_ID < 1) 
@@ -209,8 +224,8 @@ public class X_TCS_ExpenseLine extends PO implements I_TCS_ExpenseLine, I_Persis
 			set_ValueNoCheck (COLUMNNAME_TCS_ExpenseLine_ID, Integer.valueOf(TCS_ExpenseLine_ID));
 	}
 
-	/** Get TCS_ExpenseLine.
-		@return TCS_ExpenseLine	  */
+	/** Get Expense Line.
+		@return Expense Line	  */
 	public int getTCS_ExpenseLine_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_TCS_ExpenseLine_ID);
@@ -238,8 +253,8 @@ public class X_TCS_ExpenseLine extends PO implements I_TCS_ExpenseLine, I_Persis
 		return (I_TCS_TravelExpense)MTable.get(getCtx(), I_TCS_TravelExpense.Table_Name)
 			.getPO(getTCS_TravelExpense_ID(), get_TrxName());	}
 
-	/** Set TCS_TravelExpense.
-		@param TCS_TravelExpense_ID TCS_TravelExpense	  */
+	/** Set Travel Expense.
+		@param TCS_TravelExpense_ID Travel Expense	  */
 	public void setTCS_TravelExpense_ID (int TCS_TravelExpense_ID)
 	{
 		if (TCS_TravelExpense_ID < 1) 
@@ -248,8 +263,8 @@ public class X_TCS_ExpenseLine extends PO implements I_TCS_ExpenseLine, I_Persis
 			set_ValueNoCheck (COLUMNNAME_TCS_TravelExpense_ID, Integer.valueOf(TCS_TravelExpense_ID));
 	}
 
-	/** Get TCS_TravelExpense.
-		@return TCS_TravelExpense	  */
+	/** Get Travel Expense.
+		@return Travel Expense	  */
 	public int getTCS_TravelExpense_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_TCS_TravelExpense_ID);

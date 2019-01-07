@@ -136,6 +136,19 @@ public interface I_TCS_TravelExpense
 	  */
 	public boolean isActive();
 
+    /** Column name Processed */
+    public static final String COLUMNNAME_Processed = "Processed";
+
+	/** Set Processed.
+	  * The document has been processed
+	  */
+	public void setProcessed (boolean Processed);
+
+	/** Get Processed.
+	  * The document has been processed
+	  */
+	public boolean isProcessed();
+
     /** Column name TCS_TravelExpense_ID */
     public static final String COLUMNNAME_TCS_TravelExpense_ID = "TCS_TravelExpense_ID";
 

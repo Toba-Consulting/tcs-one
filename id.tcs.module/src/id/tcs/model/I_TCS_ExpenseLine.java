@@ -32,7 +32,7 @@ public interface I_TCS_ExpenseLine
     /** TableName=TCS_ExpenseLine */
     public static final String Table_Name = "TCS_ExpenseLine";
 
-    /** AD_Table_ID=1000036 */
+    /** AD_Table_ID=1000040 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -149,6 +149,19 @@ public interface I_TCS_ExpenseLine
 	  */
 	public BigDecimal getPriceEntered();
 
+    /** Column name Processed */
+    public static final String COLUMNNAME_Processed = "Processed";
+
+	/** Set Processed.
+	  * The document has been processed
+	  */
+	public void setProcessed (boolean Processed);
+
+	/** Get Processed.
+	  * The document has been processed
+	  */
+	public boolean isProcessed();
+
     /** Column name Qty */
     public static final String COLUMNNAME_Qty = "Qty";
 
@@ -165,10 +178,10 @@ public interface I_TCS_ExpenseLine
     /** Column name TCS_ExpenseLine_ID */
     public static final String COLUMNNAME_TCS_ExpenseLine_ID = "TCS_ExpenseLine_ID";
 
-	/** Set TCS_ExpenseLine	  */
+	/** Set Expense Line	  */
 	public void setTCS_ExpenseLine_ID (int TCS_ExpenseLine_ID);
 
-	/** Get TCS_ExpenseLine	  */
+	/** Get Expense Line	  */
 	public int getTCS_ExpenseLine_ID();
 
     /** Column name TCS_ExpenseLine_UU */
@@ -183,10 +196,10 @@ public interface I_TCS_ExpenseLine
     /** Column name TCS_TravelExpense_ID */
     public static final String COLUMNNAME_TCS_TravelExpense_ID = "TCS_TravelExpense_ID";
 
-	/** Set TCS_TravelExpense	  */
+	/** Set Travel Expense	  */
 	public void setTCS_TravelExpense_ID (int TCS_TravelExpense_ID);
 
-	/** Get TCS_TravelExpense	  */
+	/** Get Travel Expense	  */
 	public int getTCS_TravelExpense_ID();
 
 	public I_TCS_TravelExpense getTCS_TravelExpense() throws RuntimeException;

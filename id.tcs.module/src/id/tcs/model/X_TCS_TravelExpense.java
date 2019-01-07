@@ -30,7 +30,7 @@ public class X_TCS_TravelExpense extends PO implements I_TCS_TravelExpense, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181130L;
+	private static final long serialVersionUID = 20190102L;
 
     /** Standard Constructor */
     public X_TCS_TravelExpense (Properties ctx, int TCS_TravelExpense_ID, String trxName)
@@ -141,6 +141,30 @@ public class X_TCS_TravelExpense extends PO implements I_TCS_TravelExpense, I_Pe
 	public String getDocumentNo () 
 	{
 		return (String)get_Value(COLUMNNAME_DocumentNo);
+	}
+
+	/** Set Processed.
+		@param Processed 
+		The document has been processed
+	  */
+	public void setProcessed (boolean Processed)
+	{
+		set_Value (COLUMNNAME_Processed, Boolean.valueOf(Processed));
+	}
+
+	/** Get Processed.
+		@return The document has been processed
+	  */
+	public boolean isProcessed () 
+	{
+		Object oo = get_Value(COLUMNNAME_Processed);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set TCS_TravelExpense.
