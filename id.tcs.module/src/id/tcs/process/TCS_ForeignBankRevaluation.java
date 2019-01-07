@@ -146,9 +146,10 @@ public class TCS_ForeignBankRevaluation extends SvrProcess {
 			
 			BigDecimal factSourceBalance = DB.getSQLValueBD(get_TrxName(), sqlFactSourceBalance, paramFact)
 					.setScale(bankPrecision, RoundingMode.HALF_UP);
-
-			BigDecimal diff = trxBalance.subtract(factAcctBalance, new MathContext(glPrecision));
 			
+			
+//			BigDecimal diff = trxBalance.subtract(factAcctBalance, new MathContext(glPrecision)); 
+			BigDecimal diff = trxBalance.subtract(factAcctBalance).setScale(glPrecision, RoundingMode.HALF_UP);
 			if (diff.compareTo(Env.ZERO)==0)
 				continue;
 			
