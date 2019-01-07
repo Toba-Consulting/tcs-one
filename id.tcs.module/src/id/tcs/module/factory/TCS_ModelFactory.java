@@ -26,6 +26,7 @@ import org.adempiere.base.IModelFactory;
 import org.compiere.model.I_C_AllocationHdr;
 import org.compiere.model.I_C_BankStatement;
 import org.compiere.model.I_C_Payment;
+import org.compiere.model.MInvoice;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 
@@ -69,6 +70,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MTripFacility.Table_Name, "id.tcs.model.TCS_MTripFacility");
 		mapTableModels.put(TCS_MTravelExpense.Table_Name, "id.tcs.model.TCS_MTravelExpense");
 		mapTableModels.put(TCS_MExpenseLine.Table_Name, "id.tcs.model.TCS_MExpenseLine");
+		mapTableModels.put(MInvoice.Table_Name, "id.tcs.model.TCS_MInvoice");
 		
 	}
 	
