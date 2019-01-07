@@ -2016,7 +2016,7 @@ public void createMatchAllocation(){
 		 * 2. Invoice Allocate Charge, Get Description From C_AllocationHdr
 		 * 3. Payment Allocate Invoice, Get Description From C_Invoice
 		 * 4. Invoice Allocate Invoice, Get Description From Match_Invoice
-		 * 5. Payment Allocate Payment, Get Description From Match_Payment
+		 * 5. Payment Allocate Payment, Get Description From C_Payment
 		 */
 		
 		int C_Invoice_ID=match.getC_Invoice_ID();
@@ -2066,7 +2066,7 @@ public void createMatchAllocation(){
 		//Case 5
 		else if (C_Payment_ID>0 && Match_Payment_ID>0) {
 			
-			MPayment pay = new MPayment(getCtx(), Match_Payment_ID, get_TrxName());
+			MPayment pay = new MPayment(getCtx(), C_Payment_ID, get_TrxName());
 			return pay.getDescription();
 		}
 		
