@@ -116,7 +116,7 @@ public class TCS_CalcWithholding extends SvrProcess{
 			head.setAccumulatedAmt(accumBeggining);
 			head.saveEx();
 		
-			 while (accumBeggining.compareTo(rate[rateSeq].getMaxValue())>0){
+			 while (accumBeggining.compareTo(rate[rateSeq].getMaxAmt())>0){
 				 rateSeq++;
 			 }
 			
@@ -151,12 +151,12 @@ public class TCS_CalcWithholding extends SvrProcess{
 					
 					while (uncalculatedDPP.compareTo(Env.ZERO)>0) {
 						
-						if (head.getAccumulatedAmt().add(uncalculatedDPP).compareTo(rate[rateSeq].getMaxValue())>0) {
-							calcLineDPP=rate[rateSeq].getMaxValue().subtract(head.getAccumulatedAmt());
+						if (head.getAccumulatedAmt().add(uncalculatedDPP).compareTo(rate[rateSeq].getMaxAmt())>0) {
+							calcLineDPP=rate[rateSeq].getMaxAmt().subtract(head.getAccumulatedAmt());
 							nextRate=true;
 							
 							if (rateSeq+2>rate.length) {
-									throw new AdempiereException("Withholding Type ("+holdType.getName()+") Have No Withholding Rate For Value Over "+rate[rateSeq].getMaxValue());
+									throw new AdempiereException("Withholding Type ("+holdType.getName()+") Have No Withholding Rate For Value Over "+rate[rateSeq].getMaxAmt());
 							}
 						}
 						else {

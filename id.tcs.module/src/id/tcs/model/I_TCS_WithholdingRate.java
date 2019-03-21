@@ -32,8 +32,8 @@ public interface I_TCS_WithholdingRate
     /** TableName=TCS_WithholdingRate */
     public static final String Table_Name = "TCS_WithholdingRate";
 
-    /** AD_Table_ID=1000044 */
-    public static final int Table_ID = MTable.getTable_ID(Table_Name);
+    /** AD_Table_ID=300327 */
+    public static final int Table_ID = 300327;
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
@@ -64,21 +64,6 @@ public interface I_TCS_WithholdingRate
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name C_Charge_ID */
-    public static final String COLUMNNAME_C_Charge_ID = "C_Charge_ID";
-
-	/** Set Charge.
-	  * Additional document charges
-	  */
-	public void setC_Charge_ID (int C_Charge_ID);
-
-	/** Get Charge.
-	  * Additional document charges
-	  */
-	public int getC_Charge_ID();
-
-	public org.compiere.model.I_C_Charge getC_Charge() throws RuntimeException;
-
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
 
@@ -108,23 +93,31 @@ public interface I_TCS_WithholdingRate
 	  */
 	public boolean isActive();
 
-    /** Column name MaxValue */
-    public static final String COLUMNNAME_MaxValue = "MaxValue";
+    /** Column name MaxAmt */
+    public static final String COLUMNNAME_MaxAmt = "MaxAmt";
 
-	/** Set Max Value	  */
-	public void setMaxValue (BigDecimal MaxValue);
+	/** Set Max Amount.
+	  * Maximum Amount in invoice currency
+	  */
+	public void setMaxAmt (BigDecimal MaxAmt);
 
-	/** Get Max Value	  */
-	public BigDecimal getMaxValue();
+	/** Get Max Amount.
+	  * Maximum Amount in invoice currency
+	  */
+	public BigDecimal getMaxAmt();
 
-    /** Column name MinValue */
-    public static final String COLUMNNAME_MinValue = "MinValue";
+    /** Column name MinAmt */
+    public static final String COLUMNNAME_MinAmt = "MinAmt";
 
-	/** Set Min Value	  */
-	public void setMinValue (BigDecimal MinValue);
+	/** Set Min Amount.
+	  * Minimum Amount in invoice currency
+	  */
+	public void setMinAmt (BigDecimal MinAmt);
 
-	/** Get Min Value	  */
-	public BigDecimal getMinValue();
+	/** Get Min Amount.
+	  * Minimum Amount in invoice currency
+	  */
+	public BigDecimal getMinAmt();
 
     /** Column name Rate */
     public static final String COLUMNNAME_Rate = "Rate";
@@ -148,15 +141,6 @@ public interface I_TCS_WithholdingRate
 	/** Get Withholding Rate	  */
 	public int getTCS_WithholdingRate_ID();
 
-    /** Column name TCS_WithholdingRate_UU */
-    public static final String COLUMNNAME_TCS_WithholdingRate_UU = "TCS_WithholdingRate_UU";
-
-	/** Set TCS_WithholdingRate_UU	  */
-	public void setTCS_WithholdingRate_UU (String TCS_WithholdingRate_UU);
-
-	/** Get TCS_WithholdingRate_UU	  */
-	public String getTCS_WithholdingRate_UU();
-
     /** Column name TCS_WithholdingType_ID */
     public static final String COLUMNNAME_TCS_WithholdingType_ID = "TCS_WithholdingType_ID";
 
@@ -167,6 +151,15 @@ public interface I_TCS_WithholdingRate
 	public int getTCS_WithholdingType_ID();
 
 	public I_TCS_WithholdingType getTCS_WithholdingType() throws RuntimeException;
+
+    /** Column name TCS_WithholdingType_UU */
+    public static final String COLUMNNAME_TCS_WithholdingType_UU = "TCS_WithholdingType_UU";
+
+	/** Set TCS_WithholdingType_UU	  */
+	public void setTCS_WithholdingType_UU (String TCS_WithholdingType_UU);
+
+	/** Get TCS_WithholdingType_UU	  */
+	public String getTCS_WithholdingType_UU();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";

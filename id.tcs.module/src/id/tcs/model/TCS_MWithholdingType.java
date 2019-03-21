@@ -29,7 +29,7 @@ public class TCS_MWithholdingType extends X_TCS_WithholdingType{
     	
     	int [] withholdingRatesIDs = new Query(getCtx(), TCS_MWithholdingRate.Table_Name, "TCS_WithholdingType_ID=?", get_TrxName())
     			.setParameters(getTCS_WithholdingType_ID())
-    			.setOrderBy(TCS_MWithholdingRate.COLUMNNAME_MaxValue)
+    			.setOrderBy(TCS_MWithholdingRate.COLUMNNAME_MaxAmt)
     			.getIDs();
     	
     	TCS_MWithholdingRate [] array = new TCS_MWithholdingRate[withholdingRatesIDs.length];

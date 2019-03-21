@@ -32,7 +32,7 @@ public class X_TCS_WithholdingRate extends PO implements I_TCS_WithholdingRate, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190114L;
+	private static final long serialVersionUID = 20190312L;
 
     /** Standard Constructor */
     public X_TCS_WithholdingRate (Properties ctx, int TCS_WithholdingRate_ID, String trxName)
@@ -40,9 +40,6 @@ public class X_TCS_WithholdingRate extends PO implements I_TCS_WithholdingRate, 
       super (ctx, TCS_WithholdingRate_ID, trxName);
       /** if (TCS_WithholdingRate_ID == 0)
         {
-			setC_Charge_ID (0);
-			setMaxValue (Env.ZERO);
-			setMinValue (Env.ZERO);
 			setRate (Env.ZERO);
 			setTCS_WithholdingRate_ID (0);
 			setTCS_WithholdingType_ID (0);
@@ -77,63 +74,41 @@ public class X_TCS_WithholdingRate extends PO implements I_TCS_WithholdingRate, 
       return sb.toString();
     }
 
-	public org.compiere.model.I_C_Charge getC_Charge() throws RuntimeException
-    {
-		return (org.compiere.model.I_C_Charge)MTable.get(getCtx(), org.compiere.model.I_C_Charge.Table_Name)
-			.getPO(getC_Charge_ID(), get_TrxName());	}
-
-	/** Set Charge.
-		@param C_Charge_ID 
-		Additional document charges
+	/** Set Max Amount.
+		@param MaxAmt 
+		Maximum Amount in invoice currency
 	  */
-	public void setC_Charge_ID (int C_Charge_ID)
+	public void setMaxAmt (BigDecimal MaxAmt)
 	{
-		if (C_Charge_ID < 1) 
-			set_Value (COLUMNNAME_C_Charge_ID, null);
-		else 
-			set_Value (COLUMNNAME_C_Charge_ID, Integer.valueOf(C_Charge_ID));
+		set_Value (COLUMNNAME_MaxAmt, MaxAmt);
 	}
 
-	/** Get Charge.
-		@return Additional document charges
+	/** Get Max Amount.
+		@return Maximum Amount in invoice currency
 	  */
-	public int getC_Charge_ID () 
+	public BigDecimal getMaxAmt () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_C_Charge_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
-	/** Set Max Value.
-		@param MaxValue Max Value	  */
-	public void setMaxValue (BigDecimal MaxValue)
-	{
-		set_Value (COLUMNNAME_MaxValue, MaxValue);
-	}
-
-	/** Get Max Value.
-		@return Max Value	  */
-	public BigDecimal getMaxValue () 
-	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_MaxValue);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_MaxAmt);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
 	}
 
-	/** Set Min Value.
-		@param MinValue Min Value	  */
-	public void setMinValue (BigDecimal MinValue)
+	/** Set Min Amount.
+		@param MinAmt 
+		Minimum Amount in invoice currency
+	  */
+	public void setMinAmt (BigDecimal MinAmt)
 	{
-		set_Value (COLUMNNAME_MinValue, MinValue);
+		set_Value (COLUMNNAME_MinAmt, MinAmt);
 	}
 
-	/** Get Min Value.
-		@return Min Value	  */
-	public BigDecimal getMinValue () 
+	/** Get Min Amount.
+		@return Minimum Amount in invoice currency
+	  */
+	public BigDecimal getMinAmt () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_MinValue);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_MinAmt);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
@@ -179,20 +154,6 @@ public class X_TCS_WithholdingRate extends PO implements I_TCS_WithholdingRate, 
 		return ii.intValue();
 	}
 
-	/** Set TCS_WithholdingRate_UU.
-		@param TCS_WithholdingRate_UU TCS_WithholdingRate_UU	  */
-	public void setTCS_WithholdingRate_UU (String TCS_WithholdingRate_UU)
-	{
-		set_ValueNoCheck (COLUMNNAME_TCS_WithholdingRate_UU, TCS_WithholdingRate_UU);
-	}
-
-	/** Get TCS_WithholdingRate_UU.
-		@return TCS_WithholdingRate_UU	  */
-	public String getTCS_WithholdingRate_UU () 
-	{
-		return (String)get_Value(COLUMNNAME_TCS_WithholdingRate_UU);
-	}
-
 	public I_TCS_WithholdingType getTCS_WithholdingType() throws RuntimeException
     {
 		return (I_TCS_WithholdingType)MTable.get(getCtx(), I_TCS_WithholdingType.Table_Name)
@@ -216,5 +177,19 @@ public class X_TCS_WithholdingRate extends PO implements I_TCS_WithholdingRate, 
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set TCS_WithholdingType_UU.
+		@param TCS_WithholdingType_UU TCS_WithholdingType_UU	  */
+	public void setTCS_WithholdingType_UU (String TCS_WithholdingType_UU)
+	{
+		set_ValueNoCheck (COLUMNNAME_TCS_WithholdingType_UU, TCS_WithholdingType_UU);
+	}
+
+	/** Get TCS_WithholdingType_UU.
+		@return TCS_WithholdingType_UU	  */
+	public String getTCS_WithholdingType_UU () 
+	{
+		return (String)get_Value(COLUMNNAME_TCS_WithholdingType_UU);
 	}
 }
