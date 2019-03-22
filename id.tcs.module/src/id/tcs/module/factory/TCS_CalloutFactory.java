@@ -3,6 +3,9 @@ package id.tcs.module.factory;
 import id.tcs.callout.TCS_CalloutAdvRequestLine;
 import id.tcs.callout.TCS_CalloutAdvSettlement;
 import id.tcs.callout.TCS_CalloutAdvSettlementLine;
+import id.tcs.callout.TCS_CalloutAssetMovement;
+import id.tcs.callout.TCS_CalloutAssetReval;
+import id.tcs.callout.TCS_CalloutAssetTransfer;
 import id.tcs.callout.TCS_CalloutDestSettlement;
 import id.tcs.callout.TCS_CalloutInvoiceLine;
 
@@ -44,6 +47,18 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 			list.add(new TCS_CalloutInvoiceLine());
 		}
 		
+		if (tableName.equals("A_Asset_Reval")){
+			list.add(new TCS_CalloutAssetReval());
+		}
+
+		if (tableName.equals("A_AssetTransfer")){
+			list.add(new TCS_CalloutAssetTransfer());
+		}
+
+		if (tableName.equals("A_AssetMovement")){
+			list.add(new TCS_CalloutAssetMovement());
+		}
+
 		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];
 	}
 
