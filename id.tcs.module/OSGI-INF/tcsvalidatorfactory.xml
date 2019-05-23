@@ -2,4 +2,5 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="tcsvalidatorfactory.xml">
    <implementation class="id.tcs.module.factory.TCS_ValidatorFactory"/>
    <reference bind="bindEventManager" cardinality="1..n" interface="org.adempiere.base.event.IEventManager" name="IEventManager" policy="static" unbind="unbindEventManager"/>
+   <property name="service.ranking" type="Integer" value="100"/>
 </scr:component>
