@@ -92,6 +92,7 @@ public class TCS_CalcWithholding extends SvrProcess{
 		int a=calendar.get(Calendar.YEAR);
 		for (int C_BParnterID : C_BParnterIDs) {
 
+			
 			String sqlMostRecentCalcIDInYear = 
 					 "SELECT TCS_WithholdingCalc_ID FROM TCS_WithholdingCalc twc"
 					+" JOIN C_Period cp on twc.C_Period_ID=cp.C_Period_ID"
@@ -108,14 +109,15 @@ public class TCS_CalcWithholding extends SvrProcess{
 				accumBeggining = MostRecentCalc.getAccumulatedAmt();			
 			}
 			
+			int withholdingCalc_ID=getHeader_ID(C_BParnterID);
+			TCS_MWithholdingCalc head = new TCS_MWithholdingCalc(getCtx(), withholdingCalc_ID, get_TrxName());
+			if (withholdingCalc_ID==0) {
+				head.setC_Period_ID(p_C_Period_ID);
+				head.setC_BPartner_ID(C_BParnterID);
+				head.setAccumulatedAmt(accumBeggining);
+				head.saveEx();			
+			}
 			
-			TCS_MWithholdingCalc head = new TCS_MWithholdingCalc(getCtx(), 0, get_TrxName());
-			head.setC_Period_ID(p_C_Period_ID);
-			head.setTCS_WithholdingType_ID(p_TCS_WithholdingType_ID);
-			head.setC_BPartner_ID(C_BParnterID);
-			head.setAccumulatedAmt(accumBeggining);
-			head.saveEx();
-		
 			 while (accumBeggining.compareTo(rate[rateSeq].getMaxAmt())>0){
 				 rateSeq++;
 			 }
@@ -135,7 +137,6 @@ public class TCS_CalcWithholding extends SvrProcess{
 			sbLine.append(" AND ci.C_BPartner_ID="+C_BParnterID);
 			sbLine.append(" ORDER BY fa.DateAcct");
 			
-			int SeqNo=1;
 			
 			try
 			{
@@ -172,6 +173,8 @@ public class TCS_CalcWithholding extends SvrProcess{
 						calcLine.setAccumulatedAmt(head.getAccumulatedAmt().add(calcLineDPP));
 						calcLine.setRate(rate[rateSeq].getRate());
 						calcLine.setDateAcct(rs.getTimestamp("DateAcct"));
+						calcLine.setTCS_WithholdingType_ID(p_TCS_WithholdingType_ID);
+						calcLine.setC_Period_ID(p_C_Period_ID);
 						
 						BigDecimal pphRate = calcLine.getRate().divide(Env.ONEHUNDRED);
 						calcLine.setPPh(calcLine.getDPP().multiply(pphRate));
@@ -184,7 +187,6 @@ public class TCS_CalcWithholding extends SvrProcess{
 							rateSeq++;
 						}
 						
-						SeqNo++;
 						
 				    	if (!invoiceAlreadyExist(head.getTCS_WithholdingCalc_ID(), calcLine.getC_Invoice_ID())) {
 				    		
@@ -273,22 +275,20 @@ public class TCS_CalcWithholding extends SvrProcess{
 		}
 	
 		TCS_MWithholdingCalc wth =  new TCS_MWithholdingCalc(getCtx(), MostRecentWitholdingCalcID, get_TrxName());
-
-		//Is most recent period, but WithholdingCalc already exist, delete existing to make a new one
-		if (wth.getC_Period_ID()==C_Period_ID) {
-			String sqlDeleteLine="DELETE FROM TCS_WithholdingCalcLine wcl "+
-								"WHERE TCS_WithholdingCalc_ID IN "+
-									"(SELECT TCS_WithholdingCalc_ID FROM TCS_WithholdingCalc "+""
-									+ "WHERE C_Period_ID="+C_Period_ID+")";
-			String sqlDeleteHead="DELETE FROM TCS_WithholdingCalc WHERE C_Period_ID="+C_Period_ID;
-			DB.executeUpdate(sqlDeleteLine);
-			DB.executeUpdate(sqlDeleteHead);
-			
-			return true;
-		}
 		
 		MPeriod MostRecentPeriod = new MPeriod(getCtx(), wth.getC_Period_ID(), get_TrxName());
 		MPeriod NewPeriod = new MPeriod(getCtx(), C_Period_ID, get_TrxName());
+		
+		//Is most recent period, but WithholdingCalc already exist
+		
+		String sql = "C_Period_ID="+p_C_Period_ID+" AND TCS_WithholdingType_ID="+p_TCS_WithholdingType_ID;
+		boolean TypeExistInPeriod=new Query(getCtx(), TCS_MWithholdingCalcLine.Table_Name, sql, get_TrxName()).match();
+		if (NewPeriod.getEndDate().equals((MostRecentPeriod.getEndDate()))) {
+			if (TypeExistInPeriod) {				
+			deleteExistingWithholding(C_Period_ID);
+			}
+			return true;
+		}
 		
 		//Is new most recent		
 		if (NewPeriod.getEndDate().after(MostRecentPeriod.getEndDate())) {
@@ -304,5 +304,27 @@ public class TCS_CalcWithholding extends SvrProcess{
     	boolean Exist = new Query(getCtx(), TCS_MWithholdingCalcLine.Table_Name, sql, get_TrxName()).match();
     	
     	return Exist;
+    }
+    
+    private void deleteExistingWithholding(int C_Period_ID){
+    	
+		//Is most recent period, but WithholdingCalc already exist, delete existing to make a new one
+		String sqlDeleteLine="DELETE FROM TCS_WithholdingCalcLine wcl "+
+				"WHERE TCS_WithholdingCalc_ID IN "+
+					"(SELECT TCS_WithholdingCalc_ID FROM TCS_WithholdingCalc "+""
+					+ "WHERE C_Period_ID="+C_Period_ID+")";
+		String sqlDeleteHeader="DELETE FROM TCS_WithholdingCalc WHERE C_Period_ID="+C_Period_ID;
+		DB.executeUpdate(sqlDeleteLine);
+		DB.executeUpdate(sqlDeleteHeader);
+    }
+    
+    private int getHeader_ID(int C_BPartner_ID){
+    	
+    	String sql = "SELECT TCS_WithholdingCalc_ID FROM TCS_WithholdingCalc twc"+
+    				" WHERE C_Period_ID="+p_C_Period_ID+
+    				" AND C_BPartner_ID="+C_BPartner_ID;
+    	int ID=DB.getSQLValue(get_TrxName(), sql);
+    	if (ID>0) return ID;
+    	else return 0;
     }
 }
