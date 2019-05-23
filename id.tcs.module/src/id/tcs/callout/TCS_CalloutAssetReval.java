@@ -15,6 +15,8 @@ public class TCS_CalloutAssetReval implements IColumnCallout{
 		
 		MAsset asset = new MAsset(Env.getCtx(), (Integer)value, null);
 		mTab.setValue(asset.COLUMNNAME_AD_Org_ID, asset.getAD_Org_ID());
+		mTab.setValue("A_Asset_Cost_Change", Env.ONEHUNDRED);
+		mTab.setValue("UseLifeYears_Change", 5);
 		
 		return null;
 	}
