@@ -133,7 +133,7 @@ public class TCSBankRegister extends SvrProcess{
 		.append("when bsl.stmtamt<0 ")
 		.append("then bsl.stmtamt*-1 ")
 		.append("else null ")
-		.append("end, ")
+		.append("end, ") //amtsourceCE
 		.append("(").append(balance).append("+(sum(bsl.stmtamt) OVER (ORDER BY bsl.dateacct, cp.noVoucher, bsl.c_bankstatementline_id))), ")
 		.append(""+getAD_PInstance_ID()+", null, '")
 		.append(bankAccountName).append("', '").append(currencyName).append("', ")
@@ -143,8 +143,8 @@ public class TCSBankRegister extends SvrProcess{
 		.append(" from c_bankstatement bs ") 
 		//.append("join c_bankaccount ba on ba.c_bankaccount_id=bs.c_bankaccount_id ") 
 		.append("join c_bankstatementline bsl on bs.c_bankstatement_id=bsl.c_bankstatement_id ")
-		.append("join c_payment cp on cp.c_payment_id=bsl.c_payment_id ") // add column voucher @phie
-		.append("join c_bpartner bp on cp.c_bpartner_id = bp.c_bpartner_id ")
+		.append("LEFT join c_payment cp on cp.c_payment_id=bsl.c_payment_id ") // add column voucher @phie
+		.append("LEFT join c_bpartner bp on cp.c_bpartner_id = bp.c_bpartner_id ")
 		.append("where bs.c_bankaccount_id="+p_C_BankAccount_ID) 
 		.append(" and bs.docstatus IN ('CO','CL') ") 
 		.append("and bsl.dateAcct between '"+p_DateFrom+"' and '"+p_DateTo+"'")
