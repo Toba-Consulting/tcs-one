@@ -10,6 +10,7 @@ import java.math.RoundingMode;
 import java.util.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.logging.Level;
@@ -85,18 +86,17 @@ public class TCS_CalcWithholding extends SvrProcess{
 		int [] C_BParnterIDs = new Query(getCtx(), MBPartner.Table_Name, sbHead.toString(), get_TrxName()).setOrderBy("Value").getIDs();
 		
 		BigDecimal pct50=new BigDecimal(0.5);
-		BigDecimal pct200=new BigDecimal(2);
 		
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(period.getEndDate().getTime());
-		int a=calendar.get(Calendar.YEAR);
-		for (int C_BParnterID : C_BParnterIDs) {
+		calendar.setTimeInMillis(period.getStartDate().getTime());
+
+		for (int C_BPartnerID : C_BParnterIDs) {
 
 			
 			String sqlMostRecentCalcIDInYear = 
 					 "SELECT TCS_WithholdingCalc_ID FROM TCS_WithholdingCalc twc"
 					+" JOIN C_Period cp on twc.C_Period_ID=cp.C_Period_ID"
-					+" WHERE twc.C_BPartner_ID="+C_BParnterID
+					+" WHERE twc.C_BPartner_ID="+C_BPartnerID
 					+" AND Date_Part('YEAR', cp.EndDate)="+calendar.get(Calendar.YEAR)
 					+" ORDER BY cp.EndDate Desc";
 //					+" LIMIT 1";
@@ -109,12 +109,74 @@ public class TCS_CalcWithholding extends SvrProcess{
 				accumBeggining = MostRecentCalc.getAccumulatedAmt();			
 			}
 			
-			int withholdingCalc_ID=getHeader_ID(C_BParnterID);
+			//@David
+			//If is first withholding of current year create row beginning balance
+			String sqlWhereIsCreateBegginBal = " C_BPartner_ID = "+C_BPartnerID
+							+ " AND Date_Part('YEAR', cp.StartDate)="+calendar.get(Calendar.YEAR)
+							+ " AND TCS_WithholdingType_ID ="+p_TCS_WithholdingType_ID
+							+ " AND TCS_WithholdingCalc.AD_Client_ID="+getAD_Client_ID();
+			String sqlJoinBegginBal="JOIN C_Period cp ON cp.C_Period_ID=TCS_WithholdingCalc.C_Period_ID";
+			
+			boolean notFirstOfYear = new Query(getCtx(), TCS_MWithholdingCalc.Table_Name, sqlWhereIsCreateBegginBal, get_TrxName()).addJoinClause(sqlJoinBegginBal).match();
+			
+			if(!notFirstOfYear){
+				Calendar tempCal = Calendar.getInstance();
+				tempCal.setTimeInMillis(period.getStartDate().getTime());
+				tempCal.add(Calendar.SECOND, -1);
+				Timestamp  openBalTimeStamp= new Timestamp(tempCal.getTimeInMillis());
+				String sqlWhereBeginBal = " SELECT COALESCE(SUM(InvoiceOpenToDate(ci.C_Invoice_ID,0,'"+openBalTimeStamp+"')),0) "
+										+ " FROM C_Invoice ci "
+										+ " WHERE C_Invoice_ID IN ("
+											+ " SELECT DISTINCT cil.C_Invoice_ID FROM C_InvoiceLine cil"
+											+ " JOIN C_Invoice ci ON ci.C_Invoice_ID=cil.C_Invoice_ID"
+											+ " WHERE cil.C_Charge_ID="+holdType.getC_Charge_ID()
+											+ " AND ci.DocStatus IN ('CO','CL') AND ci.C_BPartner_ID="+C_BPartnerID
+											+ " AND ci.AD_Client_ID=?"
+										+ ")";
+				
+				BigDecimal beginBal = DB.getSQLValueBD(get_TrxName(), sqlWhereBeginBal, getAD_Client_ID());
+				
+		    	TCS_MWithholdingCalc head = new TCS_MWithholdingCalc(getCtx(), 0, get_TrxName());
+				head.setC_Period_ID(p_C_Period_ID);
+				head.setC_BPartner_ID(C_BPartnerID);
+				head.setAmt(beginBal);
+				head.setTCS_WithholdingType_ID(p_TCS_WithholdingType_ID);
+				head.setDescription("Beginning Balance "+calendar.get(calendar.YEAR));
+				head.setSequence(1);
+				head.saveEx();	
+				
+				TCS_MWithholdingCalcLine line = new TCS_MWithholdingCalcLine(getCtx(), 0, get_TrxName());
+				line.setTCS_WithholdingCalc_ID(head.getTCS_WithholdingCalc_ID());
+				line.setDateAcct(period.getStartDate());
+				line.setTCS_WithholdingType_ID(p_TCS_WithholdingType_ID);
+				line.setC_Period_ID(p_C_Period_ID);
+				line.setAmt(beginBal);
+				
+				BigDecimal DPP = beginBal.divide(BigDecimal.valueOf(2));
+				
+				while (accumBeggining.compareTo(rate[rateSeq].getMaxAmt())>0){
+					 rateSeq++;
+				 }
+				
+				line.setHalvedAmt(DPP);
+				line.setDPP(DPP);
+				line.setAccumulatedAmt(DPP);
+				line.setRate(rate[rateSeq].getRate());
+				BigDecimal pphRate = line.getRate().divide(Env.ONEHUNDRED);
+				line.setPPh(line.getDPP().multiply(pphRate));
+				line.saveEx();
+
+				accumBeggining=DPP;
+			}
+			
+			int withholdingCalc_ID=getHeader_ID(C_BPartnerID);
 			TCS_MWithholdingCalc head = new TCS_MWithholdingCalc(getCtx(), withholdingCalc_ID, get_TrxName());
 			if (withholdingCalc_ID==0) {
 				head.setC_Period_ID(p_C_Period_ID);
-				head.setC_BPartner_ID(C_BParnterID);
+				head.setC_BPartner_ID(C_BPartnerID);
 				head.setAccumulatedAmt(accumBeggining);
+				head.setTCS_WithholdingType_ID(p_TCS_WithholdingType_ID);	
+				head.setSequence(2);
 				head.saveEx();			
 			}
 			
@@ -134,7 +196,7 @@ public class TCS_CalcWithholding extends SvrProcess{
 			sbLine.append(" AND ci.IsSoTrx='N'");
 			sbLine.append(" AND cil.C_Charge_ID="+holdType.getC_Charge_ID());		
 			sbLine.append(" AND fa.DateAcct BETWEEN '"+period.getStartDate()+"' AND '"+period.getEndDate()+"'");
-			sbLine.append(" AND ci.C_BPartner_ID="+C_BParnterID);
+			sbLine.append(" AND ci.C_BPartner_ID="+C_BPartnerID);
 			sbLine.append(" ORDER BY fa.DateAcct");
 			
 			
@@ -322,9 +384,11 @@ public class TCS_CalcWithholding extends SvrProcess{
     	
     	String sql = "SELECT TCS_WithholdingCalc_ID FROM TCS_WithholdingCalc twc"+
     				" WHERE C_Period_ID="+p_C_Period_ID+
-    				" AND C_BPartner_ID="+C_BPartner_ID;
+    				" AND C_BPartner_ID="+C_BPartner_ID+
+    				" AND TCS_WithholdingType_ID="+p_TCS_WithholdingType_ID+
+    				" AND Sequence != 1"; // 1 = Beginning Balance
     	int ID=DB.getSQLValue(get_TrxName(), sql);
     	if (ID>0) return ID;
     	else return 0;
-    }
+    }    
 }

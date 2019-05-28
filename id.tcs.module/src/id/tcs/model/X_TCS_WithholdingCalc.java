@@ -32,7 +32,7 @@ public class X_TCS_WithholdingCalc extends PO implements I_TCS_WithholdingCalc, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190114L;
+	private static final long serialVersionUID = 20190527L;
 
     /** Standard Constructor */
     public X_TCS_WithholdingCalc (Properties ctx, int TCS_WithholdingCalc_ID, String trxName)
@@ -40,9 +40,7 @@ public class X_TCS_WithholdingCalc extends PO implements I_TCS_WithholdingCalc, 
       super (ctx, TCS_WithholdingCalc_ID, trxName);
       /** if (TCS_WithholdingCalc_ID == 0)
         {
-			setC_Period_ID (0);
 			setTCS_WithholdingCalc_ID (0);
-			setTCS_WithholdingType_ID (0);
         } */
     }
 
@@ -201,17 +199,17 @@ public class X_TCS_WithholdingCalc extends PO implements I_TCS_WithholdingCalc, 
 		return bd;
 	}
 
-	/** Set Amt (50%).
+	/** Set Halved Amt.
 		@param HalvedAmt 
-		Menampilkan 50% dari Amt Invoice yang di gunakan untuk perhitungan PPh
+		Untuk menampung 50% dari nilai Invoice yang akan dihitung sebagai penagihan PPh 21
 	  */
 	public void setHalvedAmt (BigDecimal HalvedAmt)
 	{
 		set_Value (COLUMNNAME_HalvedAmt, HalvedAmt);
 	}
 
-	/** Get Amt (50%).
-		@return Menampilkan 50% dari Amt Invoice yang di gunakan untuk perhitungan PPh
+	/** Get Halved Amt.
+		@return Untuk menampung 50% dari nilai Invoice yang akan dihitung sebagai penagihan PPh 21
 	  */
 	public BigDecimal getHalvedAmt () 
 	{
@@ -238,8 +236,25 @@ public class X_TCS_WithholdingCalc extends PO implements I_TCS_WithholdingCalc, 
 		return bd;
 	}
 
-	/** Set Withholding Calc.
-		@param TCS_WithholdingCalc_ID Withholding Calc	  */
+	/** Set Sequence.
+		@param Sequence Sequence	  */
+	public void setSequence (int Sequence)
+	{
+		set_Value (COLUMNNAME_Sequence, Integer.valueOf(Sequence));
+	}
+
+	/** Get Sequence.
+		@return Sequence	  */
+	public int getSequence () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Sequence);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set Withholding Calculation.
+		@param TCS_WithholdingCalc_ID Withholding Calculation	  */
 	public void setTCS_WithholdingCalc_ID (int TCS_WithholdingCalc_ID)
 	{
 		if (TCS_WithholdingCalc_ID < 1) 
@@ -248,8 +263,8 @@ public class X_TCS_WithholdingCalc extends PO implements I_TCS_WithholdingCalc, 
 			set_ValueNoCheck (COLUMNNAME_TCS_WithholdingCalc_ID, Integer.valueOf(TCS_WithholdingCalc_ID));
 	}
 
-	/** Get Withholding Calc.
-		@return Withholding Calc	  */
+	/** Get Withholding Calculation.
+		@return Withholding Calculation	  */
 	public int getTCS_WithholdingCalc_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_TCS_WithholdingCalc_ID);

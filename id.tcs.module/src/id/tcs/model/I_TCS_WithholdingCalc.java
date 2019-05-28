@@ -32,8 +32,8 @@ public interface I_TCS_WithholdingCalc
     /** TableName=TCS_WithholdingCalc */
     public static final String Table_Name = "TCS_WithholdingCalc";
 
-    /** AD_Table_ID=1000045 */
-    public static final int Table_ID = MTable.getTable_ID(Table_Name);
+    /** AD_Table_ID=300328 */
+    public static final int Table_ID = 300328;
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
@@ -157,13 +157,13 @@ public interface I_TCS_WithholdingCalc
     /** Column name HalvedAmt */
     public static final String COLUMNNAME_HalvedAmt = "HalvedAmt";
 
-	/** Set Amt (50%).
-	  * Menampilkan 50% dari Amt Invoice yang di gunakan untuk perhitungan PPh
+	/** Set Halved Amt.
+	  * Untuk menampung 50% dari nilai Invoice yang akan dihitung sebagai penagihan PPh 21
 	  */
 	public void setHalvedAmt (BigDecimal HalvedAmt);
 
-	/** Get Amt (50%).
-	  * Menampilkan 50% dari Amt Invoice yang di gunakan untuk perhitungan PPh
+	/** Get Halved Amt.
+	  * Untuk menampung 50% dari nilai Invoice yang akan dihitung sebagai penagihan PPh 21
 	  */
 	public BigDecimal getHalvedAmt();
 
@@ -189,13 +189,22 @@ public interface I_TCS_WithholdingCalc
 	/** Get PPh	  */
 	public BigDecimal getPPh();
 
+    /** Column name Sequence */
+    public static final String COLUMNNAME_Sequence = "Sequence";
+
+	/** Set Sequence	  */
+	public void setSequence (int Sequence);
+
+	/** Get Sequence	  */
+	public int getSequence();
+
     /** Column name TCS_WithholdingCalc_ID */
     public static final String COLUMNNAME_TCS_WithholdingCalc_ID = "TCS_WithholdingCalc_ID";
 
-	/** Set Withholding Calc	  */
+	/** Set Withholding Calculation	  */
 	public void setTCS_WithholdingCalc_ID (int TCS_WithholdingCalc_ID);
 
-	/** Get Withholding Calc	  */
+	/** Get Withholding Calculation	  */
 	public int getTCS_WithholdingCalc_ID();
 
     /** Column name TCS_WithholdingCalc_UU */
