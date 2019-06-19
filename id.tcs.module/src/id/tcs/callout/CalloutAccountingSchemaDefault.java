@@ -3,9 +3,9 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.banktransfer.model.IAccountGen;
-import org.banktransfer.model.MAcctSchemaDefault;
-import org.banktransfer.model.MValidCombination;
+import org.simplifyacct.model.IAccountGen;
+import org.simplifyacct.model.MAcctSchemaDefault;
+import org.simplifyacct.model.MValidCombination;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
