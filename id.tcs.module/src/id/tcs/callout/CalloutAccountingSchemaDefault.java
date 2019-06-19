@@ -1,96 +1,96 @@
-package org.banktransfer.callout;
+package id.tcs.callout;
 
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
+import org.banktransfer.model.IAccountGen;
 import org.banktransfer.model.MAcctSchemaDefault;
-import org.banktransfer.model.MAcctSchemaGL;
 import org.banktransfer.model.MValidCombination;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
 
-public class CalloutAccountingSchemaDefault implements IColumnCallout{
+public class CalloutAccountingSchemaDefault implements IColumnCallout, IAccountGen{
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		// TODO Auto-generated method stub
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_UG_ID))
-			return setUnrealizedGainAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_UG_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_UL_ID))
-			return setUnrealizedLossAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_UL_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_RG_ID))
-			return setRealizedGainAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_RG_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_RL_ID))
-			return setRealizedLossAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_RL_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_ID))
-			return setNotInvoicedReceiptsAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_PDE_ID))
-			return setPaymentDiscountExpenseAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PDE_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_PDR_ID))
-			return setPaymentDiscountRevenueAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PDR_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_WO_ID))
-			return setWriteOffAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_WO_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_CR_ID))
-			return setCustomerReceivableAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CR_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_VL_ID))
-			return setVendorLiabilityAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VL_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_CP_ID))
-			return setCustomerPrepaymentAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CP_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_VP_ID))
-			return setVendorPrepaymentAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VP_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_Asset_ID))
-			return setProductAssetAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_Asset_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_PE_ID))
-			return setProductExpenseAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PE_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_CA_ID))
-			return setCostAdjustmentAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CA_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_IC_ID))
-			return setInventoryClearingAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_IC_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_Revenue_ID))
-			return setProductRevenueAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_Revenue_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_COGS_ID))
-			return setProductCOGSAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_COGS_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_PPV_ID))
-			return setPurchasePriceVarianceAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PPV_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_IPV_ID))
-			return setInvoicePriceVarianceAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_IPV_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_TDR_ID))
-			return setTradeDiscountReceivedAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TDR_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_TDG_ID))
-			return setTradeDiscountGrantedAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TDG_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_RV_ID))
-			return setRateVarianceAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_RV_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_ACV_ID))
-			return setAverageCostVarianceAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_ACV_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_LCC_ID))
-			return setLandedCostClearingAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_LCC_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_WD_ID))
-			return setWarehouseDiffAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_WD_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_BA_ID))
-			return setBankAssetAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_BA_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_BIT_ID))
-			return setBankInTransitAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_BIT_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_PS_ID))
-			return setPaymentSelectAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PS_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_UC_ID))
-			return setUnallocatedCashAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_UC_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_BIR_ID))
-			return setBankInterestRevenueAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_BIR_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_BIE_ID))
-			return setBankInterestExpenseAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_BIE_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_TD_ID))
-			return setTaxDueAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TD_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_TC_ID))
-			return setTaxCreditAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TC_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_TE_ID))
-			return setTaxExpenseAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TE_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_Charge_ID))
-			return setChargeAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_Charge_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_PA_ID))
-			return setProjectAssetAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PA_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_C_ElementValue_WIP_ID))
-			return setWorkInProgressAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_WIP_ID");
 		if (mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_UnrealizedGain_Acct) 
 				|| mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_UnrealizedLoss_Acct)
 				|| mField.getColumnName().equals(MAcctSchemaDefault.COLUMNNAME_RealizedGain_Acct)
@@ -134,387 +134,93 @@ public class CalloutAccountingSchemaDefault implements IColumnCallout{
 		return null;
 	}
 
-	
-	// set Unrealized Gain Acct
-	protected String setUnrealizedGainAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
+	@Override
+	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
+			Object oldValue, String columnName) {
+		// TODO Auto-generated method stub
 		if(value == null)
 			return "";
 		
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_UG_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("UnrealizedGain_Acct", validAccount.get_ID());
+		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue(columnName), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
+		if(columnName.equals("C_ElementValue_UG_ID"))
+			mTab.setValue("UnrealizedGain_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_UL_ID"))
+			mTab.setValue("UnrealizedLoss_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_RG_ID"))
+			mTab.setValue("RealizedGain_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_RL_ID"))
+			mTab.setValue("RealizedLoss_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_ID"))
+			mTab.setValue("NotInvoicedReceipts_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_PDE_ID"))
+			mTab.setValue("PayDiscount_Exp_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_PDR_ID"))
+			mTab.setValue("PayDiscount_Rev_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_WO_ID"))
+			mTab.setValue("WriteOff_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_CR_ID"))
+			mTab.setValue("C_Receivable_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_VL_ID"))
+			mTab.setValue("V_Liability_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_CP_ID"))
+			mTab.setValue("C_Prepayment_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_VP_ID"))
+			mTab.setValue("V_Prepayment_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_Asset_ID"))
+			mTab.setValue("P_Asset_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_PE_ID"))	
+			mTab.setValue("P_Expense_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_CA_ID"))
+			mTab.setValue("P_CostAdjustment_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_IC_ID"))
+			mTab.setValue("P_InventoryClearing_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_Revenue_ID"))
+			mTab.setValue("P_Revenue_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_COGS_ID"))
+			mTab.setValue("P_COGS_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_PPV_ID"))
+			mTab.setValue("P_PurchasePriceVariance_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_IPV_ID"))
+			mTab.setValue("P_InvoicePriceVariance_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_TDR_ID"))
+			mTab.setValue("P_TradeDiscountRec_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_TDG_ID"))
+			mTab.setValue("P_TradeDiscountGrant_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_RV_ID"))
+			mTab.setValue("P_RateVariance_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_ACV_ID"))
+			mTab.setValue("P_AverageCostVariance_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_LCC_ID"))
+			mTab.setValue("P_LandedCostClearing_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_WD_ID"))
+			mTab.setValue("W_Differences_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_BA_ID"))
+			mTab.setValue("B_Asset_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_BIT_ID"))
+			mTab.setValue("B_InTransit_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_PS_ID"))
+			mTab.setValue("B_PaymentSelect_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_UC_ID"))
+			mTab.setValue("B_UnallocatedCash_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_BIR_ID"))
+			mTab.setValue("B_InterestRev_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_BIE_ID"))
+			mTab.setValue("B_InterestExp_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_TD_ID"))
+			mTab.setValue("T_Due_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_TC_ID"))
+			mTab.setValue("T_Credit_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_TE_ID"))
+			mTab.setValue("T_Expense_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_Charge_ID"))
+			mTab.setValue("Ch_Expense_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_PA_ID"))
+			mTab.setValue("PJ_Asset_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_WIP_ID"))
+			mTab.setValue("PJ_WIP_Acct", validAccount.get_ID());
 		return "";
 	}
-	
-	// set Unrealized Loss Acct
-	protected String setUnrealizedLossAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
 		
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_UL_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("UnrealizedLost_Acct", validAccount.get_ID());
-		return "";
-	}
-	
-	// set Realized Gain Acct
-	protected String setRealizedGainAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_RG_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("RealizedGain_Acct", validAccount.get_ID());
-		return "";
-	}
-	
-	// set Realized Loss Acct
-	protected String setRealizedLossAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_RL_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("RealizedLoss_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Not Invoiced Receipts Acct 
-	protected String setNotInvoicedReceiptsAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("NotInvoicedReceipts_Acct", validAccount.get_ID());
-		return "";
-	}	
-
-	// set Payment Discount Expense Acct 
-	protected String setPaymentDiscountExpenseAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_PDE_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("PayDiscount_Exp_Acct", validAccount.get_ID());
-		return "";
-	}		
-
-	// set Payment Discount Revenue Acct 
-	protected String setPaymentDiscountRevenueAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_PDR_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("PayDiscount_Rev_Acct", validAccount.get_ID());
-		return "";
-	}		
-	
-	// set Write-Off Acct 
-	protected String setWriteOffAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_WO_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("WriteOff_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Customer Receivable Acct 
-	protected String setCustomerReceivableAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_CR_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("C_Receivable_Acct", validAccount.get_ID());
-		return "";
-	}	
-
-	// set Vendor Liability Acct 
-	protected String setVendorLiabilityAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_VL_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("V_Liability_Acct", validAccount.get_ID());
-		return "";
-	}		
-	
-	// set Customer Prepayment Acct 
-	protected String setCustomerPrepaymentAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_CP_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("C_Prepayment_Acct", validAccount.get_ID());
-		return "";
-	}			
-
-	// set Vendor Prepayment Acct 
-	protected String setVendorPrepaymentAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_VP_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("V_Prepayment_Acct", validAccount.get_ID());
-		return "";
-	}	
-
-	// set Product Asset Acct 
-	protected String setProductAssetAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_Asset_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_Asset_Acct", validAccount.get_ID());
-		return "";
-	}		 
-	
-	// set Product Asset Acct 
-	protected String setProductExpenseAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_PE_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_Expense_Acct", validAccount.get_ID());
-		return "";
-	}		
-	
-	// set Cost Adjusment Acct 
-	protected String setCostAdjustmentAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_CA_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_CostAdjustment_Acct", validAccount.get_ID());
-		return "";
-	}	 	
-	
-	// set Inventory Clearing Acct 
-	protected String setInventoryClearingAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_IC_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_InventoryClearing_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Product Revenue Acct 
-	protected String setProductRevenueAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_Revenue_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_Revenue_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Product COGS Acct 
-	protected String setProductCOGSAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_COGS_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_COGS_Acct", validAccount.get_ID());
-		return "";
-	}	 
-
-	// set Purchase Price Variance Acct 
-	protected String setPurchasePriceVarianceAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_PPV_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_PurchasePriceVariance_Acct", validAccount.get_ID());
-		return "";
-	}		
-
-	// set Invioce Price Variance Acct 
-	protected String setInvoicePriceVarianceAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_IPV_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_InvoicePriceVariance_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Trade Discount Received Acct 
-	protected String setTradeDiscountReceivedAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_TDR_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_TradeDiscountRec_Acct", validAccount.get_ID());
-		return "";
-	}		
-
-	// set Trade Discount Granted Acct 
-	protected String setTradeDiscountGrantedAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_TDG_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_TradeDiscountGrant_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Rate Variance Acct 
-	protected String setRateVarianceAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_RV_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_RateVariance_Acct", validAccount.get_ID());
-		return "";
-	}	 
-	
-	// set Average Cost Variance Acct 
-	protected String setAverageCostVarianceAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_ACV_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_AverageCostVariance_Acct", validAccount.get_ID());
-		return "";
-	}	
-
-	// set Landed Cost Clearing Acct 
-	protected String setLandedCostClearingAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_LCC_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("P_LandedCostClearing_Acct", validAccount.get_ID());
-		return "";
-	}		
-	
-	// set Warehouse Differences Acct 
-	protected String setWarehouseDiffAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_WD_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("W_Differences_Acct", validAccount.get_ID());
-		return "";
-	}			
-	
-	// set Bank Asset Acct 
-	protected String setBankAssetAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_BA_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("B_Asset_Acct", validAccount.get_ID());
-		return "";
-	}	 
-	
-	// set Bank InTransit Acct 
-	protected String setBankInTransitAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_BIT_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("B_InTransit_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Payment Select Acct
-	protected String setPaymentSelectAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_PS_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("B_PaymentSelect_Acct", validAccount.get_ID());
-		return "";
-	}			
-	
-	// set Unallocated Cash Acct
-	protected String setUnallocatedCashAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_UC_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("B_UnallocatedCash_Acct", validAccount.get_ID());
-		return "";
-	}		
-	
-	// set Bank Interest Revenue Acct
-	protected String setBankInterestRevenueAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_BIR_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("B_InterestRev_Acct", validAccount.get_ID());
-		return "";
-	}		
-
-	// set Bank Interest Expense Acct
-	protected String setBankInterestExpenseAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_BIE_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("B_InterestExp_Acct", validAccount.get_ID());
-		return "";
-	}
-	
-	// set Tax Due Acct
-	protected String setTaxDueAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_TD_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("T_Due_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Tax Credit Acct
-	protected String setTaxCreditAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_TC_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("T_Credit_Acct", validAccount.get_ID());
-		return "";
-	}	
-
-	// set Tax Expense Acct
-	protected String setTaxExpenseAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_TE_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("T_Expense_Acct", validAccount.get_ID());
-		return "";
-	}		 
-	
-	// set Charge Acct
-	protected String setChargeAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_Charge_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("Ch_Expense_Acct", validAccount.get_ID());
-		return "";
-	}		
-	
-	// set Project Asset Acct
-	protected String setProjectAssetAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_PA_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("PJ_Asset_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Work In Progress Acct
-	protected String setWorkInProgressAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_WIP_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("PJ_WIP_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
 	//set Element Value
 	protected String setElementValue(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		if(value == null) {
@@ -603,4 +309,5 @@ public class CalloutAccountingSchemaDefault implements IColumnCallout{
 		
 		return "";
 	}
+
 }

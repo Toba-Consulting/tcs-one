@@ -1,8 +1,9 @@
-package org.banktransfer.callout;
+package id.tcs.callout;
 
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
+import org.banktransfer.interfaces.IAccountGen;
 import org.banktransfer.model.MAcctSchemaGL;
 import org.banktransfer.model.MValidCombination;
 import org.compiere.model.GridField;
@@ -13,25 +14,25 @@ import org.compiere.model.MBankAccount;
 import org.compiere.model.MField;
 import org.compiere.util.Env;
 
-public class CalloutAccountingSchemaGL implements IColumnCallout{
+public class CalloutAccountingSchemaGL implements IColumnCallout, IAccountGen{
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		// TODO Auto-generated method stub
 		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_SB_ID))
-			return setSuspenseBalancingAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_SB_ID");
 		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_CB_ID))
-			return setCurrencyBalancingAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CB_ID");
 		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_IDT_ID))
-			return setIntercompanyDueToAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_IDT_ID");
 		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_IDF_ID))
-			return setIntercompanyDueFromAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_IDF_ID");
 		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_PPVO_ID))
-			return setPPVOffsetAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PPVO_ID");
 		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_CO_ID))
-			return setCommitmentOffsetAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CO_ID");
 		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_COS_ID))
-			return setCommitmentOffsetSalesAcct(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_COS_ID");
 		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_SuspenseBalancing_Acct) 
 				|| mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_CurrencyBalancing_Acct)
 				|| mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_IntercompanyDueTo_Acct)
@@ -44,76 +45,33 @@ public class CalloutAccountingSchemaGL implements IColumnCallout{
 		return null;
 	}
 	
-	// set Suspense Balancing Acct
-	protected String setSuspenseBalancingAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
+
+	@Override
+	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
+			Object oldValue, String columnName) {
+		// TODO Auto-generated method stub
 		if(value == null)
 			return "";
 		
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_SB_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("SuspenseBalancing_Acct", validAccount.get_ID());
-		return "";
-	}
-	
-	// set Currency Balancing Acct
-	protected String setCurrencyBalancingAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
+		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue(columnName), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
+		if(columnName.equals("C_ElementValue_SB_ID"))
+			mTab.setValue("SuspenseBalancing_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_CB_ID"))
+			mTab.setValue("CurrencyBalancing_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_IDT_ID"))
+			mTab.setValue("IntercompanyDueTo_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_IDF_ID"))
+			mTab.setValue("IntercompanyDueFrom_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_PPVO_ID"))
+			mTab.setValue("PPVOffset_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_CO_ID"))
+			mTab.setValue("CommitmentOffset_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_COS_ID"))
+			mTab.setValue("CommitmentOffsetSales_Acct", validAccount.get_ID());
 			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_CB_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("CurrencyBalancing_Acct", validAccount.get_ID());
 		return "";
 	}
-
-	// set Intercompany Due To Acct
-	protected String setIntercompanyDueToAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_IDT_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("IntercompanyDueTo_Acct", validAccount.get_ID());
-		return "";
-	}
-	
-	// set Intercompany Due From Acct
-	protected String setIntercompanyDueFromAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_IDF_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("IntercompanyDueFrom_Acct", validAccount.get_ID());
-		return "";
-	}
-	
-	// set PPV Offset Acct 
-	protected String setPPVOffsetAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-				
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_PPVO_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("PPVOffset_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
-	// set Commitment Offset Acct 
-	protected String setCommitmentOffsetAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-				
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_CO_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("CommitmentOffset_Acct", validAccount.get_ID());
-		return "";
-	}		
-	
-	// set Commitment Offset Sales Acct 
-	protected String setCommitmentOffsetSalesAcct(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if(value == null)
-			return "";
-				
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_COS_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("CommitmentOffsetSales_Acct", validAccount.get_ID());
-		return "";
-	}	
-	
+		
 	//set Element Value
 	protected String setElementValue(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		if(value == null) {
@@ -139,5 +97,8 @@ public class CalloutAccountingSchemaGL implements IColumnCallout{
 			mTab.setValue(MAcctSchemaGL.COLUMNNAME_C_ElementValue_COS_ID, validcombination.getAccount_ID());
 		return "";
 	}
+
+
+
 
 }

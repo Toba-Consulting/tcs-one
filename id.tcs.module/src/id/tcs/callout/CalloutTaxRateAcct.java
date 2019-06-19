@@ -1,25 +1,26 @@
-package org.taxrateacct.callout;
+package id.tcs.callout;
 
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
+import org.banktransfer.interfaces.IAccountGen;
+import org.banktransfer.model.MTaxAcct;
+import org.banktransfer.model.MValidCombination;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
-import org.taxrateacct.model.MTaxAcct;
-import org.taxrateacct.model.MValidCombination;
 
-public class CalloutTaxRateAcct implements IColumnCallout{
+public class CalloutTaxRateAcct implements IColumnCallout, IAccountGen{
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		// TODO Auto-generated method stub
 		if (mField.getColumnName().equals(MTaxAcct.COLUMNNAME_C_ElementValue_TD_ID))
-			return setTaxDue(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TD_ID");
 		if (mField.getColumnName().equals(MTaxAcct.COLUMNNAME_C_ElementValue_TE_ID))
-			return setTaxExpense(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TE_ID");
 		if (mField.getColumnName().equals(MTaxAcct.COLUMNNAME_C_ElementValue_TC_ID))
-			return setTaxCredit(ctx, WindowNo, mTab, mField, value, oldValue);
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TC_ID");
 		if (mField.getColumnName().equals(MTaxAcct.COLUMNNAME_T_Due_Acct)
 				|| mField.getColumnName().equals(MTaxAcct.COLUMNNAME_T_Expense_Acct)
 				|| mField.getColumnName().equals(MTaxAcct.COLUMNNAME_T_Credit_Acct)
@@ -28,34 +29,21 @@ public class CalloutTaxRateAcct implements IColumnCallout{
 		return null;
 	}
 
-	//Tax Rate
-	//Set Tax Due
-	protected String setTaxDue(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
+	@Override
+	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
+			Object oldValue, String columnName) {
+		// TODO Auto-generated method stub
 		if (value == null)
 			return "";
 		
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_TD_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("T_Due_Acct", validAccount.get_ID());
-		return "";
-	}
-	
-	//Set Tax Credit
-	protected String setTaxCredit(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if (value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_TC_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("T_Credit_Acct", validAccount.get_ID());
-		return "";
-	}
-	
-	//Set Tax Expense
-	protected String setTaxExpense(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if (value == null)
-			return "";
-			
-		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue("C_ElementValue_TE_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		mTab.setValue("T_Expense_Acct", validAccount.get_ID());
+		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue(columnName), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
+		if(columnName.equals("C_ElementValue_TD_ID"))
+			mTab.setValue("T_Due_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_TC_ID"))
+			mTab.setValue("T_Credit_Acct", validAccount.get_ID());
+		else if(columnName.equals("C_ElementValue_TE_ID"))
+			mTab.setValue("T_Expense_Acct", validAccount.get_ID());
+		
 		return "";
 	}
 	
