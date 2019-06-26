@@ -413,7 +413,8 @@ public class TCSGeneralLedgerView extends SvrProcess {
 		StringBuilder sb = new StringBuilder();
 		//@phie add column gl_category_name HABCO 2596
 		sb.append("INSERT INTO T_TCSGeneralLedgerView ")
-		.append("(AccountSequence, Fact_Acct_ID, AD_Client_ID, AD_Org_ID, AD_Org_Name, C_AcctSchema_ID, C_Acct_Schema_Name, Account_ID, Account_No, Account_Name, ")
+//		.append("(AccountSequence, Fact_Acct_ID, AD_Client_ID, AD_Org_ID, AD_Org_Name, C_AcctSchema_ID, C_Acct_Schema_Name, Account_ID, Account_No, Account_Name, ")
+		.append("(AccountSequence, Fact_Acct_ID, AD_Client_ID, AD_Org_ID, AD_Org_Name, C_AcctSchema_ID, Account_ID, Account_No, Account_Name, ")
 		.append("DateAcct, C_Period_ID, C_Period_Name, PostingType, AmtAcctDr, AmtAcctCr, AmtSourceCr, AmtSourceDr, AmtAcctBalance, ")
 		.append("ISO_Code, Description, AD_PInstance_ID, Sequence, GL_Category_Name, AccountFrom, AccountTo, DocumentNo, Line, ")
 		.append("C_BPartner_ID, M_Product_ID, ")
@@ -434,7 +435,8 @@ public class TCSGeneralLedgerView extends SvrProcess {
 			sb.append(p_C_AcctSchema_ID);
 		else
 			sb.append("null");
-		sb.append(", null,");
+//		sb.append(", null,");
+		sb.append(",");
 		sb.append(account_id).append(", ");
 		sb.append(account_no).append(", '");
 		sb.append(account_name).append("', '");
