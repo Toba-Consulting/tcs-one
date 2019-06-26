@@ -30,6 +30,7 @@ import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 import id.tcs.model.I_TCS_AllocateCharge;
+import id.tcs.model.MBankTransfer;
 import id.tcs.model.TCS_MAdvRequest;
 import id.tcs.model.TCS_MAdvRequestLine;
 import id.tcs.model.TCS_MAdvSettlement;
@@ -69,6 +70,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MTripFacility.Table_Name, "id.tcs.model.TCS_MTripFacility");
 		mapTableModels.put(TCS_MTravelExpense.Table_Name, "id.tcs.model.TCS_MTravelExpense");
 		mapTableModels.put(TCS_MExpenseLine.Table_Name, "id.tcs.model.TCS_MExpenseLine");
+		mapTableModels.put(MBankTransfer.Table_Name, "id.tcs.model.MBankTransfer");
 		
 	}
 	

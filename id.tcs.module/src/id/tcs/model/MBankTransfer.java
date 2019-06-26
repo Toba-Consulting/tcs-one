@@ -315,6 +315,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 					log.warning("Payment Process Failed: " + paymentTransfer + " - " + paymentTransfer.getProcessMsg());
 					throw new IllegalStateException("Payment Process Failed: " + paymentTransfer + " - " + paymentTransfer.getProcessMsg());
 				}
+				setC_Payment_Transfer_ID(paymentTransfer.getC_Payment_ID());
 				paymentTransfer.saveEx();
 			
 			}
@@ -446,6 +447,8 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			}
 			
 			setProcessed(true);
+			setC_Payment_From_ID(paymentFrom.getC_Payment_ID());
+			setC_Payment_To_ID(paymentTo.getC_Payment_ID());			
 			setDocStatus(DOCSTATUS_Completed);
 			setDocAction(DOCACTION_Close);
 			return DocAction.STATUS_Completed;
