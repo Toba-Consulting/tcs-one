@@ -1,6 +1,5 @@
 package id.tcs.process;
 
-import java.awt.List;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,9 +16,6 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MElementValue;
 import org.compiere.model.MOrg;
 import org.compiere.model.MTree;
-import org.compiere.model.MTreeNode;
-import org.compiere.model.MTree_Node;
-import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
@@ -417,10 +413,9 @@ public class TCSGeneralLedgerView extends SvrProcess {
 		StringBuilder sb = new StringBuilder();
 		//@phie add column gl_category_name HABCO 2596
 		sb.append("INSERT INTO T_TCSGeneralLedgerView ")
-		.append("(AccountSequence, fact_acct_id, ad_client_id, ad_org_id, org_name, c_acctschema_id, acct_schema_name, account_id, account_no, account_name, ")
-		.append("dateacct, c_period_id, period_name, postingType, amtacctdr, amtacctcr, amtsourcecr, amtsourcedr, amtacctbalance, ")
-		.append("iso_code, description, AD_PInstance_ID, sequence, gl_category_name, accountfrom, accountto, DocumentNo, Line, ")
-//		.append("C_BPartner_ID, M_Product_ID, HBC_Tugboat_ID, HBC_Barge_ID, ")
+		.append("(AccountSequence, Fact_Acct_ID, AD_Client_ID, AD_Org_ID, AD_Org_Name, C_AcctSchema_ID, C_Acct_Schema_Name, Account_ID, Account_No, Account_Name, ")
+		.append("DateAcct, C_Period_ID, C_Period_Name, PostingType, AmtAcctDr, AmtAcctCr, AmtSourceCr, AmtSourceDr, AmtAcctBalance, ")
+		.append("ISO_Code, Description, AD_PInstance_ID, Sequence, GL_Category_Name, AccountFrom, AccountTo, DocumentNo, Line, ")
 		.append("C_BPartner_ID, M_Product_ID, ")
 		.append("GL_Category_ID, C_Project_ID, C_ProjectPhase_ID, C_ProjectTask_ID, C_Tax_ID, M_Locator_ID, AD_OrgTrx_ID, C_Campaign_ID, C_Activity_ID, C_SalesRegion_ID, ")
 		.append("C_LocFrom_ID, C_LocTo_ID, C_SubAcct_ID, A_Asset_ID, User1_ID, User2_ID, Qty)");
@@ -458,17 +453,6 @@ public class TCSGeneralLedgerView extends SvrProcess {
 			sb.append(p_M_Product_ID);
 		else sb.append("null");
 		sb.append(",");
-/*		
-		if (p_UserElement1_ID > 0)//TUGBOAT
-			sb.append(p_UserElement1_ID);
-		else sb.append("null");
-		sb.append(", ");
-		
-		if (p_UserElement2_ID > 0)//BARGE
-			sb.append(p_UserElement2_ID);
-		else sb.append("null");
-		sb.append(", ");
-*/		
 		if (p_GL_Category_ID > 0)
 			sb.append(p_GL_Category_ID);
 		else sb.append("null");
@@ -562,10 +546,10 @@ public class TCSGeneralLedgerView extends SvrProcess {
 		 */
 		
         StringBuilder sb = new StringBuilder("INSERT INTO T_TCSGeneralLedgerView ");
-        sb.append("(AD_Client_ID, AD_Org_ID, Org_Name, C_AcctSchema_ID, Acct_Schema_Name, Account_ID, account_no, account_name, dateacct, c_period_id, period_name, ");
-        sb.append("postingType, amtacctdr, amtacctcr, amtsourcedr, amtsourcecr, amtacctbalance, iso_code, description, AD_PInstance_ID, sequence, gl_category_name, ");
+        sb.append("(AD_Client_ID, AD_Org_ID, Org_Name, C_AcctSchema_ID, Acct_Schema_Name, Account_ID, Account_No, Account_Name, Dateacct, C_Period_ID, C_Period_Name, ");
+        sb.append("PostingType, AmtAcctDr, AmtAcctCr, AmtSourceDr, AmtSourceCr, AmtAcctBalance, ISO_Code, Description, AD_PInstance_ID, Sequence, GL_Category_Name, ");
 //        sb.append("accountfrom, accountto, DocumentNo, Line, C_BPartner_ID, M_Product_ID, HBC_Tugboat_ID, HBC_Barge_ID, Fact_Acct_ID, AccountSequence, ");
-        sb.append("accountfrom, accountto, DocumentNo, Line, C_BPartner_ID, M_Product_ID, Fact_Acct_ID, AccountSequence, ");
+        sb.append("AccountFrom, AccountTo, DocumentNo, Line, C_BPartner_ID, M_Product_ID, Fact_Acct_ID, AccountSequence, ");
         sb.append("GL_Category_ID, C_Project_ID, C_ProjectPhase_ID, C_ProjectTask_ID, C_Tax_ID, M_Locator_ID, AD_OrgTrx_ID, C_Campaign_ID, C_Activity_ID, C_SalesRegion_ID, ");
 		sb.append("C_LocFrom_ID, C_LocTo_ID, C_SubAcct_ID, A_Asset_ID, User1_ID, User2_ID, Qty)");
 
@@ -664,11 +648,11 @@ public class TCSGeneralLedgerView extends SvrProcess {
 		if (p_User2_ID > 0)
 			sb.append("AND fa.User2_ID=").append(p_User2_ID).append(" ");
 		
-        sb.append("GROUP BY fa.ad_client_id, fa.ad_org_id, ao.name, fa.c_acctschema_id, fa.account_id, ")
-        .append("cev.value, cev.name, fa.dateacct, fa.c_period_id, fa.postingtype, cev.accounttype, ")
-        .append("cas.name, cp.name, cc.iso_code, fa.description, gc.name, fa.fact_acct_id, ")
-        .append("fa.c_bpartner_id, fa.UserElement1_ID, fa.UserElement2_ID, fa.AD_Org_ID ");
-        sb.append("ORDER BY dateacct, fact_acct_id");
+        sb.append("GROUP BY fa.AD_Client_ID, fa.AD_Org_ID, ao.Name, fa.C_AcctSchema_ID, fa.Account_ID, ")
+        .append("cev.Value, cev.Name, fa.DateAcct, fa.C_Period_ID, fa.PostingType, cev.AccountType, ")
+        .append("cas.Name, cp.Name, cc.ISO_Code, fa.Description, gc.Name, fa.Fact_Acct_ID, ")
+        .append("fa.C_BPartner_ID, fa.UserElement1_ID, fa.UserElement2_ID, fa.AD_Org_ID ");
+        sb.append("ORDER BY DateAcct, Fact_Acct_ID");
         
         int no = DB.executeUpdate(sb.toString(), get_TrxName());
 		log.fine("#" + no);
