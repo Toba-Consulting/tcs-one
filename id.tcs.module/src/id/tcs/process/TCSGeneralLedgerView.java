@@ -546,7 +546,7 @@ public class TCSGeneralLedgerView extends SvrProcess {
 		 */
 		
         StringBuilder sb = new StringBuilder("INSERT INTO T_TCSGeneralLedgerView ");
-        sb.append("(AD_Client_ID, AD_Org_ID, Org_Name, C_AcctSchema_ID, Acct_Schema_Name, Account_ID, Account_No, Account_Name, Dateacct, C_Period_ID, C_Period_Name, ");
+        sb.append("(AD_Client_ID, AD_Org_ID, AD_Org_Name, C_AcctSchema_ID, C_Acct_Schema_Name, Account_ID, Account_No, Account_Name, Dateacct, C_Period_ID, C_Period_Name, ");
         sb.append("PostingType, AmtAcctDr, AmtAcctCr, AmtSourceDr, AmtSourceCr, AmtAcctBalance, ISO_Code, Description, AD_PInstance_ID, Sequence, GL_Category_Name, ");
 //        sb.append("accountfrom, accountto, DocumentNo, Line, C_BPartner_ID, M_Product_ID, HBC_Tugboat_ID, HBC_Barge_ID, Fact_Acct_ID, AccountSequence, ");
         sb.append("AccountFrom, AccountTo, DocumentNo, Line, C_BPartner_ID, M_Product_ID, Fact_Acct_ID, AccountSequence, ");
