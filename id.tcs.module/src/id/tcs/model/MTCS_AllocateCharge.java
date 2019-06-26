@@ -16,12 +16,10 @@ public class MTCS_AllocateCharge extends X_TCS_AllocateCharge{
 	
 	public MTCS_AllocateCharge(Properties ctx, int TCS_AllocateCharge_ID, String trxName) {
 		super(ctx, TCS_AllocateCharge_ID, trxName);
-		// TODO Auto-generated constructor stub
 	}
 
 	public MTCS_AllocateCharge(Properties ctx, ResultSet rs, String trxName) {
 		super(ctx, rs, trxName);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override

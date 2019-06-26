@@ -32,7 +32,7 @@ public class X_TCS_AllocateCharge extends PO implements I_TCS_AllocateCharge, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181026L;
+	private static final long serialVersionUID = 20190626L;
 
     /** Standard Constructor */
     public X_TCS_AllocateCharge (Properties ctx, int TCS_AllocateCharge_ID, String trxName)
@@ -40,7 +40,6 @@ public class X_TCS_AllocateCharge extends PO implements I_TCS_AllocateCharge, I_
       super (ctx, TCS_AllocateCharge_ID, trxName);
       /** if (TCS_AllocateCharge_ID == 0)
         {
-			setTCS_AllocateCharge_ID (0);
         } */
     }
 
@@ -51,7 +50,7 @@ public class X_TCS_AllocateCharge extends PO implements I_TCS_AllocateCharge, I_
     }
 
     /** AccessLevel
-      * @return 3 - Client - Org 
+      * @return 1 - Org 
       */
     protected int get_AccessLevel()
     {
@@ -78,7 +77,7 @@ public class X_TCS_AllocateCharge extends PO implements I_TCS_AllocateCharge, I_
 	  */
 	public void setAmount (BigDecimal Amount)
 	{
-		set_Value (COLUMNNAME_Amount, Amount);
+		set_ValueNoCheck (COLUMNNAME_Amount, Amount);
 	}
 
 	/** Get Amount.
@@ -90,6 +89,34 @@ public class X_TCS_AllocateCharge extends PO implements I_TCS_AllocateCharge, I_
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
+	}
+
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_BPartner)MTable.get(getCtx(), org.compiere.model.I_C_BPartner.Table_Name)
+			.getPO(getC_BPartner_ID(), get_TrxName());	}
+
+	/** Set Business Partner .
+		@param C_BPartner_ID 
+		Identifies a Business Partner
+	  */
+	public void setC_BPartner_ID (int C_BPartner_ID)
+	{
+		if (C_BPartner_ID < 1) 
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, null);
+		else 
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, Integer.valueOf(C_BPartner_ID));
+	}
+
+	/** Get Business Partner .
+		@return Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_BPartner_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	public org.compiere.model.I_C_Charge getC_Charge() throws RuntimeException
@@ -165,8 +192,8 @@ public class X_TCS_AllocateCharge extends PO implements I_TCS_AllocateCharge, I_
 		return (String)get_Value(COLUMNNAME_Description);
 	}
 
-	/** Set TCS_AllocateCharge.
-		@param TCS_AllocateCharge_ID TCS_AllocateCharge	  */
+	/** Set TCS Allocate Charge.
+		@param TCS_AllocateCharge_ID TCS Allocate Charge	  */
 	public void setTCS_AllocateCharge_ID (int TCS_AllocateCharge_ID)
 	{
 		if (TCS_AllocateCharge_ID < 1) 
@@ -175,8 +202,8 @@ public class X_TCS_AllocateCharge extends PO implements I_TCS_AllocateCharge, I_
 			set_ValueNoCheck (COLUMNNAME_TCS_AllocateCharge_ID, Integer.valueOf(TCS_AllocateCharge_ID));
 	}
 
-	/** Get TCS_AllocateCharge.
-		@return TCS_AllocateCharge	  */
+	/** Get TCS Allocate Charge.
+		@return TCS Allocate Charge	  */
 	public int getTCS_AllocateCharge_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_TCS_AllocateCharge_ID);

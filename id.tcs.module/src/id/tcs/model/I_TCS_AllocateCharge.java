@@ -32,14 +32,14 @@ public interface I_TCS_AllocateCharge
     /** TableName=TCS_AllocateCharge */
     public static final String Table_Name = "TCS_AllocateCharge";
 
-    /** AD_Table_ID=1000020 */
-    public static final int Table_ID = MTable.getTable_ID(Table_Name);
+    /** AD_Table_ID=300510 */
+    public static final int Table_ID = 300510;
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 3 - Client - Org 
+    /** AccessLevel = 1 - Org 
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(3);
+    BigDecimal accessLevel = BigDecimal.valueOf(1);
 
     /** Load Meta Data */
 
@@ -76,6 +76,21 @@ public interface I_TCS_AllocateCharge
 	  * Amount in a defined currency
 	  */
 	public BigDecimal getAmount();
+
+    /** Column name C_BPartner_ID */
+    public static final String COLUMNNAME_C_BPartner_ID = "C_BPartner_ID";
+
+	/** Set Business Partner .
+	  * Identifies a Business Partner
+	  */
+	public void setC_BPartner_ID (int C_BPartner_ID);
+
+	/** Get Business Partner .
+	  * Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID();
+
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException;
 
     /** Column name C_Charge_ID */
     public static final String COLUMNNAME_C_Charge_ID = "C_Charge_ID";
@@ -152,10 +167,10 @@ public interface I_TCS_AllocateCharge
     /** Column name TCS_AllocateCharge_ID */
     public static final String COLUMNNAME_TCS_AllocateCharge_ID = "TCS_AllocateCharge_ID";
 
-	/** Set TCS_AllocateCharge	  */
+	/** Set TCS Allocate Charge	  */
 	public void setTCS_AllocateCharge_ID (int TCS_AllocateCharge_ID);
 
-	/** Get TCS_AllocateCharge	  */
+	/** Get TCS Allocate Charge	  */
 	public int getTCS_AllocateCharge_ID();
 
     /** Column name Updated */
