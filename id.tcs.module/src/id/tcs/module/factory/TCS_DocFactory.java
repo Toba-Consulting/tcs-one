@@ -16,6 +16,8 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
+import id.tcs.model.MBankTransfer;
+
 public class TCS_DocFactory implements IDocFactory {
 	private final static CLogger s_log = CLogger.getCLogger(TCS_DocFactory.class);
 
@@ -72,6 +74,9 @@ public class TCS_DocFactory implements IDocFactory {
 		
 		if(tableName.equals(MPayment.Table_Name))
 			return new TCS_Doc_Payment(as, rs, trxName);
+		
+		if(tableName.equals(MBankTransfer.Table_Name))
+			return new Doc_BankTransfer(as, rs, trxName);
 		
 		return null;
 

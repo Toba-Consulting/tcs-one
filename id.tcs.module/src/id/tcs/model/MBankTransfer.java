@@ -13,6 +13,7 @@ import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBankAccount;
+import org.compiere.model.MCharge;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPeriod;
 import org.compiere.model.ModelValidationEngine;
@@ -281,6 +282,44 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			paymentTo.saveEx();
 			//paymentTo
 			
+			if(isHasTransferFee()) {
+				MPayment paymentTransfer = new MPayment(getCtx(), 0, get_TrxName());
+				
+				paymentTransfer.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
+				if(bankTransfer.getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom)) {
+					paymentTransfer.setC_BankAccount_ID(getC_BankAccount_From_ID());
+					paymentTransfer.setC_Currency_ID(getC_Currency_From_ID());
+					paymentTransfer.setPayAmt(getPayAmtFrom());
+				}
+				else {
+					paymentTransfer.setC_BankAccount_ID(getC_BankAccount_To_ID());
+					paymentTransfer.setC_Currency_ID(getC_Currency_To_ID());
+					paymentTransfer.setPayAmt(getPayAmtTo());
+				}
+				paymentTransfer.setC_BPartner_ID(getC_BPartner_ID());
+				paymentTransfer.setC_DocType_ID(true);
+				
+				if(bankTransfer.getDescription() == null) {
+					paymentTransfer.setDescription("Generated From Bank Transfer " + getDocumentNo());								
+				}
+				else {
+					paymentTransfer.setDescription(getDescription() + " | Generated From Bank Transfer " + getDocumentNo());
+				}
+				paymentTransfer.setDateAcct(getDateAcct());
+				paymentTransfer.setDateTrx(getDateAcct());
+				paymentTransfer.setChargeAmt(getChargeAmt());
+				paymentTransfer.setC_ConversionType_ID(getC_ConversionType_ID());
+				paymentTransfer.saveEx();
+				
+				if(!paymentTransfer.processIt(MPayment.DOCACTION_Complete)){
+					log.warning("Payment Process Failed: " + paymentTransfer + " - " + paymentTransfer.getProcessMsg());
+					throw new IllegalStateException("Payment Process Failed: " + paymentTransfer + " - " + paymentTransfer.getProcessMsg());
+				}
+				paymentTransfer.saveEx();
+			
+			}
+			
+			
 			//allocation
 			MAllocationHdr allocHdr = new MAllocationHdr(getCtx(), 0, get_TrxName());
 			//MAcctSchema schema = new MAcctSchema(getCtx(), bankTransfer.get_ValueAsInt("C_AcctSchema_ID"), get_TrxName());
@@ -364,20 +403,33 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				alloclineChr.saveEx();
 			
 				MAllocationLine alloclineChrGap = new MAllocationLine(allocHdr);
-//				MCharge charge2 = new MCharge(getCtx(), 1000761, get_TrxName());
+				MCharge charge3 = new MCharge(getCtx(), bankTransfer.getC_Charge_ID(), get_TrxName());
 				alloclineChrGap.setAD_Org_ID(allocHdr.getAD_Org_ID());
 				alloclineChrGap.setC_BPartner_ID(getC_BPartner_ID());
-//				alloclineChrGap.setC_Charge_ID(charge2.getC_Charge_ID());
-				if(bankTransfer.getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom)) {
-//					charge2.setChargeAmt(alloclineAP.getAmount().add(bankTransfer.getPayAmtTo().multiply(divideRate)));
-//					alloclineChrGap.setAmount(charge2.getChargeAmt());
+				alloclineChrGap.setC_Charge_ID(charge3.getC_Charge_ID());
+//				alloclineChrGap.setC_Invoice_ID(0);
+				
+				if(!paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals("IDR")) {
+//					charge2.setChargeAmt(alloclineAP.getAmount().add(bankTransfer.getPayAmtTo().multiply(multiplyRate)));
+					alloclineChrGap.setAmount(paymentFrom.getPayAmt().multiply(multiplyRate).subtract(paymentTo.getPayAmt()));
 					alloclineChrGap.setC_Payment_ID(getC_Payment_To_ID());
 				}
-				else {
-//					charge2.setChargeAmt(bankTransfer.getPayAmtTo().multiply(divideRate).add(alloclineAP.getAmount()));
-//					alloclineChrGap.setAmount(charge2.getChargeAmt());
+				else if(paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals("IDR")){
+//					charge2.setChargeAmt(bankTransfer.getPayAmtTo().multiply(multiplyRate).add(alloclineAP.getAmount()));
+					alloclineChrGap.setAmount(paymentFrom.getPayAmt());
 					alloclineChrGap.setC_Payment_ID(getC_Payment_To_ID());
 				}
+				else if(paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals("IDR")){
+//					charge2.setChargeAmt(bankTransfer.getPayAmtTo().multiply(multiplyRate).add(alloclineAP.getAmount()));
+					alloclineChrGap.setAmount(paymentTo.getPayAmt());
+					alloclineChrGap.setC_Payment_ID(getC_Payment_To_ID());
+				}
+				else if(!paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals("IDR")){
+//					charge2.setChargeAmt(bankTransfer.getPayAmtTo().multiply(multiplyRate).add(alloclineAP.getAmount()));
+					alloclineChrGap.setAmount(paymentTo.getPayAmt().multiply(multiplyRate).subtract(paymentFrom.getPayAmt()));
+					alloclineChrGap.setC_Payment_ID(getC_Payment_To_ID());
+				}
+				
 				alloclineChrGap.saveEx();
 				
 		}	
@@ -464,6 +516,9 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		}
 		MPeriod.testPeriodOpen(getCtx(), dateAcct, getC_DocType_ID(), getAD_Org_ID());
 		
+		MPayment paymentFrom = new MPayment(getCtx(), getC_Payment_From_ID(), get_TrxName());
+		MPayment paymentTo = new MPayment(getCtx(), getC_Payment_To_ID(), get_TrxName());
+		
 		// create reversal
 		MBankTransfer reversal = new MBankTransfer(getCtx(), 0, get_TrxName());
 		copyValues(this, reversal);
@@ -474,15 +529,25 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		reversal.setDocumentNo(getDocumentNo() + REVERSE_INDICATOR);
 		reversal.setDocStatus(DOCSTATUS_Drafted);
 		reversal.setDocAction(DOCACTION_Complete);
+		reversal.setC_BankAccount_From_ID(paymentFrom.getC_BankAccount_ID());
+		reversal.setC_BankAccount_To_ID(paymentTo.getC_BankAccount_ID());
 		//
 		reversal.setPayAmtFrom(getPayAmtFrom().negate());
 		reversal.setPayAmtTo(getPayAmtTo().negate());
-		reversal.setAmountFrom(getAmountFrom().negate());
-		reversal.setAmountTo(getAmountTo().negate());
 		reversal.setChargeAmt(getChargeAmt().negate());
 		//
 		reversal.setIsCanceled(true);
+//		reversal.setIsAllocated(true);
+//		reversal.setIsReconciled(false);
+//		reversal.setIsOnline(false);
+//		reversal.setIsApproved(true); 
+//		reversal.setR_PnRef(null);
+//		reversal.setR_Result(null);
+//		reversal.setR_RespMsg(null);
+//		reversal.setR_AuthCode(null);
+//		reversal.setR_Info(null);
 		reversal.setProcessing(false);
+//		reversal.setOProcessing("N");
 		reversal.setProcessed(false);
 		reversal.setPosted(false);
 		reversal.setDescription(getDescription());
