@@ -283,8 +283,8 @@ public class TCSAllocation
 			+ "currencyConvert(i.GrandTotal*i.MultiplierAP,i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID), " //  7   #1  Converted, #2 Date
 			+ "currencyConvert(invoiceOpen(C_Invoice_ID,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.MultiplierAP, "  //  8   #3, #4  Converted Open
 			+ "currencyConvert(invoiceDiscount"                               //  9       AllowedDiscount
-			+ "(i.C_Invoice_ID,?,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.Multiplier*i.MultiplierAP,"               //  #5, #6
-			+ " i.MultiplierAP,cd.name, i.poreference , i.dateacct"
+			+ "(i.C_Invoice_ID,?,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.Multiplier*i.MultiplierAP,"  //9             //  #5, #6
+			+ " i.MultiplierAP,cd.name, i.dateacct"//10..12
 			+ " FROM C_Invoice_v i"		//  corrected for CM/Split
 			+ " INNER JOIN C_Currency c ON (i.C_Currency_ID=c.C_Currency_ID) "
 			//@tegar
@@ -297,9 +297,7 @@ public class TCSAllocation
 		/* @win
 		if (m_AD_Org_ID != 0 ) 
 			sql.append(" AND i.AD_Org_ID=" + m_AD_Org_ID);
-		*/
-		if (m_poReference != null)
-			sql.append(" AND i.poreference=?");											// #9
+		*/							// #9
 		sql.append(" ORDER BY i.DateInvoiced, i.DocumentNo");
 		if (log.isLoggable(Level.FINE)) log.fine("InvSQL=" + sql.toString());
 		
@@ -355,7 +353,7 @@ public class TCSAllocation
 				//@tegar
 				line.add(rs.getString(11));						//	10/12-docttype
 				//end
-				line.add(rs.getString(12));
+				line.add(rs.getTimestamp(12));					//   11/13-dateacct
 
 				//line.add(rs.getBigDecimal(9));		
 				//	Add when open <> 0 (i.e. not if no conversion rate)
@@ -397,7 +395,7 @@ public class TCSAllocation
 		//@tegar
 		columnNames.add(Msg.getMsg(Env.getCtx(), "DocType"));
 		//end
-		columnNames.add("No Polis");
+		//columnNames.add("No Polis"); //@win
 		columnNames.add("Date Accounting");
 		//columnNames.add(" ");	//	Multiplier
 		
@@ -423,7 +421,7 @@ public class TCSAllocation
 		invoiceTable.setColumnClass(i++, BigDecimal.class, false);      //  10-Conv OverUnder
 		invoiceTable.setColumnClass(i++, BigDecimal.class, true);		//	11-Conv Applied
 		invoiceTable.setColumnClass(i++, String.class, true);			//	12-Doctype
-		invoiceTable.setColumnClass(i++, String.class, true);
+		//invoiceTable.setColumnClass(i++, String.class, true); //@win comment out poreference
 		
 		invoiceTable.setColumnClass(i++, Timestamp.class, true);		// 13 - Date Acct
 		
