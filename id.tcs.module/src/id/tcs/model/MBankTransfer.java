@@ -13,12 +13,10 @@ import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBankAccount;
-import org.compiere.model.MCharge;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPeriod;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
-import org.compiere.model.X_C_DocType;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
@@ -158,10 +156,10 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			 
 		if(!isHasTransferFee())	
 		{
-//			setC_Charge_ID(null);
-			
+			setC_Charge_ID(0);
 			setChargeAmt(null);
-			
+			setTransferFeeType(null);
+			setC_Payment_Transfer_ID(0);
 		}
 			
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
@@ -345,9 +343,14 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				  + "' AND ValidTo >= '" + bankTransfer.getDateAcct() + "'"
 				  + " AND C_ConversionType_ID = " + bankTransfer.getC_ConversionType_ID();			
 
+			String sqlCurrencyIDR = 
+					"SELECT C_Currency_ID FROM C_Currency"
+				  + " WHERE C_Currency_ID = 303";
+			
 			int DocBaseTypeAllocID = DB.getSQLValue(get_TrxName(), sqlDocBaseTypeAlloc);
 			BigDecimal divideRate = DB.getSQLValueBD(get_TrxName(), sqlDivideRate);
 			BigDecimal multiplyRate = DB.getSQLValueBD(get_TrxName(), sqlMultiplyRate);
+			int CurrencyIDR = DB.getSQLValue(get_TrxName(), sqlCurrencyIDR);
 			
 			System.out.println(multiplyRate);
 			
@@ -369,10 +372,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			alloclineAP.setAD_Org_ID(allocHdr.getAD_Org_ID());
 			alloclineAP.setC_BPartner_ID(paymentFrom.getC_BPartner_ID());
 			alloclineAP.setC_Payment_ID(paymentFrom.getC_Payment_ID());
-			if(!paymentFrom.get_Value("C_Currency_ID").equals(allocHdr.getC_Currency_ID()))
-				alloclineAP.setAmount(getAmountFrom().negate());
-			else
-				alloclineAP.setAmount(getAmountFrom().negate());
+			alloclineAP.setAmount(getAmountFrom().negate());
 			alloclineAP.saveEx();
 			
 			MAllocationLine alloclineAR = new MAllocationLine(allocHdr);
@@ -380,12 +380,41 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			alloclineAR.setAD_Org_ID(allocHdr.getAD_Org_ID());
 			alloclineAR.setC_BPartner_ID(paymentTo.getC_BPartner_ID());
 			alloclineAR.setC_Payment_ID(paymentTo.getC_Payment_ID());
-			if(!paymentTo.get_Value("C_Currency_ID").equals(getC_Currency_ID()))
-				alloclineAR.setAmount(getPayAmtFrom().subtract(bankTransfer.getChargeAmt()));
-			else
-				alloclineAR.setAmount(getPayAmtTo());
+			alloclineAR.setAmount(getPayAmtTo());
 			bankTransfer.setC_Payment_To_ID(paymentTo.getC_Payment_ID());
 			alloclineAR.saveEx();
+			
+			if(get_ValueAsInt(MBankTransfer.COLUMNNAME_C_Currency_From_ID) != get_ValueAsInt(MBankTransfer.COLUMNNAME_C_Currency_To_ID) )
+			{
+				MAllocationLine alloclineChrGap = new MAllocationLine(allocHdr);
+				MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
+				alloclineChrGap.setAD_Org_ID(allocHdr.getAD_Org_ID());
+				alloclineChrGap.setC_BPartner_ID(paymentTo.getC_BPartner_ID());
+//				if(bankTransfer.getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom))
+//					alloclineChrGap.setC_Charge_ID(bankTransfer.getC_Charge_ID());
+//				else if(bankTransfer.getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankTo))
+//					alloclineChrGap.setC_Charge_ID(paymentTo.getC_Charge_ID());
+//				alloclineChrGap.setC_Invoice_ID(0);
+				System.out.println(paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID));
+				System.out.println(paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR));
+				System.out.println(CurrencyIDR);
+				System.out.println(divideRate);
+				if(!paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR) && paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR)) {
+					alloclineChrGap.setAmount(paymentFrom.getPayAmt().multiply(multiplyRate).subtract(paymentTo.getPayAmt()));
+					alloclineChrGap.setC_Payment_ID(paymentTo.getC_Payment_ID());
+				}
+				else if(!paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR) && paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR)){
+					alloclineChrGap.setAmount(paymentTo.getPayAmt().multiply(divideRate).subtract(paymentFrom.getPayAmt()));
+					alloclineChrGap.setC_Payment_ID(paymentFrom.getC_Payment_ID());
+				}
+				else{
+					alloclineChrGap.setAmount(paymentTo.getPayAmt());
+					alloclineChrGap.setC_Payment_ID(paymentTo.getC_Payment_ID());
+				}
+				
+				alloclineChrGap.saveEx();
+			}
+
 			
 			if(bankTransfer.get_Value("C_Charge_ID") != null){
 				MAllocationLine alloclineChr = new MAllocationLine(allocHdr);
@@ -401,39 +430,8 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 					alloclineChr.setAmount(getChargeAmt());
 					alloclineChr.setC_Payment_ID(getC_Payment_To_ID());
 				}
-				alloclineChr.saveEx();
-			
-				MAllocationLine alloclineChrGap = new MAllocationLine(allocHdr);
-				MCharge charge3 = new MCharge(getCtx(), bankTransfer.getC_Charge_ID(), get_TrxName());
-				alloclineChrGap.setAD_Org_ID(allocHdr.getAD_Org_ID());
-				alloclineChrGap.setC_BPartner_ID(getC_BPartner_ID());
-				alloclineChrGap.setC_Charge_ID(charge3.getC_Charge_ID());
-//				alloclineChrGap.setC_Invoice_ID(0);
-				
-				if(!paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals("IDR")) {
-//					charge2.setChargeAmt(alloclineAP.getAmount().add(bankTransfer.getPayAmtTo().multiply(multiplyRate)));
-					alloclineChrGap.setAmount(paymentFrom.getPayAmt().multiply(multiplyRate).subtract(paymentTo.getPayAmt()));
-					alloclineChrGap.setC_Payment_ID(getC_Payment_To_ID());
-				}
-				else if(paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals("IDR")){
-//					charge2.setChargeAmt(bankTransfer.getPayAmtTo().multiply(multiplyRate).add(alloclineAP.getAmount()));
-					alloclineChrGap.setAmount(paymentFrom.getPayAmt());
-					alloclineChrGap.setC_Payment_ID(getC_Payment_To_ID());
-				}
-				else if(paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals("IDR")){
-//					charge2.setChargeAmt(bankTransfer.getPayAmtTo().multiply(multiplyRate).add(alloclineAP.getAmount()));
-					alloclineChrGap.setAmount(paymentTo.getPayAmt());
-					alloclineChrGap.setC_Payment_ID(getC_Payment_To_ID());
-				}
-				else if(!paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals("IDR")){
-//					charge2.setChargeAmt(bankTransfer.getPayAmtTo().multiply(multiplyRate).add(alloclineAP.getAmount()));
-					alloclineChrGap.setAmount(paymentTo.getPayAmt().multiply(multiplyRate).subtract(paymentFrom.getPayAmt()));
-					alloclineChrGap.setC_Payment_ID(getC_Payment_To_ID());
-				}
-				
-				alloclineChrGap.saveEx();
-				
-		}	
+				alloclineChr.saveEx();			
+			}	
 			
 			allocHdr.processIt(DocAction.ACTION_Complete);
 
@@ -526,7 +524,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		MBankTransfer reversal = new MBankTransfer(getCtx(), 0, get_TrxName());
 		copyValues(this, reversal);
 		reversal.setClientOrg(this);
-//		reversal.setC_Invoice_ID(0);
 		reversal.setDateAcct(dateAcct);
 		//
 		reversal.setDocumentNo(getDocumentNo() + REVERSE_INDICATOR);
@@ -540,23 +537,12 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		reversal.setChargeAmt(getChargeAmt().negate());
 		//
 		reversal.setIsCanceled(true);
-//		reversal.setIsAllocated(true);
-//		reversal.setIsReconciled(false);
-//		reversal.setIsOnline(false);
-//		reversal.setIsApproved(true); 
-//		reversal.setR_PnRef(null);
-//		reversal.setR_Result(null);
-//		reversal.setR_RespMsg(null);
-//		reversal.setR_AuthCode(null);
-//		reversal.setR_Info(null);
 		reversal.setProcessing(false);
-//		reversal.setOProcessing("N");
 		reversal.setProcessed(false);
 		reversal.setPosted(false);
 		reversal.setDescription(getDescription());
 		reversal.addDescription("{->" + getDocumentNo() + ")");
 		//
-//		reversal.setReversal_ID(getC_BankTransfer_ID()); reversal id nya gaada
 		reversal.saveEx(get_TrxName());
 		// post reversal
 		try {
@@ -595,7 +581,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		//	Reversal Allocation
 		aLine = new MAllocationLine (alloc);
 		aLine.setDocInfo(reversal.getC_BPartner_ID(), 0, 0);
-//		aLine.setPaymentInfo(reversal.getC_Payment_ID(), 0);
 		if (!aLine.save(get_TrxName()))
 			log.warning("Automatic allocation - reversal line not saved");
 		
