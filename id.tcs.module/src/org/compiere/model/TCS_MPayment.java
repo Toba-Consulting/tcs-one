@@ -1,4 +1,4 @@
-package id.tcs.model;
+package org.compiere.model;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
