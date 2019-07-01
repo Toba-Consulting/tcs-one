@@ -24,14 +24,20 @@ import java.util.Properties;
 
 import org.adempiere.base.IModelFactory;
 import org.compiere.model.I_C_AllocationHdr;
+import org.compiere.model.I_C_AllocationLine;
 import org.compiere.model.I_C_BankStatement;
+import org.compiere.model.I_C_Invoice;
+import org.compiere.model.I_C_Order;
 import org.compiere.model.I_C_Payment;
-import org.compiere.model.MInvoice;
+import org.compiere.model.I_M_InOut;
+import org.compiere.model.I_M_Inventory;
+import org.compiere.model.I_M_Movement;
+import org.compiere.model.I_M_RMA;
+import org.compiere.model.I_M_Requisition;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 import id.tcs.model.I_TCS_AllocateCharge;
-import org.compiere.model.TCS_MAllocationHdr;
 
 
 
@@ -46,10 +52,19 @@ public class TCS_ModelFactory implements IModelFactory {
 	private static HashMap<String, String> mapTableModels = new HashMap<String, String>();
 	static
 	{
-		mapTableModels.put(I_C_Payment.Table_Name, "id.tcs.model.TCS_MPayment");
+		mapTableModels.put(I_M_Requisition.Table_Name, "org.compiere.model.TCS_MRequisition");
+		mapTableModels.put(I_C_Order.Table_Name, "org.compiere.model.TCS_MOrder");
+		mapTableModels.put(I_M_RMA.Table_Name, "org.compiere.model.TCS_MRMA");
+		mapTableModels.put(I_M_InOut.Table_Name, "org.compiere.model.TCS_MInOut");
+		mapTableModels.put(I_C_Invoice.Table_Name, "org.compiere.model.TCS_MInvoice");
+		mapTableModels.put(I_C_Payment.Table_Name, "org.compiere.model.TCS_MPayment");
+		mapTableModels.put(I_C_AllocationHdr.Table_Name, "org.compiere.model.TCS_MAllocationHdr");
+		mapTableModels.put(I_C_AllocationLine.Table_Name, "org.compiere.model.TCS_MAllocationLine");
+		mapTableModels.put(I_C_BankStatement.Table_Name, "org.compiere.model.TCS_MBankStatement");
+		mapTableModels.put(I_M_Inventory.Table_Name, "org.compiere.model.TCS_MInventory");
+		mapTableModels.put(I_M_Movement.Table_Name, "org.compiere.model.TCS_MMovement");
+		
 		mapTableModels.put(I_TCS_AllocateCharge.Table_Name, "id.tcs.model.MTCS_AllocateCharge");
-		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
-		mapTableModels.put(TCS_MAllocationHdr.Table_Name, "org.compiere.model.TCS_MAllocationHdr");
 		
 	}
 	
