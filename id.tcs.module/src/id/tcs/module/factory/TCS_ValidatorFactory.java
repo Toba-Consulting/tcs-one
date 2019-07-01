@@ -8,6 +8,7 @@ import org.compiere.model.I_C_Order;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MBankStatement;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MOrder;
 import org.compiere.model.MPayment;
 import org.compiere.model.X_AD_WF_Activity;
 import org.compiere.util.CLogger;
@@ -15,6 +16,7 @@ import org.compiere.wf.MWFActivity;
 import org.osgi.service.event.Event;
 
 import id.tcs.validator.TCS_BankStatementDocValidator;
+import id.tcs.validator.TCS_OrderValidator;
 import id.tcs.validator.TCS_WFActivityValidator;
 import id.tcs.validator.TCS_MAllocationHdrValidator;
 
@@ -26,6 +28,7 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 	protected void initialize() {
 		registerEvent(IEventTopics.AFTER_LOGIN);
 		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, I_C_Order.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_REACTIVATE, I_C_Order.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, X_AD_WF_Activity.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MAllocationHdr.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MAllocationHdr.Table_Name);
@@ -60,6 +63,9 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		}
 		else if(getPO(event).get_TableName().equals(MBankStatement.Table_Name)) {
 			msg = TCS_BankStatementDocValidator.executeEvent(event, getPO(event));
+		}
+		else if(getPO(event).get_TableName().equals(MBankStatement.Table_Name)) {
+			msg = TCS_OrderValidator.executeEvent(event, getPO(event));
 		}
 
 		if (msg.length() > 0)
