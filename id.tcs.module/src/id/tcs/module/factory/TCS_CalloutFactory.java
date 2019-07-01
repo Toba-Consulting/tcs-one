@@ -1,13 +1,10 @@
 package id.tcs.module.factory;
 
-import id.tcs.callout.TCS_CalloutAdvRequestLine;
-import id.tcs.callout.TCS_CalloutAdvSettlement;
-import id.tcs.callout.TCS_CalloutAdvSettlementLine;
+import id.tcs.callout.TCS_CalloutAsset;
 import id.tcs.callout.TCS_CalloutAssetMovement;
 import id.tcs.callout.TCS_CalloutAssetReval;
 import id.tcs.callout.TCS_CalloutAssetTransfer;
-import id.tcs.callout.TCS_CalloutDestSettlement;
-import id.tcs.callout.TCS_CalloutInvoiceLine;
+import id.tcs.callout.TCS_CalloutPayment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,31 +19,7 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 	public IColumnCallout[] getColumnCallouts(String tableName,
 			String columnName) {
 		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
-		
-		if (tableName.equals("TCS_AdvSettlement")){
-			list.add(new TCS_CalloutAdvSettlement());
-		}
-		
-		if (tableName.equals("TCS_DestSettlement")){
-			list.add(new TCS_CalloutDestSettlement());
-		}
-		
-		if (tableName.equals("TCS_AdvSettlementLine")){
-			list.add(new TCS_CalloutAdvSettlementLine());
-		}
-		
-		if (tableName.equals("TCS_AdvRequestLine")){
-			list.add(new TCS_CalloutAdvRequestLine());
-		}
-		
-		if (tableName.equals("TCS_AdvSettlementLine")){
-			list.add(new TCS_CalloutAdvSettlementLine());
-		}
-		
-		if (tableName.equals("C_InvoiceLine")){
-			list.add(new TCS_CalloutInvoiceLine());
-		}
-		
+				
 		if (tableName.equals("A_Asset_Reval")){
 			list.add(new TCS_CalloutAssetReval());
 		}
@@ -57,6 +30,14 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 
 		if (tableName.equals("A_AssetMovement")){
 			list.add(new TCS_CalloutAssetMovement());
+		}
+
+		if (tableName.equals("C_Payment")){
+			list.add(new TCS_CalloutPayment());
+		}
+
+		if (tableName.equals("A_Asset")){
+			list.add(new TCS_CalloutAsset());
 		}
 
 		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];

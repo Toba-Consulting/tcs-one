@@ -31,16 +31,6 @@ import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 import id.tcs.model.I_TCS_AllocateCharge;
-import id.tcs.model.TCS_MAdvRequest;
-import id.tcs.model.TCS_MAdvRequestLine;
-import id.tcs.model.TCS_MAdvSettlement;
-import id.tcs.model.TCS_MAdvSettlementLine;
-import id.tcs.model.TCS_MDestRequest;
-import id.tcs.model.TCS_MDestSettlement;
-import id.tcs.model.TCS_MExpenseLine;
-import id.tcs.model.TCS_MTravelExpense;
-import id.tcs.model.TCS_MTripFacility;
-
 import org.compiere.model.TCS_MAllocationHdr;
 
 
@@ -61,16 +51,6 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
 		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
 		mapTableModels.put(TCS_MAllocationHdr.Table_Name, "org.compiere.model.TCS_MAllocationHdr");
-		mapTableModels.put(TCS_MAdvRequest.Table_Name, "id.tcs.model.TCS_MAdvRequest");
-		mapTableModels.put(TCS_MDestRequest.Table_Name, "id.tcs.model.TCS_MDestRequest");
-		mapTableModels.put(TCS_MAdvRequestLine.Table_Name, "id.tcs.model.TCS_MAdvRequestLine");
-		mapTableModels.put(TCS_MAdvSettlement.Table_Name, "id.tcs.model.TCS_MAdvSettlement");
-		mapTableModels.put(TCS_MDestSettlement.Table_Name, "id.tcs.model.TCS_MDestSettlement");
-		mapTableModels.put(TCS_MAdvSettlementLine.Table_Name, "id.tcs.model.TCS_MAdvSettlementLine");
-		mapTableModels.put(TCS_MTripFacility.Table_Name, "id.tcs.model.TCS_MTripFacility");
-		mapTableModels.put(TCS_MTravelExpense.Table_Name, "id.tcs.model.TCS_MTravelExpense");
-		mapTableModels.put(TCS_MExpenseLine.Table_Name, "id.tcs.model.TCS_MExpenseLine");
-		mapTableModels.put(MInvoice.Table_Name, "id.tcs.model.TCS_MInvoice");
 		
 	}
 	
