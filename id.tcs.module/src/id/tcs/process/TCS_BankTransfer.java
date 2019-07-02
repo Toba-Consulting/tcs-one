@@ -28,7 +28,7 @@ import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
 
-import id.tcs.model.TCS_MPayment;
+import org.compiere.model.TCS_MPayment;
 
 
  
