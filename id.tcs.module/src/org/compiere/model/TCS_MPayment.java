@@ -1,5 +1,7 @@
 package org.compiere.model;
 
+import id.tcs.model.MTCS_AllocateCharge;
+
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
