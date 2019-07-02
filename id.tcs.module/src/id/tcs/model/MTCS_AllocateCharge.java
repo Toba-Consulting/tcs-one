@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import org.compiere.model.MPayment;
 import org.compiere.model.Query;
+import org.compiere.util.DB;
 
 public class MTCS_AllocateCharge extends X_TCS_AllocateCharge{
 
@@ -41,6 +42,10 @@ public class MTCS_AllocateCharge extends X_TCS_AllocateCharge{
 				.setParameters(payment.get_ID())
 				.setOnlyActiveRecords(true)
 				.sum(COLUMNNAME_Amount);
+				
+				String sql = "SELECT COALESCE(SUM(Amount),0) FROM C_PaymentAllocate WHERE C_Payment_ID="+getC_Payment_ID();
+				totalAmt=totalAmt.add(DB.getSQLValueBD(get_TrxName(), sql));
+				
 				payment.setPayAmt(totalAmt);
 			}
 
