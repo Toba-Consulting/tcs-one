@@ -22,7 +22,11 @@ public class TCS_PaymentValidator {
 	}
 	
 	public static String checkAllocation(MPayment payment){
-		String whereClause = "C_Payment_ID = ? AND cdr.docStatus='CO'";
+		String whereClause =  " C_Payment_ID = ? AND cdr.docStatus='CO' AND"
+							+ " NOT EXISTS ("
+							+ " SELECT 1 FROM TCS_AllocateCharge tac WHERE tac.C_Payment_ID = C_AllocationLine.C_Payment_ID)"
+							+ " AND NOT EXISTS ("
+							+ " SELECT 1 FROM C_PaymentAllocate cpa WHERE C_AllocationLine.C_Payment_ID=cpa.C_Payment_ID)";
 		boolean match = new Query(payment.getCtx(), MAllocationLine.Table_Name, whereClause, payment.get_TrxName())
 				.addJoinClause("JOIN C_AllocationHdr cdr ON cdr.c_AllocationHdr_ID = C_AllocationLine.C_AllocationHdr_ID")
 				.setParameters(new Object[]{payment.getC_Payment_ID()})
