@@ -118,10 +118,14 @@ public class TCS_AllocationReset extends SvrProcess
 			//@PhieAlbert
 			String whereClause = "C_AllocationHDR_ID = ? and C_Payment_ID IS NOT NULL "
 					+ "AND (Exists ("
-					+ "SELECT 1 FROM TCS_AllocateCharge tac WHERE C_Payment_ID = C_AllocationLine.C_Payment_ID"
+					+ "SELECT 1 FROM TCS_AllocateCharge tac WHERE tac.C_Payment_ID = C_AllocationLine.C_Payment_ID"
 					+ ") OR Exists ("
 					+ "SELECT 1 FROM C_Payment where C_Payment_ID = C_AllocationLine.C_Payment_ID AND C_Charge_id is not NULL"
-					+ "))";
+					+ "))"
+					+ " OR EXISTS (SELECT 1 "
+					+ "FROM C_PaymentAllocate cpa WHERE C_AllocationLine.C_Payment_ID=cpa.C_Payment_ID"
+					+ ")";
+
 			boolean notValid = new Query(getCtx(), I_C_AllocationLine.Table_Name, whereClause, get_TrxName())
 								.setParameters(new Object[]{p_C_AllocationHdr_ID})
 								.match();
@@ -160,7 +164,16 @@ public class TCS_AllocationReset extends SvrProcess
 		sql.append(" AND EXISTS (SELECT * FROM C_Period p")
 			.append(" INNER JOIN C_PeriodControl pc ON (p.C_Period_ID=pc.C_Period_ID AND pc.DocBaseType='CMA') ")
 			.append("WHERE ah.DateAcct BETWEEN p.StartDate AND p.EndDate)");
-		//
+		//	Not Payment allocated with "Allocated" Tab or "Allocate Charge" Tab for multi charge
+		sql.append(" AND NOT EXISTS (SELECT cal.C_AllocationHdr_ID"
+				+ "FROM C_AllocationLine cal"
+				+ "JOIN C_PaymentAllocate cpa on cpa.C_Payment_ID=cal.C_Payment_ID"
+				+ "WHERE cal.C_AllocationHdr_ID=ah.C_AllocationHdr_ID AND cal.C_Payment_ID IS NOT NULL");
+		sql.append(" AND NOT EXISTS (SELECT cal.C_AllocationHdr_ID"
+				+ "FROM C_AllocationLine cal"
+				+ "JOIN TCS_AllocateCharge tac on tac.C_Payment_ID=cal.C_Payment_ID"
+				+ "WHERE cal.C_AllocationHdr_ID=ah.C_AllocationHdr_ID AND cal.C_Payment_ID IS NOT NULL");
+		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try
