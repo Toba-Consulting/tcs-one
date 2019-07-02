@@ -879,4 +879,294 @@ public class TCS_MPayment extends MPayment {
 		if (documentNo.length() > 0)
 			setDocumentNo(documentNo);
 	}	//	setDocumentNo
+	
+	@Override
+	public String prepareIt() {
+		if (log.isLoggable(Level.INFO)) log.info(toString());
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_PREPARE);
+		if (m_processMsg != null)
+			return DocAction.STATUS_Invalid;
+
+		if (! MPaySelectionCheck.deleteGeneratedDraft(getCtx(), getC_Payment_ID(), get_TrxName())) {
+			m_processMsg = "Could not delete draft generated payment selection lines";
+			return DocAction.STATUS_Invalid;
+		}
+
+		//	Std Period open?
+		if (!MPeriod.isOpen(getCtx(), getDateAcct(), 
+			isReceipt() ? X_C_DocType.DOCBASETYPE_ARReceipt : X_C_DocType.DOCBASETYPE_APPayment, getAD_Org_ID()))
+		{
+			m_processMsg = "@PeriodClosed@";
+			return DocAction.STATUS_Invalid;
+		}
+		
+		//	Unsuccessful Online Payment
+		if (isOnline() && !isApproved())
+		{
+			if (getR_Result() != null)
+				m_processMsg = "@OnlinePaymentFailed@";
+			else
+				m_processMsg = "@PaymentNotProcessed@";
+			return DocAction.STATUS_Invalid;
+		}
+		
+		//	Waiting Payment - Need to create Invoice & Shipment
+		if (getC_Order_ID() != 0 && getC_Invoice_ID() == 0)
+		{	//	see WebOrder.process
+			MOrder order = new MOrder (getCtx(), getC_Order_ID(), get_TrxName());
+			if (DOCSTATUS_WaitingPayment.equals(order.getDocStatus()))
+			{
+				order.setC_Payment_ID(getC_Payment_ID());
+				order.setDocAction(X_C_Order.DOCACTION_WaitComplete);
+				order.set_TrxName(get_TrxName());
+				// added AdempiereException by zuhri 
+				if (!order.processIt (X_C_Order.DOCACTION_WaitComplete))
+					throw new AdempiereException("Failed when processing document - " + order.getProcessMsg());
+				// end added
+				m_processMsg = order.getProcessMsg();
+				order.saveEx(get_TrxName());
+				//	Set Invoice
+				MInvoice[] invoices = order.getInvoices();
+				int length = invoices.length;
+				if (length > 0)		//	get last invoice
+					setC_Invoice_ID (invoices[length-1].getC_Invoice_ID());
+				//
+				if (getC_Invoice_ID() == 0)
+				{
+					m_processMsg = "@NotFound@ @C_Invoice_ID@";
+					return DocAction.STATUS_Invalid;
+				}
+			}	//	WaitingPayment
+		}
+		
+		MPaymentAllocate[] pAllocs = MPaymentAllocate.get(this);
+		
+		//	Consistency of Invoice / Document Type and IsReceipt
+		if (!verifyDocType(pAllocs))
+		{
+			m_processMsg = "@PaymentDocTypeInvoiceInconsistent@";
+			return DocAction.STATUS_Invalid;
+		}
+
+		//	Payment Allocate is ignored if charge/invoice/order exists in header
+		if (!verifyPaymentAllocateVsHeader(pAllocs))
+		{
+			m_processMsg = "@PaymentAllocateIgnored@";
+			return DocAction.STATUS_Invalid;
+		}
+
+		//	Payment Amount must be equal to sum of Allocate amounts
+		if (!verifyPaymentAllocateSum(pAllocs))
+		{
+			m_processMsg = "@PaymentAllocateSumInconsistent@";
+			return DocAction.STATUS_Invalid;
+		}
+
+		//	Do not pay when Credit Stop/Hold
+		if (!isReceipt())
+		{
+			MBPartner bp = new MBPartner (getCtx(), getC_BPartner_ID(), get_TrxName());
+			if (X_C_BPartner.SOCREDITSTATUS_CreditStop.equals(bp.getSOCreditStatus()))
+			{
+				m_processMsg = "@BPartnerCreditStop@ - @TotalOpenBalance@=" 
+					+ bp.getTotalOpenBalance()
+					+ ", @SO_CreditLimit@=" + bp.getSO_CreditLimit();
+				return DocAction.STATUS_Invalid;
+			}
+			if (X_C_BPartner.SOCREDITSTATUS_CreditHold.equals(bp.getSOCreditStatus()))
+			{
+				m_processMsg = "@BPartnerCreditHold@ - @TotalOpenBalance@=" 
+					+ bp.getTotalOpenBalance()
+					+ ", @SO_CreditLimit@=" + bp.getSO_CreditLimit();
+				return DocAction.STATUS_Invalid;
+			}
+		}
+		
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
+		if (m_processMsg != null)
+			return DocAction.STATUS_Invalid;
+
+		m_justPrepared = true;
+		if (!DOCACTION_Complete.equals(getDocAction()))
+			setDocAction(DOCACTION_Complete);
+		return DocAction.STATUS_InProgress;
+	}
+	private boolean verifyPaymentAllocateSum(MPaymentAllocate[] pAllocs) {
+		BigDecimal sumPaymentAllocates = Env.ZERO;
+		//TCS calculation include TCS_AllocateCharge
+		String sqlCount = "SELECT COUNT(1) FROM TCS_AllocateCharge WHERE C_Payment_ID="+getC_Payment_ID();
+		int allocChargeCount = DB.getSQLValue(get_TrxName(), sqlCount);
+		
+		if (pAllocs.length > 0 || allocChargeCount > 0) {
+			for (MPaymentAllocate pAlloc : pAllocs)
+				sumPaymentAllocates = sumPaymentAllocates.add(pAlloc.getAmount());
+			
+			String sql = "SELECT COALESCE(SUM(Amount),0) FROM TCS_AllocateCharge WHERE C_Payment_ID="+getC_Payment_ID();
+			sumPaymentAllocates=sumPaymentAllocates.add((BigDecimal)DB.getSQLValueBD(get_TrxName(), sql));
+			if (getPayAmt().compareTo(sumPaymentAllocates) != 0) {
+				if (isReceipt() && getPayAmt().compareTo(sumPaymentAllocates) < 0) {
+					if (MSysConfig.getBooleanValue(MSysConfig.ALLOW_OVER_APPLIED_PAYMENT, false, Env.getAD_Client_ID(Env.getCtx()))) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean verifyDocType(MPaymentAllocate[] pAllocs)
+	{
+		if (getC_DocType_ID() == 0)
+			return false;
+		//
+		Boolean documentSO = null;
+		//	Check Invoice First
+		if (getC_Invoice_ID() > 0)
+		{
+			String sql = "SELECT idt.IsSOTrx "
+				+ "FROM C_Invoice i"
+				+ " INNER JOIN C_DocType idt ON (CASE WHEN i.C_DocType_ID=0 THEN i.C_DocTypeTarget_ID ELSE i.C_DocType_ID END=idt.C_DocType_ID) "
+				+ "WHERE i.C_Invoice_ID=?";
+			PreparedStatement pstmt = null;
+			ResultSet rs = null;
+			try
+			{
+				pstmt = DB.prepareStatement(sql, get_TrxName());
+				pstmt.setInt(1, getC_Invoice_ID());
+				rs = pstmt.executeQuery();
+				if (rs.next())
+					documentSO = new Boolean ("Y".equals(rs.getString(1)));
+			}
+			catch (Exception e)
+			{
+				log.log(Level.SEVERE, sql, e);
+			}
+			finally
+			{
+				DB.close(rs, pstmt);
+				rs = null;
+				pstmt = null;
+			}
+		}	//	now Order - in Adempiere is allowed to pay PO or receive SO
+		else if (getC_Order_ID() > 0)
+		{
+			String sql = "SELECT odt.IsSOTrx "
+				+ "FROM C_Order o"
+				+ " INNER JOIN C_DocType odt ON (o.C_DocType_ID=odt.C_DocType_ID) "
+				+ "WHERE o.C_Order_ID=?";
+			PreparedStatement pstmt = null;
+			ResultSet rs = null;
+			try
+			{
+				pstmt = DB.prepareStatement(sql, get_TrxName());
+				pstmt.setInt(1, getC_Order_ID());
+				rs = pstmt.executeQuery();
+				if (rs.next())
+					documentSO = new Boolean ("Y".equals(rs.getString(1)));
+			}
+			catch (Exception e)
+			{
+				log.log(Level.SEVERE, sql, e);
+			}
+			finally
+			{
+				DB.close(rs, pstmt);
+				rs = null;
+				pstmt = null;
+			}
+		}	//	now Charge
+		else if (getC_Charge_ID() > 0) 
+		{
+			// do nothing about charge
+		} // now payment allocate
+		else
+		{
+			if (pAllocs.length > 0) {
+				for (MPaymentAllocate pAlloc : pAllocs) {
+					String sql = "SELECT idt.IsSOTrx "
+						+ "FROM C_Invoice i"
+						+ " INNER JOIN C_DocType idt ON (i.C_DocType_ID=idt.C_DocType_ID) "
+						+ "WHERE i.C_Invoice_ID=?";
+					PreparedStatement pstmt = null;
+					ResultSet rs = null;
+					try
+					{
+						pstmt = DB.prepareStatement(sql, get_TrxName());
+						pstmt.setInt(1, pAlloc.getC_Invoice_ID());
+						rs = pstmt.executeQuery();
+						if (rs.next()) {
+							if (documentSO != null) { // already set, compare with current
+								if (documentSO.booleanValue() != ("Y".equals(rs.getString(1)))) {
+									return false;
+								}
+							} else {
+								documentSO = new Boolean ("Y".equals(rs.getString(1)));
+							}
+						}
+					}
+					catch (Exception e)
+					{
+						log.log(Level.SEVERE, sql, e);
+					}
+					finally
+					{
+						DB.close(rs, pstmt);
+						rs = null;
+						pstmt = null;
+					}
+				}
+			}
+		}
+		
+		//	DocumentType
+		Boolean paymentSO = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = "SELECT IsSOTrx "
+			+ "FROM C_DocType "
+			+ "WHERE C_DocType_ID=?";
+		try
+		{
+			pstmt = DB.prepareStatement(sql, get_TrxName());
+			pstmt.setInt(1, getC_DocType_ID());
+			rs = pstmt.executeQuery();
+			if (rs.next())
+				paymentSO = new Boolean ("Y".equals(rs.getString(1)));
+		}
+		catch (Exception e)
+		{
+			log.log(Level.SEVERE, sql, e);
+		}
+		finally
+		{
+			DB.close(rs, pstmt);
+			rs = null;
+			pstmt = null;
+		}
+		//	No Payment info
+		if (paymentSO == null)
+			return false;
+		setIsReceipt(paymentSO.booleanValue());
+			
+		//	We have an Invoice .. and it does not match
+		if (documentSO != null 
+				&& documentSO.booleanValue() != paymentSO.booleanValue())
+			return false;
+		//	OK
+		return true;
+	}	//	verifyDocType
+	
+	/**
+	 * 	Verify Payment Allocate is ignored (must not exists) if the payment header has charge/invoice/order
+	 * @param pAllocs 
+	 *	@return true if ok
+	 */
+	private boolean verifyPaymentAllocateVsHeader(MPaymentAllocate[] pAllocs) {
+		if (pAllocs.length > 0) {
+			if (getC_Charge_ID() > 0 || getC_Invoice_ID() > 0 || getC_Order_ID() > 0)
+				return false;
+		}
+		return true;
+	}
 }
