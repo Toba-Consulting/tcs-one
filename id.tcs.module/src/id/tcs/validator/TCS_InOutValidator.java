@@ -1,6 +1,7 @@
 package id.tcs.validator;
 
 import org.adempiere.base.event.IEventTopics;
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MMatchInv;
@@ -16,7 +17,9 @@ public class TCS_InOutValidator {
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL) ||
 				event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT)) {
 			msg = checkMatchInvoice(inout);
-		} 
+		} else if(event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)){
+			msg = checkExistsNullOrderLine(inout);
+		}		
 		return msg;
 	}
 	
@@ -44,5 +47,19 @@ public class TCS_InOutValidator {
 						.match();
 		if (match) return "Cannot Reverse InOut : Match Invoice With Active Invoice Exists";
 		return "";
+	}
+	
+	private static String checkExistsNullOrderLine(MInOut inout)
+	{
+		String whereClause = "M_InOut_ID = ? AND C_OrderLine_ID is null";
+		boolean match = new Query(inout.getCtx(), MInOutLine.Table_Name, whereClause, inout.get_TrxName())
+		.setParameters(inout.get_ID())
+		.setOnlyActiveRecords(true)
+		.match();
+		
+		if(match)
+			return "Cannot complete.. All shipment / receipt line(s) must be linked to order line";
+		
+		else return "";
 	}
 }
