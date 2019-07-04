@@ -474,49 +474,48 @@ public class TCS_MPayment extends MPayment {
 					pa.saveEx();
 				}
 			}
-		} else {
-			MTCS_AllocateCharge[] pAllocMultiCharge = getAllocLines();
-			if (pAllocMultiCharge.length > 0) {
-				alloc = new MAllocationHdr(getCtx(), false, 
-						getDateTrx(), getC_Currency_ID(), 
-						Msg.translate(getCtx(), "C_Payment_ID")	+ ": " + getDocumentNo(), 
-						get_TrxName());
-				alloc.setAD_Org_ID(getAD_Org_ID());
-				alloc.setDateAcct(getDateAcct()); // in case date acct is different from datetrx in payment; IDEMPIERE-1532 tbayen
-				if (!alloc.save())
-				{
-					log.severe("P.Allocations not created");
-					return false;
-				}
-
+		}
+		
+		MTCS_AllocateCharge[] pAllocMultiCharge = getAllocLines();
+		if (pAllocMultiCharge.length > 0) {
+			alloc = new MAllocationHdr(getCtx(), false, 
+					getDateTrx(), getC_Currency_ID(), 
+					Msg.translate(getCtx(), "C_Payment_ID")	+ ": " + getDocumentNo(), 
+					get_TrxName());
+			alloc.setAD_Org_ID(getAD_Org_ID());
+			alloc.setDateAcct(getDateAcct()); // in case date acct is different from datetrx in payment; IDEMPIERE-1532 tbayen
+			if (!alloc.save())
+			{
+				log.severe("P.Allocations not created");
+				return false;
+			}
 				for (MTCS_AllocateCharge allocharge : pAllocMultiCharge)
-				{
-					BigDecimal allocateAmount = isReceipt() 
-							? allocharge.getAmount() 
-							: allocharge.getAmount().negate();
-					
-					MAllocationLine alloclineCr = new MAllocationLine(alloc);
-					alloclineCr.setAD_Org_ID(allocharge.getAD_Org_ID());
-					alloclineCr.setC_BPartner_ID(getC_BPartner_ID());
-					alloclineCr.setC_Payment_ID(getC_Payment_ID());
-					alloclineCr.setDateTrx(alloc.getDateTrx());
-					alloclineCr.setAmount(allocateAmount);
-					//allocline.setC_Charge_ID(allocharge.getC_Charge_ID());
-					alloclineCr.saveEx();
-					
-					MAllocationLine alloclineDr = new MAllocationLine(alloc);
-					alloclineDr.setAD_Org_ID(allocharge.getAD_Org_ID());
-					alloclineDr.setC_BPartner_ID(getC_BPartner_ID());
-					//alloclineDr.setC_Payment_ID(getC_Payment_ID());
-					alloclineDr.setDateTrx(alloc.getDateTrx());
-					alloclineDr.setAmount(allocateAmount.negate());
-					alloclineDr.setC_Charge_ID(allocharge.getC_Charge_ID());
-					//@PhieAlbert
-					alloclineDr.set_ValueOfColumn("TCS_AllocateCharge_ID", allocharge.getTCS_AllocateCharge_ID());
-					alloclineDr.set_ValueOfColumn("description", allocharge.get_ValueAsString("description"));
-					//end @PhieAlbert
-					alloclineDr.saveEx();
-				}
+			{
+				BigDecimal allocateAmount = isReceipt() 
+						? allocharge.getAmount() 
+						: allocharge.getAmount().negate();
+				
+				MAllocationLine alloclineCr = new MAllocationLine(alloc);
+				alloclineCr.setAD_Org_ID(allocharge.getAD_Org_ID());
+				alloclineCr.setC_BPartner_ID(getC_BPartner_ID());
+				alloclineCr.setC_Payment_ID(getC_Payment_ID());
+				alloclineCr.setDateTrx(alloc.getDateTrx());
+				alloclineCr.setAmount(allocateAmount);
+				//allocline.setC_Charge_ID(allocharge.getC_Charge_ID());
+				alloclineCr.saveEx();
+				
+				MAllocationLine alloclineDr = new MAllocationLine(alloc);
+				alloclineDr.setAD_Org_ID(allocharge.getAD_Org_ID());
+				alloclineDr.setC_BPartner_ID(getC_BPartner_ID());
+				//alloclineDr.setC_Payment_ID(getC_Payment_ID());
+				alloclineDr.setDateTrx(alloc.getDateTrx());
+				alloclineDr.setAmount(allocateAmount.negate());
+				alloclineDr.setC_Charge_ID(allocharge.getC_Charge_ID());
+				//@PhieAlbert
+				alloclineDr.set_ValueOfColumn("TCS_AllocateCharge_ID", allocharge.getTCS_AllocateCharge_ID());
+				alloclineDr.set_ValueOfColumn("description", allocharge.get_ValueAsString("description"));
+				//end @PhieAlbert
+				alloclineDr.saveEx();
 			}
 		}
 		
