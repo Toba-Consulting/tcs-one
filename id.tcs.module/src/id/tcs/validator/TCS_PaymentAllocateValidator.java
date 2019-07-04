@@ -26,7 +26,7 @@ public class TCS_PaymentAllocateValidator {
 		String sqlSumPayAlloc = "SELECT COALESCE(SUM(Amount),0) FROM C_PaymentAllocate WHERE C_Payment_ID="+payAlloc.getC_Payment_ID();
 		String sqlSumAllocCharge = "SELECT COALESCE(SUM(Amount),0) FROM TCS_AllocateCharge WHERE C_Payment_ID="+payAlloc.getC_Payment_ID();
 		BigDecimal PayAmt = DB.getSQLValueBD(payAlloc.get_TrxName(), sqlSumPayAlloc);
-		PayAmt.add(DB.getSQLValueBD(payAlloc.get_TrxName(), sqlSumAllocCharge));
+		PayAmt=PayAmt.add(DB.getSQLValueBD(payAlloc.get_TrxName(), sqlSumAllocCharge));
 		
 		MPayment payment = new MPayment(payAlloc.getCtx(), payAlloc.getC_Payment_ID(), payAlloc.get_TrxName());
 		payment.setPayAmt(PayAmt);
