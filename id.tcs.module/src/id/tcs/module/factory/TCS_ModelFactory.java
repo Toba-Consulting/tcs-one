@@ -38,6 +38,7 @@ import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 import id.tcs.model.I_TCS_AllocateCharge;
+import id.tcs.model.MBankTransfer;
 
 
 
@@ -65,6 +66,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(I_M_Movement.Table_Name, "org.compiere.model.TCS_MMovement");
 		
 		mapTableModels.put(I_TCS_AllocateCharge.Table_Name, "id.tcs.model.MTCS_AllocateCharge");
+		mapTableModels.put(MBankTransfer.Table_Name, "id.tcs.model.MBankTransfer");
 		
 	}
 	
