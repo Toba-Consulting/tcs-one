@@ -1,6 +1,7 @@
 package id.tcs.validator;
 
 import org.adempiere.base.event.IEventTopics;
+import org.compiere.model.MInOutLine;
 import org.compiere.model.MMatchPO;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
@@ -23,10 +24,12 @@ public class TCS_OrderValidator {
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
 			msg = checkMatchPO(order);
 			msg = checkLinkedPayment(order);
+			msg = checkActiveLinkedInOut(order);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)) {
 			msg = checkMatchPO(order);
 			msg = checkLinkedPayment(order);
+			msg = checkActiveLinkedInOut(order);
 		} 
 		return msg;
 	}
@@ -73,4 +76,26 @@ public class TCS_OrderValidator {
 		if (match) return "Cannot Reactivate / Void : Linked Payment Exist";
 		return "";
 	}
+	
+	public static String checkActiveLinkedInOut(MOrder order){
+		int [] temp = new Query(order.getCtx(), MOrderLine.Table_Name, "C_Order_ID="+order.getC_Order_ID(), order.get_TrxName())
+		.getIDs();
+		if (temp==null || temp.length==0) {
+			return "";
+		}
+		String IDs = "";
+		for (int i : temp) {
+			IDs+=i;
+			IDs+=", ";
+		}
+		IDs=IDs.substring(0, IDs.length()-2);
+		String sqlWhere = "C_OrderLine_ID IN ("+IDs+") AND mi.DocStatus IN ('CO','CL','IP')";
+		boolean match = new Query(order.getCtx(), MInOutLine.Table_Name, sqlWhere, order.get_TrxName())
+				.addJoinClause("JOIN M_InOut mi on mi.M_InOut_ID=M_InOutLine.M_InOut_ID")
+				.match();
+		if (match) {
+			return "Cannot Reverse Order : Active InOut Exists For Order Line";
+		}
+		return "";
+}
 }
