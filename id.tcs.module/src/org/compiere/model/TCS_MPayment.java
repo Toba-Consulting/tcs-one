@@ -466,7 +466,7 @@ public class TCS_MPayment extends MPayment {
 						pa.getDiscountAmt().negate(), pa.getWriteOffAmt().negate(), pa.getOverUnderAmt().negate());
 				aLine.setDocInfo(pa.getC_BPartner_ID(), 0, pa.getC_Invoice_ID());
 				aLine.setPaymentInfo(getC_Payment_ID(), 0);
-				aLine.set_ValueOfColumn("Description", pa.get_Value("Description"));
+				aLine.set_ValueOfColumn("Description", pa.get_ValueAsString("Description"));
 				if (!aLine.save(get_TrxName()))
 					log.warning("P.Allocations - line not saved");
 				else
@@ -479,16 +479,18 @@ public class TCS_MPayment extends MPayment {
 		
 		MTCS_AllocateCharge[] pAllocMultiCharge = getAllocLines();
 		if (pAllocMultiCharge.length > 0) {
-			alloc = new MAllocationHdr(getCtx(), false, 
-					getDateTrx(), getC_Currency_ID(), 
-					Msg.translate(getCtx(), "C_Payment_ID")	+ ": " + getDocumentNo(), 
-					get_TrxName());
-			alloc.setAD_Org_ID(getAD_Org_ID());
-			alloc.setDateAcct(getDateAcct()); // in case date acct is different from datetrx in payment; IDEMPIERE-1532 tbayen
-			if (!alloc.save())
-			{
-				log.severe("P.Allocations not created");
-				return false;
+			if(alloc==null){
+				alloc = new MAllocationHdr(getCtx(), false, 
+						getDateTrx(), getC_Currency_ID(), 
+						Msg.translate(getCtx(), "C_Payment_ID")	+ ": " + getDocumentNo(), 
+						get_TrxName());
+				alloc.setAD_Org_ID(getAD_Org_ID());
+				alloc.setDateAcct(getDateAcct()); // in case date acct is different from datetrx in payment; IDEMPIERE-1532 tbayen
+				if (!alloc.save())
+				{
+					log.severe("P.Allocations not created");
+					return false;
+				}
 			}
 			for (MTCS_AllocateCharge allocharge : pAllocMultiCharge)
 			{
@@ -503,6 +505,7 @@ public class TCS_MPayment extends MPayment {
 				alloclineCr.setDateTrx(alloc.getDateTrx());
 				alloclineCr.setAmount(allocateAmount);
 				//allocline.setC_Charge_ID(allocharge.getC_Charge_ID());
+				alloclineCr.set_ValueOfColumn("Description", allocharge.get_ValueAsString("Description"));
 				alloclineCr.saveEx();
 				
 				MAllocationLine alloclineDr = new MAllocationLine(alloc);
