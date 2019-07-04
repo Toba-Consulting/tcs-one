@@ -466,6 +466,7 @@ public class TCS_MPayment extends MPayment {
 						pa.getDiscountAmt().negate(), pa.getWriteOffAmt().negate(), pa.getOverUnderAmt().negate());
 				aLine.setDocInfo(pa.getC_BPartner_ID(), 0, pa.getC_Invoice_ID());
 				aLine.setPaymentInfo(getC_Payment_ID(), 0);
+				aLine.set_ValueOfColumn("Description", pa.get_Value("Description"));
 				if (!aLine.save(get_TrxName()))
 					log.warning("P.Allocations - line not saved");
 				else
@@ -489,7 +490,7 @@ public class TCS_MPayment extends MPayment {
 				log.severe("P.Allocations not created");
 				return false;
 			}
-				for (MTCS_AllocateCharge allocharge : pAllocMultiCharge)
+			for (MTCS_AllocateCharge allocharge : pAllocMultiCharge)
 			{
 				BigDecimal allocateAmount = isReceipt() 
 						? allocharge.getAmount() 
@@ -513,7 +514,7 @@ public class TCS_MPayment extends MPayment {
 				alloclineDr.setC_Charge_ID(allocharge.getC_Charge_ID());
 				//@PhieAlbert
 				alloclineDr.set_ValueOfColumn("TCS_AllocateCharge_ID", allocharge.getTCS_AllocateCharge_ID());
-				alloclineDr.set_ValueOfColumn("description", allocharge.get_ValueAsString("description"));
+				alloclineDr.set_ValueOfColumn("Description", allocharge.get_ValueAsString("Description"));
 				//end @PhieAlbert
 				alloclineDr.saveEx();
 			}
