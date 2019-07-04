@@ -539,7 +539,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		reversal.setIsCanceled(true);
 		reversal.setProcessing(false);
 		reversal.setProcessed(false);
-		reversal.setPosted(false);
 		reversal.setDescription(getDescription());
 		reversal.addDescription("{->" + getDocumentNo() + ")");
 		//

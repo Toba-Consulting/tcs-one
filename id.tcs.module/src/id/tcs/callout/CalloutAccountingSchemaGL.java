@@ -3,35 +3,28 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.simplifyacct.model.IAccountGen;
-import org.simplifyacct.model.MAcctSchemaGL;
-import org.simplifyacct.model.MValidCombination;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
-import org.compiere.model.MAcctSchema;
-import org.compiere.model.MBankAccount;
-import org.compiere.model.MField;
-import org.compiere.util.Env;
+import org.compiere.model.MAcctSchemaGL;
 
-public class CalloutAccountingSchemaGL implements IColumnCallout, IAccountGen{
+public class CalloutAccountingSchemaGL implements IColumnCallout {
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		// TODO Auto-generated method stub
-		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_SB_ID))
+		if (mField.getColumnName().equals("C_ElementValue_SB_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_SB_ID");
-		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_CB_ID))
+		if (mField.getColumnName().equals("C_ElementValue_CB_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CB_ID");
-		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_IDT_ID))
+		if (mField.getColumnName().equals("C_ElementValue_IDT_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_IDT_ID");
-		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_IDF_ID))
+		if (mField.getColumnName().equals("C_ElementValue_IDF_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_IDF_ID");
-		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_PPVO_ID))
+		if (mField.getColumnName().equals("C_ElementValue_PPVO_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PPVO_ID");
-		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_CO_ID))
+		if (mField.getColumnName().equals("C_ElementValue_CO_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CO_ID");
-		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_C_ElementValue_COS_ID))
+		if (mField.getColumnName().equals("C_ElementValue_COS_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_COS_ID");
 		if (mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_SuspenseBalancing_Acct) 
 				|| mField.getColumnName().equals(MAcctSchemaGL.COLUMNNAME_CurrencyBalancing_Acct)
@@ -45,11 +38,8 @@ public class CalloutAccountingSchemaGL implements IColumnCallout, IAccountGen{
 		return null;
 	}
 	
-
-	@Override
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
-		// TODO Auto-generated method stub
 		if(value == null)
 			return "";
 		
@@ -79,22 +69,22 @@ public class CalloutAccountingSchemaGL implements IColumnCallout, IAccountGen{
 		}
 		
 		int C_ValidCombination_ID = (int) value;
-		MValidCombination validcombination = new MValidCombination(ctx, C_ValidCombination_ID, null);
+		MAccount validcombination = new MAccount(ctx, C_ValidCombination_ID, null);
 		
 		if(mField.getColumnName().equals("SuspenseBalancing_Acct"))
-			mTab.setValue(MAcctSchemaGL.COLUMNNAME_C_ElementValue_SB_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_SB_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("CurrencyBalancing_Acct"))
-			mTab.setValue(MAcctSchemaGL.COLUMNNAME_C_ElementValue_CB_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_CB_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("IntercompanyDueTo_Acct"))
-			mTab.setValue(MAcctSchemaGL.COLUMNNAME_C_ElementValue_IDT_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_IDT_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("IntercompanyDueFrom_Acct"))
-			mTab.setValue(MAcctSchemaGL.COLUMNNAME_C_ElementValue_IDF_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_IDF_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("PPVOffset_Acct"))
-			mTab.setValue(MAcctSchemaGL.COLUMNNAME_C_ElementValue_PPVO_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_PPVO_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("CommitmentOffset_Acct"))
-			mTab.setValue(MAcctSchemaGL.COLUMNNAME_C_ElementValue_CO_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_CO_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("CommitmentOffsetSales_Acct"))
-			mTab.setValue(MAcctSchemaGL.COLUMNNAME_C_ElementValue_COS_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_COS_ID", validcombination.getAccount_ID());
 		return "";
 	}
 

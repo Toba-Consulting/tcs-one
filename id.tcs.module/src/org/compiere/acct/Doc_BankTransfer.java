@@ -17,13 +17,11 @@ public class Doc_BankTransfer extends Doc{
 
 	@Override
 	protected String loadDocumentDetails() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public BigDecimal getBalance() {
-		// TODO Auto-generated method stub
 		return Env.ZERO;
 	}
 
