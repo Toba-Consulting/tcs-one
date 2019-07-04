@@ -4,6 +4,7 @@ import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.MMatchPO;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.MPayment;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.util.DB;
@@ -21,9 +22,11 @@ public class TCS_OrderValidator {
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
 			msg = checkMatchPO(order);
+			msg = checkLinkedPayment(order);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)) {
 			msg = checkMatchPO(order);
+			msg = checkLinkedPayment(order);
 		} 
 		return msg;
 	}
@@ -59,6 +62,15 @@ public class TCS_OrderValidator {
 		if (match) {
 			return "Cannot Reverse Order : Existing Match PO Exist For Order Line";
 		}
+		return "";
+	}
+	
+	public static String checkLinkedPayment(MOrder order){
+		String sqlWhere="C_Order_ID="+order.getC_Order_ID()+" AND DocStatus IN ('CO','CL','IP')";
+		boolean match = new Query(order.getCtx(), MPayment.Table_Name, sqlWhere, order.get_TrxName())
+						.match();
+		
+		if (match) return "Cannot Reactivate / Void : Linked Payment Exist";
 		return "";
 	}
 }
