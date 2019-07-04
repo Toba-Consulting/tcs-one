@@ -3,21 +3,19 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.simplifyacct.model.IAccountGen;
-import org.simplifyacct.model.MProjectAcct;
-import org.simplifyacct.model.MValidCombination;
+import org.compiere.model.MProjectAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
 
-public class CalloutProjectAcct implements IColumnCallout, IAccountGen{
+public class CalloutProjectAcct implements IColumnCallout{
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		// TODO Auto-generated method stub
-		if (mField.getColumnName().equals(MProjectAcct.COLUMNNAME_C_ElementValue_PA_ID))
+		if (mField.getColumnName().equals("C_ElementValue_PA_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PA_ID");
-		if (mField.getColumnName().equals(MProjectAcct.COLUMNNAME_C_ElementValue_WIP_ID))
+		if (mField.getColumnName().equals("C_ElementValue_WIP_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_WIP_ID");
 		if (mField.getColumnName().equals(MProjectAcct.COLUMNNAME_PJ_Asset_Acct)
 				|| mField.getColumnName().equals(MProjectAcct.COLUMNNAME_PJ_WIP_Acct))
@@ -26,7 +24,6 @@ public class CalloutProjectAcct implements IColumnCallout, IAccountGen{
 		return null;
 	}
 	
-	@Override
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
 		// TODO Auto-generated method stub
@@ -50,13 +47,13 @@ public class CalloutProjectAcct implements IColumnCallout, IAccountGen{
 			return "";
 		}
 		
-		int C_ValidCombination_ID = (int) value;
-		MValidCombination validcombination = new MValidCombination(ctx, C_ValidCombination_ID, null);
+		int C_ValidCombination_ID = (int)value;
+		MAccount validcombination = new MAccount(ctx, C_ValidCombination_ID, null);
 		
 		if(mField.getColumnName().equals("PJ_Asset_Acct"))
-			mTab.setValue(MProjectAcct.COLUMNNAME_C_ElementValue_PA_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_PA_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("PJ_WIP_Acct"))
-			mTab.setValue(MProjectAcct.COLUMNNAME_C_ElementValue_WIP_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_WIP_ID", validcombination.getAccount_ID());
 		return "";
 	}
 

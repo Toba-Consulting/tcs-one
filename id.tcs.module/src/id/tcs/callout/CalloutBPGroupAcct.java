@@ -3,33 +3,31 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.simplifyacct.model.IAccountGen;
-import org.simplifyacct.model.MBPGroupAcct;
-import org.simplifyacct.model.MValidCombination;
+import org.compiere.model.MBPGroupAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
 
-public class CalloutBPGroupAcct implements IColumnCallout, IAccountGen {
+public class CalloutBPGroupAcct implements IColumnCallout {
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		// TODO Auto-generated method stub
-		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_ElementValue_ID)) 
+		if (mField.getColumnName().equals("C_ElementValue_ID")) 
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_ID");
-		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_ElementValue_PDE_ID))
+		if (mField.getColumnName().equals("C_ElementValue_PDE_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PDE_ID");
-		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_ElementValue_PDR_ID))
+		if (mField.getColumnName().equals("C_ElementValue_PDR_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PDR_ID");
-		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_ElementValue_WO_ID))
+		if (mField.getColumnName().equals("C_ElementValue_WO_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_WO_ID");
-		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_ElementValue_CP_ID))
+		if (mField.getColumnName().equals("C_ElementValue_CP_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CP_ID");
-		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_ElementValue_CR_ID))
+		if (mField.getColumnName().equals("C_ElementValue_CR_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CR_ID");
-		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_ElementValue_VL_ID))
+		if (mField.getColumnName().equals("C_ElementValue_VL_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VL_ID");
-		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_ElementValue_VP_ID))
+		if (mField.getColumnName().equals("C_ElementValue_VP_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VP_ID");
 		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_NotInvoicedReceipts_Acct)
 				|| mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_PayDiscount_Exp_Acct)
@@ -43,7 +41,6 @@ public class CalloutBPGroupAcct implements IColumnCallout, IAccountGen {
 		return null;
 	}
 	
-	@Override
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
 		// TODO Auto-generated method stub
@@ -79,24 +76,24 @@ public class CalloutBPGroupAcct implements IColumnCallout, IAccountGen {
 		}
 		
 		int C_ValidCombination_ID = (int) value;
-		MValidCombination validCombination = new MValidCombination(ctx, C_ValidCombination_ID, null);
+		MAccount validCombination = new MAccount(ctx, C_ValidCombination_ID, null);
 		
 		if (mField.getColumnName().equals("NotInvoicedReceipts_Acct")) {
-			mTab.setValue(MBPGroupAcct.COLUMNNAME_C_ElementValue_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_ID", validCombination.getAccount_ID());
 		}else if(mField.getColumnName().equals("PayDiscount_Exp_Acct")) {
-			mTab.setValue(MBPGroupAcct.COLUMNNAME_C_ElementValue_PDE_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_PDE_ID", validCombination.getAccount_ID());
 		}else if(mField.getColumnName().equals("PayDiscount_Rev_Acct")) {
-			mTab.setValue(MBPGroupAcct.COLUMNNAME_C_ElementValue_PDR_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_PDR_ID", validCombination.getAccount_ID());
 		}else if(mField.getColumnName().equals("WriteOff_Acct")) {
-			mTab.setValue(MBPGroupAcct.COLUMNNAME_C_ElementValue_WO_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_WO_ID", validCombination.getAccount_ID());
 		}else if(mField.getColumnName().equals("C_Prepayment_Acct")) {
-			mTab.setValue(MBPGroupAcct.COLUMNNAME_C_ElementValue_CP_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_CP_ID", validCombination.getAccount_ID());
 		}else if(mField.getColumnName().equals("C_Receivable_Acct")) {
-			mTab.setValue(MBPGroupAcct.COLUMNNAME_C_ElementValue_CR_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_CR_ID", validCombination.getAccount_ID());
 		}else if(mField.getColumnName().equals("V_Liability_Acct")) {
-			mTab.setValue(MBPGroupAcct.COLUMNNAME_C_ElementValue_VL_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_VL_ID", validCombination.getAccount_ID());
 		}else if(mField.getColumnName().equals("V_Prepayment_Acct")) {
-			mTab.setValue(MBPGroupAcct.COLUMNNAME_C_ElementValue_VP_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_VP_ID", validCombination.getAccount_ID());
 		}
 		return "";
 	}

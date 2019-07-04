@@ -3,27 +3,24 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.simplifyacct.model.IAccountGen;
-import org.simplifyacct.model.MChargeAcct;
-import org.simplifyacct.model.MValidCombination;
+import org.compiere.model.MChargeAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
 import org.compiere.util.Env;
 
-public class CalloutChargeAcct implements IColumnCallout, IAccountGen{
+public class CalloutChargeAcct implements IColumnCallout{
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		// TODO Auto-generated method stub
-		if(mField.getColumnName().equals(MChargeAcct.COLUMNNAME_C_ElementValue_Charge_ID))
+		if(mField.getColumnName().equals("C_ElementValue_Charge_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_Charge_ID");
 		if(mField.getColumnName().equals(MChargeAcct.COLUMNNAME_Ch_Expense_Acct))
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;
 	}
 	
-	@Override
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
 		// TODO Auto-generated method stub
@@ -44,8 +41,8 @@ public class CalloutChargeAcct implements IColumnCallout, IAccountGen{
 			return "";
 		
 		int C_ValidCombination_ID = (int) value;
-		MValidCombination validCombination = new MValidCombination(Env.getCtx(), C_ValidCombination_ID, null);
-		mTab.setValue(MChargeAcct.COLUMNNAME_C_ElementValue_Charge_ID, validCombination.getAccount_ID());
+		MAccount validCombination = new MAccount(Env.getCtx(), C_ValidCombination_ID, null);
+		mTab.setValue("C_ElementValue_Charge_ID", validCombination.getAccount_ID());
 		return "";
 	}
 
