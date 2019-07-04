@@ -26,10 +26,24 @@ import org.adempiere.base.IModelFactory;
 import org.compiere.model.I_C_AllocationHdr;
 import org.compiere.model.I_C_BankStatement;
 import org.compiere.model.I_C_Payment;
+import org.compiere.model.MWarehouse;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 import id.tcs.model.I_TCS_AllocateCharge;
+import id.tcs.model.MAcctSchemaDefault;
+import id.tcs.model.MAcctSchemaGL;
+import id.tcs.model.MBPCustomerAcct;
+import id.tcs.model.MBPGroupAcct;
+import id.tcs.model.MBPVendorAcct;
+import id.tcs.model.MBankAccountAcct;
+import id.tcs.model.MChargeAcct;
+import id.tcs.model.MFADefaultAccount;
+import id.tcs.model.MProductAcct;
+import id.tcs.model.MProductCategoryAcct;
+import id.tcs.model.MProjectAcct;
+import id.tcs.model.MTaxAcct;
+import id.tcs.model.MWarehouseAcct;
 import id.tcs.model.TCS_MAdvRequest;
 import id.tcs.model.TCS_MAdvRequestLine;
 import id.tcs.model.TCS_MAdvSettlement;
@@ -69,7 +83,19 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MTripFacility.Table_Name, "id.tcs.model.TCS_MTripFacility");
 		mapTableModels.put(TCS_MTravelExpense.Table_Name, "id.tcs.model.TCS_MTravelExpense");
 		mapTableModels.put(TCS_MExpenseLine.Table_Name, "id.tcs.model.TCS_MExpenseLine");
-		
+		mapTableModels.put(MAcctSchemaDefault.Table_Name, "id.tcs.model.MAcctSchemaDefault");
+		mapTableModels.put(MAcctSchemaGL.Table_Name, "id.tcs.model.MAcctSchemaGL");
+		mapTableModels.put(MBankAccountAcct.Table_Name, "id.tcs.model.MBankAccountAcct");
+		mapTableModels.put(MBPCustomerAcct.Table_Name, "id.tcs.model.MBPCustomerAcct");
+		mapTableModels.put(MBPGroupAcct.Table_Name, "id.tcs.model.MBPGroupAcct");
+		mapTableModels.put(MBPVendorAcct.Table_Name, "id.tcs.model.MBPVendorAcct");
+		mapTableModels.put(MChargeAcct.Table_Name, "id.tcs.model.MChargeAcct");
+		mapTableModels.put(MFADefaultAccount.Table_Name, "id.tcs.model.MFADefaultAccount");
+		mapTableModels.put(MProductAcct.Table_Name, "id.tcs.model.MProductAcct");
+		mapTableModels.put(MProductCategoryAcct.Table_Name, "id.tcs.model.MProductCategoryAcct");
+		mapTableModels.put(MProjectAcct.Table_Name, "id.tcs.model.MProjectAcct");
+		mapTableModels.put(MTaxAcct.Table_Name, "id.tcs.model.MTaxAcct");
+		mapTableModels.put(MWarehouseAcct.Table_Name, "id.tcs.model.MWarehouseAcct");
 	}
 	
 	@Override

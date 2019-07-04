@@ -3,13 +3,13 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.simplifyacct.model.IAccountGen;
-import org.simplifyacct.model.MProductCategoryAcct;
-import org.simplifyacct.model.MValidCombination;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
 
+import id.tcs.model.IAccountGen;
+import id.tcs.model.MProductCategoryAcct;
+import id.tcs.model.MValidCombination;
 
 public class CalloutProductCategoryAcct implements IColumnCallout, IAccountGen{
 

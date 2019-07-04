@@ -3,13 +3,14 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.simplifyacct.model.IAccountGen;
-import org.simplifyacct.model.MBPCustomerAcct;
-import org.simplifyacct.model.MBPVendorAcct;
-import org.simplifyacct.model.MValidCombination;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
+
+import id.tcs.model.IAccountGen;
+import id.tcs.model.MBPCustomerAcct;
+import id.tcs.model.MBPVendorAcct;
+import id.tcs.model.MValidCombination;
 
 public class CalloutBPAcct implements IColumnCallout, IAccountGen{
 
