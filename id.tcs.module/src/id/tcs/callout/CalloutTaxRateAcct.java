@@ -3,7 +3,6 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.compiere.model.MTaxAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
@@ -19,9 +18,9 @@ public class CalloutTaxRateAcct implements IColumnCallout{
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TE_ID");
 		if (mField.getColumnName().equals("C_ElementValue_TC_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TC_ID");
-		if (mField.getColumnName().equals(MTaxAcct.COLUMNNAME_T_Due_Acct)
-				|| mField.getColumnName().equals(MTaxAcct.COLUMNNAME_T_Expense_Acct)
-				|| mField.getColumnName().equals(MTaxAcct.COLUMNNAME_T_Credit_Acct)
+		if (mField.getColumnName().equals("T_Due_Acct")
+				|| mField.getColumnName().equals("T_Expense_Acct")
+				|| mField.getColumnName().equals("T_Credit_Acct")
 				)
 			setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;

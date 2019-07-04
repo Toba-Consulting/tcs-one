@@ -3,7 +3,6 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.compiere.model.MProductAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
@@ -39,19 +38,19 @@ public class CalloutProductAcct implements IColumnCallout {
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TDG_ID");
 		if (mField.getColumnName().equals("C_ElementValue_ACV_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_ACV_ID");
-		if (mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_Asset_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_CostAdjustment_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_COGS_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_PurchasePriceVariance_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_TradeDiscountRec_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_RateVariance_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_LandedCostClearing_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_Expense_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_InventoryClearing_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_Revenue_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_InvoicePriceVariance_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_TradeDiscountGrant_Acct)
-				|| mField.getColumnName().equals(MProductAcct.COLUMNNAME_P_AverageCostVariance_Acct)
+		if (mField.getColumnName().equals("P_Asset_Acct")
+				|| mField.getColumnName().equals("P_CostAdjustment_Acct")
+				|| mField.getColumnName().equals("P_COGS_Acct")
+				|| mField.getColumnName().equals("P_PurchasePriceVariance_Acct")
+				|| mField.getColumnName().equals("P_TradeDiscountRec_Acct")
+				|| mField.getColumnName().equals("P_RateVariance_Acct")
+				|| mField.getColumnName().equals("P_LandedCostClearing_Acct")
+				|| mField.getColumnName().equals("P_Expense_Acct")
+				|| mField.getColumnName().equals("P_InventoryClearing_Acct")
+				|| mField.getColumnName().equals("P_Revenue_Acct")
+				|| mField.getColumnName().equals("P_InvoicePriceVariance_Acct")
+				|| mField.getColumnName().equals("P_TradeDiscountGrant_Acct")
+				|| mField.getColumnName().equals("P_AverageCostVariance_Acct")
 				)
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;

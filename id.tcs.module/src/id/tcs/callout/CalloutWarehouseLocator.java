@@ -3,7 +3,6 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.compiere.model.MWarehouseAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
@@ -16,7 +15,7 @@ public class CalloutWarehouseLocator implements IColumnCallout{
 		if(mField.getColumnName().equals("C_ElementValue_WD_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_WD_ID");
 		
-		if(mField.getColumnName().equals(MWarehouseAcct.COLUMNNAME_W_Differences_Acct))
+		if(mField.getColumnName().equals("W_Differences_Acct"))
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		
 		return null;

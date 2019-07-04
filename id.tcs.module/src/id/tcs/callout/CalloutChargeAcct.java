@@ -3,7 +3,6 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.compiere.model.MChargeAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
@@ -16,7 +15,7 @@ public class CalloutChargeAcct implements IColumnCallout{
 		// TODO Auto-generated method stub
 		if(mField.getColumnName().equals("C_ElementValue_Charge_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_Charge_ID");
-		if(mField.getColumnName().equals(MChargeAcct.COLUMNNAME_Ch_Expense_Acct))
+		if(mField.getColumnName().equals("Ch_Expense_Acct"))
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;
 	}

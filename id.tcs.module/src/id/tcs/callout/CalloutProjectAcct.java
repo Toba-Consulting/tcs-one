@@ -3,7 +3,6 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.compiere.model.MProjectAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
@@ -17,8 +16,8 @@ public class CalloutProjectAcct implements IColumnCallout{
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PA_ID");
 		if (mField.getColumnName().equals("C_ElementValue_WIP_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_WIP_ID");
-		if (mField.getColumnName().equals(MProjectAcct.COLUMNNAME_PJ_Asset_Acct)
-				|| mField.getColumnName().equals(MProjectAcct.COLUMNNAME_PJ_WIP_Acct))
+		if (mField.getColumnName().equals("PJ_Asset_Acct")
+				|| mField.getColumnName().equals("PJ_WIP_Acct"))
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		
 		return null;

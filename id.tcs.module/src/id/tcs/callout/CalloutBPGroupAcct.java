@@ -3,7 +3,6 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.compiere.model.MBPGroupAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
@@ -29,14 +28,14 @@ public class CalloutBPGroupAcct implements IColumnCallout {
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VL_ID");
 		if (mField.getColumnName().equals("C_ElementValue_VP_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VP_ID");
-		if (mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_NotInvoicedReceipts_Acct)
-				|| mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_PayDiscount_Exp_Acct)
-				|| mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_PayDiscount_Rev_Acct)
-				|| mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_WriteOff_Acct)
-				|| mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_Prepayment_Acct)
-				|| mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_C_Receivable_Acct)
-				|| mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_V_Liability_Acct)
-				|| mField.getColumnName().equals(MBPGroupAcct.COLUMNNAME_V_Prepayment_Acct))
+		if (mField.getColumnName().equals("NotInvoicedReceipts_Acct")
+				|| mField.getColumnName().equals("PayDiscount_Exp_Acct")
+				|| mField.getColumnName().equals("PayDiscount_Rev_Acct")
+				|| mField.getColumnName().equals("WriteOff_Acct")
+				|| mField.getColumnName().equals("C_Prepayment_Acct")
+				|| mField.getColumnName().equals("C_Receivable_Acct")
+				|| mField.getColumnName().equals("V_Liability_Acct")
+				|| mField.getColumnName().equals("V_Prepayment_Acct"))
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;
 	}

@@ -12,24 +12,11 @@ import id.tcs.callout.CalloutProductCategoryAcct;
 import id.tcs.callout.CalloutProjectAcct;
 import id.tcs.callout.CalloutTaxRateAcct;
 import id.tcs.callout.CalloutWarehouseLocator;
-import id.tcs.callout.TCS_CalloutAdvRequestLine;
-import id.tcs.callout.TCS_CalloutAdvSettlement;
-import id.tcs.callout.TCS_CalloutAdvSettlementLine;
-import id.tcs.callout.TCS_CalloutDestSettlement;
-import id.tcs.callout.TCS_CalloutInvoiceLine;
-import id.tcs.model.MAcctSchemaDefault;
-import id.tcs.model.MAcctSchemaGL;
-import id.tcs.model.MBPCustomerAcct;
-import id.tcs.model.MBPGroupAcct;
-import id.tcs.model.MBPVendorAcct;
-import id.tcs.model.MBankAccountAcct;
-import id.tcs.model.MChargeAcct;
-import id.tcs.model.MFADefaultAccount;
-import id.tcs.model.MProductAcct;
-import id.tcs.model.MProductCategoryAcct;
-import id.tcs.model.MProjectAcct;
-import id.tcs.model.MTaxAcct;
-import id.tcs.model.MWarehouseAcct;
+import id.tcs.callout.TCS_CalloutAsset;
+import id.tcs.callout.TCS_CalloutAssetMovement;
+import id.tcs.callout.TCS_CalloutAssetReval;
+import id.tcs.callout.TCS_CalloutAssetTransfer;
+import id.tcs.callout.TCS_CalloutPayment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,28 +32,24 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 			String columnName) {
 		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
 		
-		if (tableName.equals("TCS_AdvSettlement")){
-			list.add(new TCS_CalloutAdvSettlement());
+		if (tableName.equals("A_Asset_Reval")){
+			list.add(new TCS_CalloutAssetReval());
 		}
-		
-		if (tableName.equals("TCS_DestSettlement")){
-			list.add(new TCS_CalloutDestSettlement());
+
+		if (tableName.equals("A_AssetTransfer")){
+			list.add(new TCS_CalloutAssetTransfer());
 		}
-		
-		if (tableName.equals("TCS_AdvSettlementLine")){
-			list.add(new TCS_CalloutAdvSettlementLine());
+
+		if (tableName.equals("A_AssetMovement")){
+			list.add(new TCS_CalloutAssetMovement());
 		}
-		
-		if (tableName.equals("TCS_AdvRequestLine")){
-			list.add(new TCS_CalloutAdvRequestLine());
+
+		if (tableName.equals("C_Payment")){
+			list.add(new TCS_CalloutPayment());
 		}
-		
-		if (tableName.equals("TCS_AdvSettlementLine")){
-			list.add(new TCS_CalloutAdvSettlementLine());
-		}
-		
-		if (tableName.equals("C_InvoiceLine")){
-			list.add(new TCS_CalloutInvoiceLine());
+
+		if (tableName.equals("A_Asset")){
+			list.add(new TCS_CalloutAsset());
 		}
 		
 		if(tableName.equals("C_AcctSchema_GL"))

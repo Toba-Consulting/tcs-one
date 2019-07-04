@@ -3,7 +3,6 @@ package id.tcs.callout;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
-import org.compiere.model.MBPCustomerAcct;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
@@ -21,10 +20,10 @@ public class CalloutBPAcct implements IColumnCallout{
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VL_ID");
 		if (mField.getColumnName().equals("C_ElementValue_VP_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VP_ID");
-		if (mField.getColumnName().equals(MBPCustomerAcct.COLUMNNAME_C_Receivable_Acct)
-				|| mField.getColumnName().equals(MBPCustomerAcct.COLUMNNAME_C_Prepayment_Acct)
-				|| mField.getColumnName().equals(MBPVendorAcct.COLUMNNAME_V_Liability_Acct)
-				|| mField.getColumnName().equals(MBPVendorAcct.COLUMNNAME_V_Prepayment_Acct)
+		if (mField.getColumnName().equals("C_Receivable_Acct")
+				|| mField.getColumnName().equals("C_Prepayment_Acct")
+				|| mField.getColumnName().equals("V_Liability_Acct")
+				|| mField.getColumnName().equals("V_Prepayment_Acct")
 				)
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;
