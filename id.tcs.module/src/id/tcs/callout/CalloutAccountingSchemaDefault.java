@@ -20,8 +20,8 @@ public class CalloutAccountingSchemaDefault implements IColumnCallout {
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_RG_ID");
 		if (mField.getColumnName().equals("C_ElementValue_RL_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_RL_ID");
-		if (mField.getColumnName().equals("C_ElementValue_ID"))
-			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_ID");
+		if (mField.getColumnName().equals("C_ElementValue_NIR"))
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_NIR");
 		if (mField.getColumnName().equals("C_ElementValue_PDE_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PDE_ID");
 		if (mField.getColumnName().equals("C_ElementValue_PDR_ID"))
@@ -145,7 +145,7 @@ public class CalloutAccountingSchemaDefault implements IColumnCallout {
 			mTab.setValue("RealizedGain_Acct", validAccount.get_ID());
 		else if(columnName.equals("C_ElementValue_RL_ID"))
 			mTab.setValue("RealizedLoss_Acct", validAccount.get_ID());
-		else if(columnName.equals("C_ElementValue_ID"))
+		else if(columnName.equals("C_ElementValue_NIR"))
 			mTab.setValue("NotInvoicedReceipts_Acct", validAccount.get_ID());
 		else if(columnName.equals("C_ElementValue_PDE_ID"))
 			mTab.setValue("PayDiscount_Exp_Acct", validAccount.get_ID());
@@ -234,7 +234,7 @@ public class CalloutAccountingSchemaDefault implements IColumnCallout {
 		else if(mField.getColumnName().equals("RealizedLoss_Acct"))
 			mTab.setValue("C_ElementValue_RL_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("NotInvoicedReceipts_Acct"))
-			mTab.setValue("C_ElementValue_ID", validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_NIR", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("PayDiscount_Exp_Acct"))
 			mTab.setValue("C_ElementValue_PDE_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("PayDiscount_Rev_Acct"))
