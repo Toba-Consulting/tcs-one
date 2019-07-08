@@ -121,10 +121,10 @@ public class TCS_AllocationReset extends SvrProcess
 					+ "SELECT 1 FROM TCS_AllocateCharge tac WHERE tac.C_Payment_ID = C_AllocationLine.C_Payment_ID"
 					+ ") OR Exists ("
 					+ "SELECT 1 FROM C_Payment where C_Payment_ID = C_AllocationLine.C_Payment_ID AND C_Charge_id is not NULL"
-					+ "))"
+					+ ")"
 					+ " OR EXISTS (SELECT 1 "
 					+ "FROM C_PaymentAllocate cpa WHERE C_AllocationLine.C_Payment_ID=cpa.C_Payment_ID"
-					+ ")";
+					+ "))";
 
 			boolean notValid = new Query(getCtx(), I_C_AllocationLine.Table_Name, whereClause, get_TrxName())
 								.setParameters(new Object[]{p_C_AllocationHdr_ID})
