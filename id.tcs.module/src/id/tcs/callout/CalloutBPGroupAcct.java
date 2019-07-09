@@ -12,8 +12,8 @@ public class CalloutBPGroupAcct implements IColumnCallout {
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		// TODO Auto-generated method stub
-		if (mField.getColumnName().equals("C_ElementValue_ID")) 
-			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_ID");
+		if (mField.getColumnName().equals("C_ElementValue_NIR")) 
+			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_NIR");
 		if (mField.getColumnName().equals("C_ElementValue_PDE_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PDE_ID");
 		if (mField.getColumnName().equals("C_ElementValue_PDR_ID"))
@@ -47,7 +47,7 @@ public class CalloutBPGroupAcct implements IColumnCallout {
 			return "";
 		
 		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue(columnName), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
-		if(columnName.equals("C_ElementValue_ID"))
+		if(columnName.equals("C_ElementValue_NIR"))
 			mTab.setValue("NotInvoicedReceipts_Acct", validAccount.get_ID());
 		else if(columnName.equals("C_ElementValue_PDE_ID"))
 			mTab.setValue("PayDiscount_Exp_Acct", validAccount.get_ID());
@@ -78,7 +78,7 @@ public class CalloutBPGroupAcct implements IColumnCallout {
 		MAccount validCombination = new MAccount(ctx, C_ValidCombination_ID, null);
 		
 		if (mField.getColumnName().equals("NotInvoicedReceipts_Acct")) {
-			mTab.setValue("C_ElementValue_ID", validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_NIR", validCombination.getAccount_ID());
 		}else if(mField.getColumnName().equals("PayDiscount_Exp_Acct")) {
 			mTab.setValue("C_ElementValue_PDE_ID", validCombination.getAccount_ID());
 		}else if(mField.getColumnName().equals("PayDiscount_Rev_Acct")) {
