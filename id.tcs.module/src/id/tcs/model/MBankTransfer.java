@@ -7,11 +7,8 @@ import java.sql.Timestamp;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import org.adempiere.exceptions.AdempiereException;
-import org.adempiere.exceptions.PeriodClosedException;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
-import org.compiere.model.MBPartner;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPeriod;
@@ -253,7 +250,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			paymentFrom.setDateAcct(getDateAcct());
 			paymentFrom.setDateTrx(getDateAcct()); 
 			paymentFrom.setPayAmt(getPayAmtFrom());
-			paymentFrom.setChargeAmt(getChargeAmt());
 			
 			if (funcCurrencyID!=getC_Currency_From_ID()) {
 				paymentFrom.setC_ConversionType_ID(getC_ConversionType_ID());
@@ -268,7 +264,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			//payment from
 			
 			MPayment paymentTo = new MPayment(getCtx(), 0, get_TrxName());
-			
 			paymentTo.setAD_Org_ID(getAD_Org_ID());
 			paymentTo.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
 			paymentTo.setC_BankAccount_ID(getC_BankAccount_To_ID());
@@ -284,8 +279,9 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			paymentTo.setDateAcct(getDateAcct());
 			paymentTo.setDateTrx(getDateAcct());
 			paymentTo.setPayAmt(getPayAmtTo());
-			paymentTo.setChargeAmt(getChargeAmt());
-			paymentTo.setC_ConversionType_ID(getC_ConversionType_ID());
+			if (funcCurrencyID!=getC_Currency_From_ID()) {
+				paymentTo.setC_ConversionType_ID(getC_ConversionType_ID());
+			}
 			paymentTo.saveEx();
 			
 			if(!paymentTo.processIt(MPayment.DOCACTION_Complete)) {
@@ -295,14 +291,15 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			paymentTo.saveEx();
 			//paymentTo
 			
+			/*
 			if(isHasTransferFee()) {
 				MPayment paymentTransfer = new MPayment(getCtx(), 0, get_TrxName());
 				
 				paymentTransfer.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
 				if(getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom)) {
 					paymentTransfer.setC_BankAccount_ID(getC_BankAccount_From_ID());
-					paymentTransfer.setC_Currency_ID(getC_Currency_From_ID());
-					paymentTransfer.setPayAmt(getPayAmtFrom());
+					paymentTransfer.setC_Currency_ID(getChar);
+					paymentTransfer.setPayAmt(getChargeAmt());
 				}
 				else {
 					paymentTransfer.setC_BankAccount_ID(getC_BankAccount_To_ID());
@@ -332,45 +329,11 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				paymentTransfer.saveEx();
 			
 			}
-			
+			*/
 			
 			//allocation
-			MAllocationHdr allocHdr = new MAllocationHdr(getCtx(), 0, get_TrxName());
-			//MAcctSchema schema = new MAcctSchema(getCtx(), get_ValueAsInt("C_AcctSchema_ID"), get_TrxName());
-			
-			String sqlDocBaseTypeAlloc = 
-						"SELECT C_DocType_ID FROM C_DOCTYPE" 
-					  + " WHERE DocBaseType = 'CMA'";
-			
-			String sqlDivideRate =
-					"SELECT dividerate FROM C_Conversion_Rate"
-				  + " WHERE C_Currency_ID = " + getC_Currency_From_ID() 
-				  + " AND C_Currency_ID_To = " + getC_Currency_To_ID()
-				  + " AND ValidFrom < '" + getDateAcct()
-				  + "' AND ValidTo >= '" + getDateAcct() + "'"
-				  + " AND C_ConversionType_ID = " + getC_ConversionType_ID();
-			
-			String sqlMultiplyRate =
-					"SELECT multiplyrate FROM C_Conversion_Rate"
-				  + " WHERE C_Currency_ID = " + getC_Currency_From_ID() 
-				  + " AND C_Currency_ID_To = " + getC_Currency_To_ID()
-				  + " AND ValidFrom < '" + getDateAcct()
-				  + "' AND ValidTo >= '" + getDateAcct() + "'"
-				  + " AND C_ConversionType_ID = " + getC_ConversionType_ID();			
-
-			String sqlCurrencyIDR = 
-					"SELECT C_Currency_ID FROM C_Currency"
-				  + " WHERE C_Currency_ID = 303";
-			
-			int DocBaseTypeAllocID = DB.getSQLValue(get_TrxName(), sqlDocBaseTypeAlloc);
-			BigDecimal divideRate = DB.getSQLValueBD(get_TrxName(), sqlDivideRate);
-			BigDecimal multiplyRate = DB.getSQLValueBD(get_TrxName(), sqlMultiplyRate);
-			int CurrencyIDR = DB.getSQLValue(get_TrxName(), sqlCurrencyIDR);
-			
-			System.out.println(multiplyRate);
-			
+			MAllocationHdr allocHdr = new MAllocationHdr(getCtx(), false, getDateAcct(), getC_Currency_ID(),"", get_TrxName());
 			allocHdr.setAD_Org_ID(getAD_Org_ID());
-			allocHdr.setC_DocType_ID(DocBaseTypeAllocID);
 			allocHdr.setDateAcct(getDateAcct());
 			allocHdr.setDateTrx(getDateAcct());
 			allocHdr.setC_Currency_ID(getC_Currency_ID());
@@ -398,55 +361,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			alloclineAR.setAmount(getPayAmtTo());
 			setC_Payment_To_ID(paymentTo.getC_Payment_ID());
 			alloclineAR.saveEx();
-			
-			if(get_ValueAsInt(MBankTransfer.COLUMNNAME_C_Currency_From_ID) != get_ValueAsInt(MBankTransfer.COLUMNNAME_C_Currency_To_ID) )
-			{
-				MAllocationLine alloclineChrGap = new MAllocationLine(allocHdr);
-				MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
-				alloclineChrGap.setAD_Org_ID(allocHdr.getAD_Org_ID());
-				alloclineChrGap.setC_BPartner_ID(paymentTo.getC_BPartner_ID());
-//				if(getTransferFeeType().equals(MTRANSFERFEETYPE_ChargeOnBankFrom))
-//					alloclineChrGap.setC_Charge_ID(getC_Charge_ID());
-//				else if(getTransferFeeType().equals(MTRANSFERFEETYPE_ChargeOnBankTo))
-//					alloclineChrGap.setC_Charge_ID(paymentTo.getC_Charge_ID());
-//				alloclineChrGap.setC_Invoice_ID(0);
-				System.out.println(paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID));
-				System.out.println(paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR));
-				System.out.println(CurrencyIDR);
-				System.out.println(divideRate);
-				if(!paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR) && paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR)) {
-					alloclineChrGap.setAmount(paymentFrom.getPayAmt().multiply(multiplyRate).subtract(paymentTo.getPayAmt()));
-					alloclineChrGap.setC_Payment_ID(paymentTo.getC_Payment_ID());
-				}
-				else if(!paymentTo.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR) && paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID).equals(CurrencyIDR)){
-					alloclineChrGap.setAmount(paymentTo.getPayAmt().multiply(divideRate).subtract(paymentFrom.getPayAmt()));
-					alloclineChrGap.setC_Payment_ID(paymentFrom.getC_Payment_ID());
-				}
-				else{
-					alloclineChrGap.setAmount(paymentTo.getPayAmt());
-					alloclineChrGap.setC_Payment_ID(paymentTo.getC_Payment_ID());
-				}
-				
-				alloclineChrGap.saveEx();
-			}
-
-			
-			if(get_Value("C_Charge_ID") != null){
-				MAllocationLine alloclineChr = new MAllocationLine(allocHdr);
-				
-				alloclineChr.setAD_Org_ID(allocHdr.getAD_Org_ID());
-				alloclineChr.setC_BPartner_ID(getC_BPartner_ID());
-				alloclineChr.setC_Charge_ID(getC_Charge_ID());
-				if(getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom)) {
-					alloclineChr.setAmount(getChargeAmt().negate());
-					alloclineChr.setC_Payment_ID(getC_Payment_From_ID());
-				}
-				else {
-					alloclineChr.setAmount(getChargeAmt());
-					alloclineChr.setC_Payment_ID(getC_Payment_To_ID());
-				}
-				alloclineChr.saveEx();			
-			}	
 			
 			allocHdr.processIt(DocAction.ACTION_Complete);
 
