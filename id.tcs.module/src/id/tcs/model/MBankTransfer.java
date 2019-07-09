@@ -55,14 +55,13 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 //
 //		setDivideRate(divideRate);
 //		setMultiplyRate(multiplyRate);
-
+		
 		return true;
 	}
 
 	@Override
 	public int customizeValidActions(String docStatus, Object processing, String orderType, String isSOTrx,
 			int AD_Table_ID, String[] docAction, String[] options, int index) {
-		// TODO Auto-generated method stub
 		
 		//if docstatus = DR,IN, IP allowed docaction CO, VO, PR
 		//if docstatus = CO allowed docaction RE
@@ -80,11 +79,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			options[index++] = DocAction.ACTION_Void;
 			options[index++] = DocAction.ACTION_Prepare;
 		} else if (docStatus.equals(DocAction.STATUS_Completed)) {
-			options[index++] = DocAction.ACTION_Reverse_Accrual;
 			options[index++] = DocAction.ACTION_Reverse_Correct;
-		} else if (docStatus.equals(DocAction.STATUS_Voided) 
-				|| docStatus.equals(DocAction.STATUS_Reversed)) {
-			options[index++] = DocAction.ACTION_None;
 		}
 
 		return index;
@@ -103,7 +98,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 
 	@Override
 	public boolean unlockIt() {
-		// TODO Auto-generated method stub
 		if (log.isLoggable(Level.INFO)) log.info(toString());
 		setProcessing(false);
 		return true;
@@ -111,7 +105,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 
 	@Override
 	public boolean invalidateIt() {
-		// TODO Auto-generated method stub
 		if (log.isLoggable(Level.INFO)) log.info(toString());
 		setDocAction(DOCACTION_Prepare);
 		return true;
@@ -119,7 +112,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 
 	@Override
 	public String prepareIt() {
-		// TODO Auto-generated method stub
 		if (log.isLoggable(Level.INFO)) log.info(toString());
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_PREPARE);
 		if(m_processMsg != null)
@@ -132,23 +124,41 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		//02 - currency to = currency bankaccountto
 		//03 - ad org tidak boleh *, ad org harus sama dengan org bank account from
 		//04 - if ishastransferfee=N, set c_charge_id, chargeamt, charge_currency_id, charge_payment_ID to null
-		MBankTransfer bankTransfer = new MBankTransfer(getCtx(), C_BankTransfer_ID, get_TrxName());
-		MBankAccount bankAccountFrom = new MBankAccount(getCtx(), bankTransfer.getC_BankAccount_From_ID(), get_TrxName());
-		MBankAccount bankAccountTo = new MBankAccount(getCtx(), bankTransfer.getC_BankAccount_To_ID(), get_TrxName());
 		
-		if(bankTransfer.getC_Currency_From_ID() != bankAccountFrom.getC_Currency_ID())
+		if (getC_BankAccount_From()==null)
+			return "Error.. Bank Account From is mandatory";
+		
+		if (getC_BankAccount_To()==null)
+			return "Error.. Bank Account To is mandatory";
+		
+		if(getC_Currency_From() == null)
+			return "Error.. Currency From is mandatory";
+		
+		if(getC_Currency_To() == null)
+			return "Error.. Currency To is mandatory";
+		
+		if (getAmountFrom()==null)
+			return "Error.. Amount From is mandatory";
+		
+		if (getAmountTo()==null)
+			return "Error.. Amount To is mandatory";
+		
+		MBankAccount bankAccountFrom = new MBankAccount(getCtx(), getC_BankAccount_From_ID(), get_TrxName());
+		MBankAccount bankAccountTo = new MBankAccount(getCtx(), getC_BankAccount_To_ID(), get_TrxName());
+		
+		if(getC_Currency_From_ID() != bankAccountFrom.getC_Currency_ID())
 		{
 			m_processMsg = "Currency From does not match with Currency from Bank Account From";
 			return DocAction.STATUS_Invalid;
 		}
 		
-		if(bankTransfer.getC_Currency_To_ID() != bankAccountTo.getC_Currency_ID())
+		if(getC_Currency_To_ID() != bankAccountTo.getC_Currency_ID())
 		{
 			m_processMsg = "Currency To does not match with Currency from Bank Account To";
 			return DocAction.STATUS_Invalid;
 		}
 		
-		if(bankTransfer.getAD_Org_ID() == 0)
+		if(getAD_Org_ID() == 0)
 		{
 			m_processMsg = "Organization cannot be *";
 			return DocAction.STATUS_Invalid;
@@ -160,6 +170,13 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			setChargeAmt(null);
 			setTransferFeeType(null);
 			setC_Payment_Transfer_ID(0);
+		} else {
+			if (getC_Charge()==null)
+				return "Error, transfer charge is mandatory";
+			
+			if (getChargeAmt()==null)
+				return "Error, transfer amount is mandatory";
+			
 		}
 			
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
@@ -169,7 +186,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			return DocAction.STATUS_Invalid;
 		}
 
-		
 		m_justPrepared = true;
 
 		if (!DOCACTION_Complete.equals(getDocAction()))
@@ -180,7 +196,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 
 	@Override
 	public boolean approveIt() {
-		// TODO Auto-generated method stub
 		if (log.isLoggable(Level.INFO)) log.info(toString());
 		setProcessed(true);
 		return true;
@@ -188,7 +203,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 
 	@Override
 	public boolean rejectIt() {
-		// TODO Auto-generated method stub
 		if (log.isLoggable(Level.INFO)) log.info(toString());
 		setProcessed(false);
 		return true;
@@ -196,7 +210,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 
 	@Override
 	public String completeIt() {
-		// TODO Auto-generated method stub
 		//		Re-Check
 			if (!m_justPrepared)
 			{
@@ -222,17 +235,16 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			//create payment for transfer fee and complete
 			
 			//setdocstatus and docaction
+			int funcCurrencyID = Env.getContextAsInt(getCtx(), "$C_Currency_ID");
 			
-			MBankTransfer bankTransfer = new MBankTransfer(getCtx(), getC_BankTransfer_ID(), get_TrxName());
-			MPayment paymentFrom = new MPayment(getCtx(), 0, get_TrxName());
-			
+			MPayment paymentFrom = new MPayment(getCtx(), 0, get_TrxName());			
 			paymentFrom.setAD_Org_ID(getAD_Org_ID());
 			paymentFrom.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
 			paymentFrom.setC_BankAccount_ID(getC_BankAccount_From_ID());
 			paymentFrom.setC_BPartner_ID(getC_BPartner_ID());
 			paymentFrom.setC_DocType_ID(false); 
 			paymentFrom.setC_Currency_ID(getC_Currency_From_ID());
-			if(bankTransfer.getDescription() == null) {
+			if(getDescription() == null) {
 				paymentFrom.setDescription("Generated From Bank Transfer " + getDocumentNo());								
 			}
 			else {
@@ -242,7 +254,10 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			paymentFrom.setDateTrx(getDateAcct()); 
 			paymentFrom.setPayAmt(getPayAmtFrom());
 			paymentFrom.setChargeAmt(getChargeAmt());
-			paymentFrom.setC_ConversionType_ID(getC_ConversionType_ID());
+			
+			if (funcCurrencyID!=getC_Currency_From_ID()) {
+				paymentFrom.setC_ConversionType_ID(getC_ConversionType_ID());
+			}
 			paymentFrom.saveEx();
 			
 			if(!paymentFrom.processIt(MPayment.DOCACTION_Complete)) {
@@ -260,7 +275,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			paymentTo.setC_BPartner_ID(getC_BPartner_ID());
 			paymentTo.setC_DocType_ID(true);
 			paymentTo.setC_Currency_ID(getC_Currency_To_ID());
-			if(bankTransfer.getDescription() == null) {
+			if(getDescription() == null) {
 				paymentTo.setDescription("Generated From Bank Transfer " + getDocumentNo());								
 			}
 			else {
@@ -284,7 +299,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				MPayment paymentTransfer = new MPayment(getCtx(), 0, get_TrxName());
 				
 				paymentTransfer.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
-				if(bankTransfer.getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom)) {
+				if(getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom)) {
 					paymentTransfer.setC_BankAccount_ID(getC_BankAccount_From_ID());
 					paymentTransfer.setC_Currency_ID(getC_Currency_From_ID());
 					paymentTransfer.setPayAmt(getPayAmtFrom());
@@ -297,7 +312,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				paymentTransfer.setC_BPartner_ID(getC_BPartner_ID());
 				paymentTransfer.setC_DocType_ID(true);
 				
-				if(bankTransfer.getDescription() == null) {
+				if(getDescription() == null) {
 					paymentTransfer.setDescription("Generated From Bank Transfer " + getDocumentNo());								
 				}
 				else {
@@ -321,7 +336,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			
 			//allocation
 			MAllocationHdr allocHdr = new MAllocationHdr(getCtx(), 0, get_TrxName());
-			//MAcctSchema schema = new MAcctSchema(getCtx(), bankTransfer.get_ValueAsInt("C_AcctSchema_ID"), get_TrxName());
+			//MAcctSchema schema = new MAcctSchema(getCtx(), get_ValueAsInt("C_AcctSchema_ID"), get_TrxName());
 			
 			String sqlDocBaseTypeAlloc = 
 						"SELECT C_DocType_ID FROM C_DOCTYPE" 
@@ -329,19 +344,19 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			
 			String sqlDivideRate =
 					"SELECT dividerate FROM C_Conversion_Rate"
-				  + " WHERE C_Currency_ID = " + bankTransfer.getC_Currency_From_ID() 
-				  + " AND C_Currency_ID_To = " + bankTransfer.getC_Currency_To_ID()
-				  + " AND ValidFrom < '" + bankTransfer.getDateAcct()
-				  + "' AND ValidTo >= '" + bankTransfer.getDateAcct() + "'"
-				  + " AND C_ConversionType_ID = " + bankTransfer.getC_ConversionType_ID();
+				  + " WHERE C_Currency_ID = " + getC_Currency_From_ID() 
+				  + " AND C_Currency_ID_To = " + getC_Currency_To_ID()
+				  + " AND ValidFrom < '" + getDateAcct()
+				  + "' AND ValidTo >= '" + getDateAcct() + "'"
+				  + " AND C_ConversionType_ID = " + getC_ConversionType_ID();
 			
 			String sqlMultiplyRate =
 					"SELECT multiplyrate FROM C_Conversion_Rate"
-				  + " WHERE C_Currency_ID = " + bankTransfer.getC_Currency_From_ID() 
-				  + " AND C_Currency_ID_To = " + bankTransfer.getC_Currency_To_ID()
-				  + " AND ValidFrom < '" + bankTransfer.getDateAcct()
-				  + "' AND ValidTo >= '" + bankTransfer.getDateAcct() + "'"
-				  + " AND C_ConversionType_ID = " + bankTransfer.getC_ConversionType_ID();			
+				  + " WHERE C_Currency_ID = " + getC_Currency_From_ID() 
+				  + " AND C_Currency_ID_To = " + getC_Currency_To_ID()
+				  + " AND ValidFrom < '" + getDateAcct()
+				  + "' AND ValidTo >= '" + getDateAcct() + "'"
+				  + " AND C_ConversionType_ID = " + getC_ConversionType_ID();			
 
 			String sqlCurrencyIDR = 
 					"SELECT C_Currency_ID FROM C_Currency"
@@ -354,16 +369,16 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			
 			System.out.println(multiplyRate);
 			
-			allocHdr.setAD_Org_ID(bankTransfer.getAD_Org_ID());
+			allocHdr.setAD_Org_ID(getAD_Org_ID());
 			allocHdr.setC_DocType_ID(DocBaseTypeAllocID);
-			allocHdr.setDateAcct(bankTransfer.getDateAcct());
-			allocHdr.setDateTrx(bankTransfer.getDateAcct());
+			allocHdr.setDateAcct(getDateAcct());
+			allocHdr.setDateTrx(getDateAcct());
 			allocHdr.setC_Currency_ID(getC_Currency_ID());
-			if(bankTransfer.getDescription() == null) {
-				allocHdr.setDescription("Generated From Bank Transfer " + bankTransfer.getDocumentNo());								
+			if(getDescription() == null) {
+				allocHdr.setDescription("Generated From Bank Transfer " + getDocumentNo());								
 			}
 			else {
-				allocHdr.setDescription(bankTransfer.getDescription() + " | Generated From Bank Transfer " + bankTransfer.getDocumentNo());
+				allocHdr.setDescription(getDescription() + " | Generated From Bank Transfer " + getDocumentNo());
 			}
 			allocHdr.saveEx();
 			
@@ -381,7 +396,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			alloclineAR.setC_BPartner_ID(paymentTo.getC_BPartner_ID());
 			alloclineAR.setC_Payment_ID(paymentTo.getC_Payment_ID());
 			alloclineAR.setAmount(getPayAmtTo());
-			bankTransfer.setC_Payment_To_ID(paymentTo.getC_Payment_ID());
+			setC_Payment_To_ID(paymentTo.getC_Payment_ID());
 			alloclineAR.saveEx();
 			
 			if(get_ValueAsInt(MBankTransfer.COLUMNNAME_C_Currency_From_ID) != get_ValueAsInt(MBankTransfer.COLUMNNAME_C_Currency_To_ID) )
@@ -390,9 +405,9 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
 				alloclineChrGap.setAD_Org_ID(allocHdr.getAD_Org_ID());
 				alloclineChrGap.setC_BPartner_ID(paymentTo.getC_BPartner_ID());
-//				if(bankTransfer.getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom))
-//					alloclineChrGap.setC_Charge_ID(bankTransfer.getC_Charge_ID());
-//				else if(bankTransfer.getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankTo))
+//				if(getTransferFeeType().equals(MTRANSFERFEETYPE_ChargeOnBankFrom))
+//					alloclineChrGap.setC_Charge_ID(getC_Charge_ID());
+//				else if(getTransferFeeType().equals(MTRANSFERFEETYPE_ChargeOnBankTo))
 //					alloclineChrGap.setC_Charge_ID(paymentTo.getC_Charge_ID());
 //				alloclineChrGap.setC_Invoice_ID(0);
 				System.out.println(paymentFrom.get_Value(MPayment.COLUMNNAME_C_Currency_ID));
@@ -416,13 +431,13 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			}
 
 			
-			if(bankTransfer.get_Value("C_Charge_ID") != null){
+			if(get_Value("C_Charge_ID") != null){
 				MAllocationLine alloclineChr = new MAllocationLine(allocHdr);
 				
 				alloclineChr.setAD_Org_ID(allocHdr.getAD_Org_ID());
 				alloclineChr.setC_BPartner_ID(getC_BPartner_ID());
 				alloclineChr.setC_Charge_ID(getC_Charge_ID());
-				if(bankTransfer.getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom)) {
+				if(getTransferFeeType().equals(MBankTransfer.TRANSFERFEETYPE_ChargeOnBankFrom)) {
 					alloclineChr.setAmount(getChargeAmt().negate());
 					alloclineChr.setC_Payment_ID(getC_Payment_From_ID());
 				}
@@ -435,8 +450,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			
 			allocHdr.processIt(DocAction.ACTION_Complete);
 
-			
-			
 			String valid = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_COMPLETE);
 			if (valid != null)
 			{
@@ -477,22 +490,9 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		}
 		else
 		{
-			boolean accrual = false;
-			try 
-			{
-				MPeriod.testPeriodOpen(getCtx(), getDateAcct(), getC_DocType_ID(), getAD_Org_ID());
-			}
-			catch (PeriodClosedException e) 
-			{
-				accrual = true;
-			}
-			
-			if (accrual)
-				return reverseAccrualIt();
-			else
-				return reverseCorrectIt();
+			m_processMsg = "Cannot Void Document.. Only Document with status Draft / Invalid / In Progress can be voided";
+			return false;
 		}
-		
 		
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_VOID);
 		if (m_processMsg != null)
@@ -517,8 +517,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		}
 		MPeriod.testPeriodOpen(getCtx(), dateAcct, getC_DocType_ID(), getAD_Org_ID());
 		
-		MPayment paymentFrom = new MPayment(getCtx(), getC_Payment_From_ID(), get_TrxName());
-		MPayment paymentTo = new MPayment(getCtx(), getC_Payment_To_ID(), get_TrxName());
+		//@win.. when reversing, we are only creating a bank transfer which reverse the flow of original bank transfer and then process complete it
 		
 		// create reversal
 		MBankTransfer reversal = new MBankTransfer(getCtx(), 0, get_TrxName());
@@ -529,14 +528,15 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		reversal.setDocumentNo(getDocumentNo() + REVERSE_INDICATOR);
 		reversal.setDocStatus(DOCSTATUS_Drafted);
 		reversal.setDocAction(DOCACTION_Complete);
-		reversal.setC_BankAccount_From_ID(paymentFrom.getC_BankAccount_ID());
-		reversal.setC_BankAccount_To_ID(paymentTo.getC_BankAccount_ID());
+		reversal.setC_BankAccount_From_ID(getC_BankAccount_To_ID());
+		reversal.setC_BankAccount_To_ID(getC_BankAccount_From_ID());
+		reversal.setC_Currency_From_ID(getC_Currency_To_ID());
+		reversal.setC_Currency_To_ID(getC_Currency_From_ID());
 		//
-		reversal.setPayAmtFrom(getPayAmtFrom().negate());
-		reversal.setPayAmtTo(getPayAmtTo().negate());
+		reversal.setPayAmtFrom(getPayAmtTo());
+		reversal.setPayAmtTo(getPayAmtFrom());
 		reversal.setChargeAmt(getChargeAmt().negate());
 		//
-		reversal.setIsCanceled(true);
 		reversal.setProcessing(false);
 		reversal.setProcessed(false);
 		reversal.setDescription(getDescription());
@@ -551,53 +551,19 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				return null;
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		reversal.closeIt();
 		reversal.setDocStatus(DOCSTATUS_Reversed);
 		reversal.setDocAction(DOCACTION_None);
 		reversal.saveEx(get_TrxName());
-	
-
+		
+		//Add description on original document to link to reversal document
+		addDescription("{->" + reversal.getDocumentNo() + ")");
+		saveEx();
 		
 		StringBuilder info = new StringBuilder(reversal.getDocumentNo());
 
-		//	Create automatic Allocation
-		MAllocationHdr alloc = new MAllocationHdr (getCtx(), false, 
-			getDateAcct(), 
-			getC_Currency_ID(),
-			Msg.translate(getCtx(), "C_BankTransfer_ID")	+ ": " + reversal.getDocumentNo(), get_TrxName());
-		alloc.setAD_Org_ID(getAD_Org_ID());
-		alloc.setDateAcct(dateAcct); // dateAcct variable already take into account the accrual parameter
-		alloc.saveEx(get_TrxName());
-
-		//	Original Allocation
-		MAllocationLine aLine = new MAllocationLine (alloc);
-		aLine.setDocInfo(getC_BPartner_ID(), 0, 0);
-		if (!aLine.save(get_TrxName()))
-			log.warning("Automatic allocation - line not saved");
-		//	Reversal Allocation
-		aLine = new MAllocationLine (alloc);
-		aLine.setDocInfo(reversal.getC_BPartner_ID(), 0, 0);
-		if (!aLine.save(get_TrxName()))
-			log.warning("Automatic allocation - reversal line not saved");
-		
-		// added AdempiereException by zuhri
-		if (!alloc.processIt(DocAction.ACTION_Complete))
-			throw new AdempiereException("Failed when processing document - " + alloc.getProcessMsg());
-		// end added
-		alloc.saveEx(get_TrxName());
-		//			
-		info.append(" - @C_AllocationHdr_ID@: ").append(alloc.getDocumentNo());
-		
-		//	Update BPartner
-		if (getC_BPartner_ID() != 0)
-		{
-			MBPartner bp = new MBPartner (getCtx(), getC_BPartner_ID(), get_TrxName());
-			bp.setTotalOpenBalance();
-			bp.saveEx(get_TrxName());
-		}
 		
 		return info;
 	}
@@ -634,23 +600,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 
 	@Override
 	public boolean reverseAccrualIt() {
-		if (log.isLoggable(Level.INFO)) log.info(toString());
-		//before reverseAccrual
-		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_REVERSEACCRUAL);
-		if(m_processMsg != null)
-			return false;
-
-		StringBuilder info = reverse(true);
-		if (info == null)
-			return false;
-
-		//After reverseAccrual
-		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_REVERSEACCRUAL);
-		if (m_processMsg != null)
-			return false;
-		
-		m_processMsg = info.toString();
-		return true;
+		return false;
 	}
 
 	@Override
@@ -660,40 +610,33 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 
 	@Override
 	public String getSummary() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getDocumentInfo() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public File createPDF() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getProcessMsg() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int getDoc_User_ID() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int getC_Currency_ID() {
-		// TODO Auto-generated method stub
 		//@win note.. get from context variable.. from default acct schema
-		int C_Currency_ID = Env.getContextAsInt(getCtx(), "$C_Currency_ID");
-		return C_Currency_ID;
+		return Env.getContextAsInt(getCtx(), "$C_Currency_ID");
 	}
 
 	@Override
