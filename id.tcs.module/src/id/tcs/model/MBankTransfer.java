@@ -17,9 +17,7 @@ import org.compiere.model.ModelValidator;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
-import org.compiere.util.DB;
 import org.compiere.util.Env;
-import org.compiere.util.Msg;
 
 public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOptions {
 
@@ -114,7 +112,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		if(m_processMsg != null)
 			return DocAction.STATUS_Invalid;
 		
-		int C_BankTransfer_ID = getC_BankTransfer_ID();
 		//@win note
 		//all validation code here
 		//01 - currency from = currency bankaccountfrom
@@ -358,8 +355,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			alloclineAR.setAD_Org_ID(allocHdr.getAD_Org_ID());
 			alloclineAR.setC_BPartner_ID(paymentTo.getC_BPartner_ID());
 			alloclineAR.setC_Payment_ID(paymentTo.getC_Payment_ID());
-			alloclineAR.setAmount(getPayAmtTo());
-			setC_Payment_To_ID(paymentTo.getC_Payment_ID());
+			alloclineAR.setAmount(getAmountTo());
 			alloclineAR.saveEx();
 			
 			allocHdr.processIt(DocAction.ACTION_Complete);
