@@ -2,9 +2,11 @@ package id.tcs.module.factory;
 
 import id.tcs.callout.CalloutAccountingSchemaDefault;
 import id.tcs.callout.CalloutAccountingSchemaGL;
+import id.tcs.callout.CalloutDeltaUseLifeYears;
 import id.tcs.callout.CalloutBPAcct;
 import id.tcs.callout.CalloutBPGroupAcct;
 import id.tcs.callout.CalloutBankCash;
+import id.tcs.callout.CalloutBankTransfer;
 import id.tcs.callout.CalloutChargeAcct;
 import id.tcs.callout.CalloutFADefaultAccount;
 import id.tcs.callout.CalloutProductAcct;
@@ -87,6 +89,12 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 		
 		if(tableName.equals("FA_DefaultAccount"))
 			list.add(new CalloutFADefaultAccount());
+		
+		if(tableName.equals("A_Asset_Addition"))
+			list.add(new CalloutDeltaUseLifeYears());
+		
+		if(tableName.equals("C_BankTransfer"))
+			list.add(new CalloutBankTransfer());
 		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];
 	}
 
