@@ -86,13 +86,11 @@ public class TCS_CreateFromOrder extends CreateFrom {
         if (dateRequired != null) {
         	sqlStmt.append("AND mr.DateRequired=? ");
         }
-        
         if (C_Project_ID > 0) {
         	sqlStmt.append("AND mr.C_Project_ID=? ");
         } else {
         	sqlStmt.append("AND mr.C_Project_ID IS NULL ");
         }
-        
         if (C_Charge_ID > 0) {
         	sqlStmt.append("AND rl.C_Charge_ID=? ");
         }
@@ -122,12 +120,10 @@ public class TCS_CreateFromOrder extends CreateFrom {
             	count++;
             	pstmt.setTimestamp(count, dateRequired);
             }
-            
             if (C_Project_ID > 0) {
             	count++;
             	pstmt.setInt(count, C_Project_ID);
             }
-            
             if (C_Charge_ID > 0) {
             	count++;
             	pstmt.setInt(count, C_Charge_ID);
@@ -411,13 +407,11 @@ public class TCS_CreateFromOrder extends CreateFrom {
 			.append(" AND l.AD_Client_ID=? AND r.DocStatus IN (?,?))");
 		//	.append(" AND (l.QtyRequisite - unprocessedpofrompr(m_requisitionline_ID)) > 0) ");
 		//@Stephan
-		
 		if (C_Project_ID > 0) {
 			sql.append(" AND r.C_Project_ID=? ");
 		} else {
 			sql.append(" AND r.C_Project_ID IS NULL ");
 		}
-		
         if (salesRepID > 0) {
         	sql.append("AND r.AD_User_ID=? ");
         }
@@ -436,8 +430,7 @@ public class TCS_CreateFromOrder extends CreateFrom {
 			if (C_Project_ID > 0) {
 				pstmt.setInt(++count, C_Project_ID);
 			}
-			
-	        if (salesRepID > 0) {
+			if (salesRepID > 0) {
 	        	pstmt.setInt(++count, salesRepID);
 	        }
 	        
