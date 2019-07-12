@@ -57,7 +57,7 @@ public class TCS_OrderValidator {
 		}
 		IDs=IDs.substring(0, IDs.length()-2);
 		//match PO tetap ada setelah MR direverse
-		String sqlWhere = "C_OrderLine_ID IN ("+IDs+") AND mi.DocStatus IN ('CO','CL','IP')";
+		String sqlWhere = "M_MatchPO.C_OrderLine_ID IN ("+IDs+") AND mi.DocStatus IN ('CO','CL','IP')";
 		boolean match = new Query(order.getCtx(), MMatchPO.Table_Name, sqlWhere, order.get_TrxName())
 							.addJoinClause("JOIN M_InOutLine mil on mil.M_InOutline_ID=M_MatchPO.M_InOutLine_ID")
 							.addJoinClause("JOIN M_InOut mi on mi.M_InOut_ID=mil.M_InOut_ID")
