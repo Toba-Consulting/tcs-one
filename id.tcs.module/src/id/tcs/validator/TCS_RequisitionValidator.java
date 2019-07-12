@@ -16,6 +16,12 @@ public class TCS_RequisitionValidator {
 				(event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT))) {
 			msg = checkPO(req);
 		}
+		else if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE))){
+			msg = checkPO(req);
+		}
+		else if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID))){
+			msg = checkPO(req);
+		}
 
 		return msg;
 	}
@@ -25,7 +31,7 @@ public class TCS_RequisitionValidator {
 		boolean match = false;
 		String sqlWhere = "M_Requisition.M_Requisition_ID="+req.getM_Requisition_ID()+" AND co.DocStatus IN ('CO','CL') ";
 		match = new Query(req.getCtx(), MRequisition.Table_Name, sqlWhere, req.get_TrxName())
-				.addJoinClause("JOIN M_RequisitionLine rl on rl.M_Requisition_ID=M_Requisition.M_Requsition_ID ")
+				.addJoinClause("JOIN M_RequisitionLine rl on rl.M_Requisition_ID=M_Requisition.M_Requisition_ID ")
 				.addJoinClause("JOIN C_OrderLine col on col.M_RequisitionLine_ID=rl.M_RequisitionLine_ID ")
 				.addJoinClause("JOIN C_Order co on co.C_Order_ID=col.C_Order_ID AND co.IsSOTrx='N' ")
 				.match();

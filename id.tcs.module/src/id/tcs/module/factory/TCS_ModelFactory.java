@@ -39,6 +39,11 @@ import org.compiere.util.Env;
 
 import id.tcs.model.I_TCS_AllocateCharge;
 import id.tcs.model.MBankTransfer;
+import id.tcs.model.MInquiry;
+import id.tcs.model.MInquiryLine;
+import id.tcs.model.MQuotation;
+import id.tcs.model.MQuotationLine;
+import id.tcs.model.MQuotationTax;
 
 
 
@@ -67,6 +72,11 @@ public class TCS_ModelFactory implements IModelFactory {
 		
 		mapTableModels.put(I_TCS_AllocateCharge.Table_Name, "id.tcs.model.MTCS_AllocateCharge");
 		mapTableModels.put(MBankTransfer.Table_Name, "id.tcs.model.MBankTransfer");
+		mapTableModels.put(MQuotation.Table_Name, "id.tcs.model.MQuotation");
+		mapTableModels.put(MQuotationLine.Table_Name, "id.tcs.model.MQuotationLine");
+		mapTableModels.put(MQuotationTax.Table_Name, "id.tcs.model.MQuotationTax");
+		mapTableModels.put(MInquiry.Table_Name, "id.tcs.model.MInquiry");
+		mapTableModels.put(MInquiryLine.Table_Name, "id.tcs.model.MInquiryLine");
 		
 	}
 	
