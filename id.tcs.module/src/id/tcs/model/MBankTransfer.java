@@ -164,7 +164,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			setC_Charge_ID(0);
 			setChargeAmt(null);
 			setTransferFeeType(null);
-			setC_Payment_Transfer_ID(0);
+//			setC_Payment_Transfer_ID(0);
 		} else {
 			if (getC_Charge()==null)
 				return "Error, transfer charge is mandatory";
