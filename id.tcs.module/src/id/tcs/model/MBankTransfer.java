@@ -164,7 +164,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			setC_Charge_ID(0);
 			setChargeAmt(null);
 			setTransferFeeType(null);
-//			setC_Payment_Transfer_ID(0);
 		} else {
 			if (getC_Charge()==null)
 				return "Error, transfer charge is mandatory";
@@ -335,29 +334,37 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 					"SELECT dividerate FROM C_Conversion_Rate"
 				  + " WHERE C_Currency_ID = " + getC_Currency_From_ID() 
 				  + " AND C_Currency_ID_To = " + getC_Currency_To_ID()
-				  + " AND ValidFrom < '" + getDateAcct()
+				  + " AND ValidFrom <= '" + getDateAcct()
 				  + "' AND ValidTo >= '" + getDateAcct() + "'"
 				  + " AND C_ConversionType_ID = " + getC_ConversionType_ID();
-			
 
 			String sqlMultiplyRate =
 					"SELECT multiplyrate FROM C_Conversion_Rate"
 				  + " WHERE C_Currency_ID = " + getC_Currency_From_ID() 
 				  + " AND C_Currency_ID_To = " + getC_Currency_To_ID()
-				  + " AND ValidFrom < '" + getDateAcct()
+				  + " AND ValidFrom <= '" + getDateAcct()
 				  + "' AND ValidTo >= '" + getDateAcct() + "'"
 				  + " AND C_ConversionType_ID = " + getC_ConversionType_ID();
 			
-			String sqlMultiplyRateForSameCurrencynotIDR =
+			String sqlMultiplyRateForCurrencynotIDRFrom =
 					"SELECT multiplyrate FROM C_Conversion_Rate"
 				  + " WHERE C_Currency_ID = " + getC_Currency_From_ID() 
 				  + " AND C_Currency_ID_To = " + getC_Currency_ID()
-				  + " AND ValidFrom < '" + getDateAcct()
+				  + " AND ValidFrom <= '" + getDateAcct()
+				  + "' AND ValidTo >= '" + getDateAcct() + "'"
+				  + " AND C_ConversionType_ID = " + getC_ConversionType_ID();
+			
+			String sqlMultiplyRateForCurrencynotIDRTo =
+					"SELECT multiplyrate FROM C_Conversion_Rate"
+				  + " WHERE C_Currency_ID = " + getC_Currency_To_ID()
+				  + " AND C_Currency_ID_To = " + getC_Currency_ID()
+				  + " AND ValidFrom <= '" + getDateAcct()
 				  + "' AND ValidTo >= '" + getDateAcct() + "'"
 				  + " AND C_ConversionType_ID = " + getC_ConversionType_ID();
 						
 			BigDecimal multiplyRate = DB.getSQLValueBD(get_TrxName(), sqlMultiplyRate);
-			BigDecimal multiplyRateSameCurrencynotIDR = DB.getSQLValueBD(get_TrxName(), sqlMultiplyRateForSameCurrencynotIDR);
+			BigDecimal multiplyRateCurrencynotIDRFrom = DB.getSQLValueBD(get_TrxName(), sqlMultiplyRateForCurrencynotIDRFrom);
+			BigDecimal multiplyRateCurrencynotIDRTo = DB.getSQLValueBD(get_TrxName(), sqlMultiplyRateForCurrencynotIDRTo);			
 			BigDecimal divideRate = DB.getSQLValueBD(get_TrxName(), sqlDivideRate);
 			
 			MAllocationHdr allocHdr = new MAllocationHdr(getCtx(), false, getDateAcct(), getC_Currency_ID(),"", get_TrxName());
@@ -378,10 +385,12 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			alloclineAP.setAD_Org_ID(allocHdr.getAD_Org_ID());
 			alloclineAP.setC_BPartner_ID(paymentFrom.getC_BPartner_ID());
 			alloclineAP.setC_Payment_ID(paymentFrom.getC_Payment_ID());
-			if(getC_Currency_From_ID() != getC_Currency_To_ID() && getC_Currency_From_ID() != funcCurrencyID)
+			if(getC_Currency_From_ID() != getC_Currency_To_ID() && getC_Currency_From_ID() != funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID)
+				alloclineAP.setAmount(paymentFrom.getPayAmt().multiply(multiplyRateCurrencynotIDRFrom).negate());
+			else if(getC_Currency_From_ID() != getC_Currency_To_ID() && getC_Currency_From_ID() != funcCurrencyID)
 				alloclineAP.setAmount(paymentFrom.getPayAmt().multiply(multiplyRate).negate());
 			else if(getC_Currency_From_ID() != getC_Currency_ID() && getC_Currency_To_ID() != getC_Currency_ID())
-				alloclineAP.setAmount(paymentFrom.getPayAmt().multiply(multiplyRateSameCurrencynotIDR).negate());
+				alloclineAP.setAmount(paymentFrom.getPayAmt().multiply(multiplyRateCurrencynotIDRFrom).negate());
 			else
 				alloclineAP.setAmount(getAmountFrom().negate());
 			alloclineAP.saveEx();
@@ -391,10 +400,12 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			alloclineAR.setAD_Org_ID(allocHdr.getAD_Org_ID());
 			alloclineAR.setC_BPartner_ID(paymentTo.getC_BPartner_ID());
 			alloclineAR.setC_Payment_ID(paymentTo.getC_Payment_ID());
-			if(getC_Currency_To_ID() != getC_Currency_From_ID() && getC_Currency_To_ID() != funcCurrencyID)
+			if(getC_Currency_From_ID() != getC_Currency_To_ID() && getC_Currency_From_ID() != funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID)
+				alloclineAR.setAmount(paymentTo.getPayAmt().multiply(multiplyRateCurrencynotIDRTo));
+			else if(getC_Currency_To_ID() != getC_Currency_From_ID() && getC_Currency_To_ID() != funcCurrencyID)
 				alloclineAR.setAmount(paymentTo.getPayAmt().multiply(divideRate));
 			else if(getC_Currency_From_ID() != getC_Currency_ID() && getC_Currency_To_ID() != getC_Currency_ID())
-				alloclineAR.setAmount(paymentTo.getPayAmt().multiply(multiplyRateSameCurrencynotIDR));
+				alloclineAR.setAmount(paymentTo.getPayAmt().multiply(multiplyRateCurrencynotIDRTo));
 			else
 				alloclineAR.setAmount(getAmountTo());
 			alloclineAR.saveEx();
@@ -406,12 +417,16 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				alloclineLossvsGain.setAD_Org_ID(allocHdr.getAD_Org_ID());
 				alloclineLossvsGain.setC_BPartner_ID(getC_BPartner_ID());
 				
-				if(getC_Currency_From_ID() == funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID) {			
+				if(getC_Currency_From_ID() != funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID && getC_Currency_From_ID() != getC_Currency_To_ID()) {
+					alloclineLossvsGain.setC_Payment_ID(paymentFrom.getC_Payment_ID());					
+					alloclineLossvsGain.setAmount(paymentFrom.getPayAmt().multiply(multiplyRateCurrencynotIDRFrom).subtract(paymentTo.getPayAmt().multiply(multiplyRateCurrencynotIDRTo)));
+				}
+				else if(getC_Currency_From_ID() == funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID) {			
 					alloclineLossvsGain.setC_Payment_ID(paymentFrom.getC_Payment_ID());
 					alloclineLossvsGain.setAmount(paymentTo.getPayAmt().multiply(divideRate).subtract(paymentFrom.getPayAmt()));
 				}
 				else if(getC_Currency_To_ID() == funcCurrencyID && getC_Currency_From_ID() != funcCurrencyID) {
-					alloclineLossvsGain.setC_Payment_ID(paymentTo.getC_Payment_ID());;
+					alloclineLossvsGain.setC_Payment_ID(paymentTo.getC_Payment_ID());
 					alloclineLossvsGain.setAmount(paymentFrom.getPayAmt().multiply(multiplyRate).subtract(paymentTo.getPayAmt()));
 				}
 				alloclineLossvsGain.saveEx();
@@ -424,13 +439,15 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 					allocCharge.setC_BPartner_ID(getC_BPartner_ID());
 					allocCharge.setAmount(alloclineLossvsGain.getAmount().negate());						
 					
-					if(getC_Currency_To_ID() != funcCurrencyID) {
+					if(getC_Currency_From_ID() != funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID && getC_Currency_From_ID() != getC_Currency_To_ID()) {
+						allocCharge.setC_Payment_ID(paymentFrom.getC_Payment_ID());	
+					}	
+					else if(getC_Currency_To_ID() != funcCurrencyID) {
 						allocCharge.setC_Payment_ID(paymentFrom.getC_Payment_ID());
 					}
 					else if(getC_Currency_From_ID() != funcCurrencyID) {
 						allocCharge.setC_Payment_ID(paymentTo.getC_Payment_ID());
 					}
-					
 					allocCharge.saveEx();
 				}
 			
