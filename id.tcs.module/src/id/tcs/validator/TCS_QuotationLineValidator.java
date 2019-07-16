@@ -19,13 +19,13 @@ public class TCS_QuotationLineValidator {
 		MQuotationLine quotationLine = (MQuotationLine) po;
 		
 		if (event.getTopic().equals(IEventTopics.PO_AFTER_DELETE)){
-			msgQuotation =setTotalLines(quotationLine);
-			msgQuotation = removeMatchQuotation(quotationLine);
+			msgQuotation +=setTotalLines(quotationLine);
+			msgQuotation += removeMatchQuotation(quotationLine);
 
 		}
 		if (event.getTopic().equals(IEventTopics.PO_AFTER_NEW) 
 				|| event.getTopic().equals(IEventTopics.PO_AFTER_CHANGE)){
-			msgQuotation=setTotalLines(quotationLine);
+			msgQuotation +=setTotalLines(quotationLine);
 		}
 
 		

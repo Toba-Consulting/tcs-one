@@ -17,10 +17,10 @@ public class TCS_InOutValidator {
 		MInOut inout = (MInOut) po;
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL) ||
 				event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT)) {
-			msg = checkMatchInvoice(inout);
-			msg = checkLinkedActiveInvoice(inout);
+			msg += checkMatchInvoice(inout);
+			msg += checkLinkedActiveInvoice(inout);
 		} else if(event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)){
-			msg = checkExistsNullOrderLine(inout);
+			msg += checkExistsNullOrderLine(inout);
 		}		
 		return msg;
 	}

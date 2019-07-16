@@ -19,17 +19,17 @@ public class TCS_OrderValidator {
 		String msg = "";
 		MOrder order = (MOrder) po;
 		if (event.getTopic().equals(IEventTopics.DOC_AFTER_REACTIVATE)) {
-			msg = unreserveQty(order);
+			msg += unreserveQty(order);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
-			msg = checkMatchPO(order);
-			msg = checkLinkedPayment(order);
-			msg = checkActiveLinkedInOut(order);
+			msg += checkMatchPO(order);
+			msg += checkLinkedPayment(order);
+			msg += checkActiveLinkedInOut(order);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)) {
-			msg = checkMatchPO(order);
-			msg = checkLinkedPayment(order);
-			msg = checkActiveLinkedInOut(order);
+			msg += checkMatchPO(order);
+			msg += checkLinkedPayment(order);
+			msg += checkActiveLinkedInOut(order);
 		} 
 		return msg;
 	}
