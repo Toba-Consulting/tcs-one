@@ -23,7 +23,7 @@ public class TCS_InvoiceValidator {
 		}
 		else if(event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)){
 			if (!invoice.isReversal())
-				msg = validateRelatedInOut(invoice);
+				msg += validateRelatedInOut(invoice);
 				msg += validateRelatedOrder(invoice);
 		}
 
