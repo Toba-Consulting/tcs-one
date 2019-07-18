@@ -6,9 +6,11 @@ import java.util.logging.Level;
 
 import org.adempiere.base.IDocFactory;
 import org.compiere.acct.Doc;
+import org.compiere.acct.Doc_AssetAddition;
 import org.compiere.acct.Doc_BankTransfer;
 import org.compiere.acct.TCS_Doc_Payment;
 import org.compiere.model.MAcctSchema;
+import org.compiere.model.MAssetAddition;
 import org.compiere.model.MPayment;
 import org.compiere.model.MTable;
 import org.compiere.util.CLogger;
@@ -73,7 +75,10 @@ public class TCS_DocFactory implements IDocFactory {
 		
 		if(tableName.equals(MBankTransfer.Table_Name))
 			return new Doc_BankTransfer(as, rs, trxName);
-		
+
+		if(tableName.equals(MAssetAddition.Table_Name))
+			return new Doc_AssetAddition(as, rs, trxName);
+
 		return null;
 
 	}
