@@ -12,6 +12,7 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPeriod;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.process.DocAction;
@@ -372,6 +373,8 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			allocHdr.setDateAcct(getDateAcct());
 			allocHdr.setDateTrx(getDateAcct());
 			allocHdr.setC_Currency_ID(getC_Currency_ID());
+
+System.out.println(MSysConfig.getIntValue("ChargeSelisih", 0));
 			if(getDescription() == null) {
 				allocHdr.setDescription("Generated From Bank Transfer " + getDocumentNo());								
 			}
@@ -413,41 +416,59 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			if(getC_Currency_From_ID() != getC_Currency_To_ID()) {
 				
 				MAllocationLine alloclineLossvsGain = new MAllocationLine(allocHdr);
+				BigDecimal cFrom = null, cTo = null;
 				
 				alloclineLossvsGain.setAD_Org_ID(allocHdr.getAD_Org_ID());
-				alloclineLossvsGain.setC_BPartner_ID(getC_BPartner_ID());
+				alloclineLossvsGain.setC_BPartner_ID(getC_BPartner_ID());				
+				alloclineLossvsGain.setC_Charge_ID(getC_Charge_ID());
 				
-				if(getC_Currency_From_ID() != funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID && getC_Currency_From_ID() != getC_Currency_To_ID()) {
-					alloclineLossvsGain.setC_Payment_ID(paymentFrom.getC_Payment_ID());					
-					alloclineLossvsGain.setAmount(paymentFrom.getPayAmt().multiply(multiplyRateCurrencynotIDRFrom).subtract(paymentTo.getPayAmt().multiply(multiplyRateCurrencynotIDRTo)));
+				if(get_Value("TransferFeeType").equals(TRANSFERFEETYPE_ChargeOnBankFrom)) {
+					if(getC_Currency_From_ID() != funcCurrencyID)
+					{
+						cFrom = getChargeAmt().multiply(multiplyRateCurrencynotIDRFrom);
+						if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1)
+							alloclineLossvsGain.setAmount(cFrom);
+						else if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==-1)
+							alloclineLossvsGain.setAmount(cFrom.negate());
+					}
+					else
+						alloclineLossvsGain.setAmount(getChargeAmt());
+					
 				}
-				else if(getC_Currency_From_ID() == funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID) {			
-					alloclineLossvsGain.setC_Payment_ID(paymentFrom.getC_Payment_ID());
-					alloclineLossvsGain.setAmount(paymentTo.getPayAmt().multiply(divideRate).subtract(paymentFrom.getPayAmt()));
-				}
-				else if(getC_Currency_To_ID() == funcCurrencyID && getC_Currency_From_ID() != funcCurrencyID) {
-					alloclineLossvsGain.setC_Payment_ID(paymentTo.getC_Payment_ID());
-					alloclineLossvsGain.setAmount(paymentFrom.getPayAmt().multiply(multiplyRate).subtract(paymentTo.getPayAmt()));
+					
+				else if(get_Value("TransferFeeType").equals(TRANSFERFEETYPE_ChargeOnBankTo)) {
+					if(getC_Currency_To_ID() != funcCurrencyID) {
+						cTo = getChargeAmt().multiply(multiplyRateCurrencynotIDRTo);
+						System.out.println(multiplyRateCurrencynotIDRTo);
+						if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1)
+							alloclineLossvsGain.setAmount(cTo);
+						else if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==-1)
+							alloclineLossvsGain.setAmount(cTo.negate());
+					}
+					else
+						alloclineLossvsGain.setAmount(getChargeAmt());
+					
 				}
 				alloclineLossvsGain.saveEx();
+			
+				
 				
 				if(get_Value("C_Charge_ID") != null) {
 					MAllocationLine allocCharge = new MAllocationLine(allocHdr);
-					
+
+					BigDecimal selisihAP = alloclineAP.getAmount().negate().subtract(alloclineAR.getAmount());
 					allocCharge.setAD_Org_ID(getAD_Org_ID());
-					allocCharge.setC_Charge_ID(getC_Charge_ID());
 					allocCharge.setC_BPartner_ID(getC_BPartner_ID());
-					allocCharge.setAmount(alloclineLossvsGain.getAmount().negate());						
-					
-					if(getC_Currency_From_ID() != funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID && getC_Currency_From_ID() != getC_Currency_To_ID()) {
-						allocCharge.setC_Payment_ID(paymentFrom.getC_Payment_ID());	
-					}	
-					else if(getC_Currency_To_ID() != funcCurrencyID) {
-						allocCharge.setC_Payment_ID(paymentFrom.getC_Payment_ID());
+					//notes: harus bikin 2 system configuration -currency_loss_charge -currency_gain_charge
+					if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1) {
+						allocCharge.setC_Charge_ID(MSysConfig.getIntValue("currency_loss_charge", 0, paymentFrom.getAD_Client_ID()));
+						allocCharge.setAmount(selisihAP.subtract(alloclineLossvsGain.getAmount()));
 					}
-					else if(getC_Currency_From_ID() != funcCurrencyID) {
-						allocCharge.setC_Payment_ID(paymentTo.getC_Payment_ID());
-					}
+					else if(alloclineAR.getAmount().compareTo(alloclineAP.getAmount().negate())==1)
+					{
+						allocCharge.setC_Charge_ID(MSysConfig.getIntValue("currency_gain_charge", 0, paymentFrom.getAD_Client_ID()));
+						allocCharge.setAmount(selisihAP.negate().add(alloclineLossvsGain.getAmount()).negate());
+					}					
 					allocCharge.saveEx();
 				}
 			
