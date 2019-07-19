@@ -22,9 +22,9 @@ import org.compiere.util.Env;
 /**
  * @author Teo_Sarca, SC ARHIPAC SERVICE SRL
  */
-public class Doc_AssetAddition extends Doc
+public class TCS_Doc_AssetAddition extends Doc
 {
-	public Doc_AssetAddition (MAcctSchema as, ResultSet rs, String trxName)
+	public TCS_Doc_AssetAddition (MAcctSchema as, ResultSet rs, String trxName)
 	{
 		super(as, MAssetAddition.class, rs, MDocType.DOCBASETYPE_GLDocument, trxName);
 	}
