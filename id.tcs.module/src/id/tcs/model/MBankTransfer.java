@@ -374,7 +374,6 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			allocHdr.setDateTrx(getDateAcct());
 			allocHdr.setC_Currency_ID(getC_Currency_ID());
 
-System.out.println(MSysConfig.getIntValue("ChargeSelisih", 0));
 			if(getDescription() == null) {
 				allocHdr.setDescription("Generated From Bank Transfer " + getDocumentNo());								
 			}
@@ -416,69 +415,18 @@ System.out.println(MSysConfig.getIntValue("ChargeSelisih", 0));
 			if(getC_Currency_From_ID() != getC_Currency_To_ID()) {
 				
 				MAllocationLine alloclineLossvsGain = new MAllocationLine(allocHdr);
-				BigDecimal cFrom = null, cTo = null;
 				
 				alloclineLossvsGain.setAD_Org_ID(allocHdr.getAD_Org_ID());
-				alloclineLossvsGain.setC_BPartner_ID(getC_BPartner_ID());				
-				alloclineLossvsGain.setC_Charge_ID(getC_Charge_ID());
-				
-				if(get_Value("TransferFeeType").equals(TRANSFERFEETYPE_ChargeOnBankFrom)) {
-					if(getC_Currency_From_ID() != funcCurrencyID)
-					{
-						cFrom = getChargeAmt().multiply(multiplyRateCurrencynotIDRFrom);
-						if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1)
-							alloclineLossvsGain.setAmount(cFrom);
-						else if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==-1)
-							alloclineLossvsGain.setAmount(cFrom.negate());
-					}
-					else {
-						if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1)
-							alloclineLossvsGain.setAmount(getChargeAmt());						
-						else
-							alloclineLossvsGain.setAmount(getChargeAmt().negate());
-					}
-					
+				alloclineLossvsGain.setC_BPartner_ID(getC_BPartner_ID());	
+				alloclineLossvsGain.setAmount(alloclineAP.getAmount().negate().subtract(alloclineAR.getAmount()));
+				if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1) {
+					alloclineLossvsGain.setC_Charge_ID(MSysConfig.getIntValue("currency_loss_charge", 0, paymentFrom.getAD_Client_ID()));
 				}
-					
-				else if(get_Value("TransferFeeType").equals(TRANSFERFEETYPE_ChargeOnBankTo)) {
-					if(getC_Currency_To_ID() != funcCurrencyID) {
-						cTo = getChargeAmt().multiply(multiplyRateCurrencynotIDRTo);
-						System.out.println(multiplyRateCurrencynotIDRTo);
-						if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1)
-							alloclineLossvsGain.setAmount(cTo);
-						else if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==-1)
-							alloclineLossvsGain.setAmount(cTo.negate());
-					}
-					else
-						if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1)
-							alloclineLossvsGain.setAmount(getChargeAmt());						
-						else
-							alloclineLossvsGain.setAmount(getChargeAmt().negate());
-					
-				}
+				else if(alloclineAR.getAmount().compareTo(alloclineAP.getAmount().negate())==1)
+				{
+					alloclineLossvsGain.setC_Charge_ID(MSysConfig.getIntValue("currency_gain_charge", 0, paymentFrom.getAD_Client_ID()));
+				}					
 				alloclineLossvsGain.saveEx();
-			
-				
-				
-				if(get_Value("C_Charge_ID") != null) {
-					MAllocationLine allocCharge = new MAllocationLine(allocHdr);
-
-					BigDecimal selisihAP = alloclineAP.getAmount().negate().subtract(alloclineAR.getAmount());
-					allocCharge.setAD_Org_ID(getAD_Org_ID());
-					allocCharge.setC_BPartner_ID(getC_BPartner_ID());
-					//notes: harus bikin 2 system configuration -currency_loss_charge -currency_gain_charge
-					if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1) {
-						allocCharge.setC_Charge_ID(MSysConfig.getIntValue("currency_loss_charge", 0, paymentFrom.getAD_Client_ID()));
-						allocCharge.setAmount(selisihAP.subtract(alloclineLossvsGain.getAmount()));
-					}
-					else if(alloclineAR.getAmount().compareTo(alloclineAP.getAmount().negate())==1)
-					{
-						allocCharge.setC_Charge_ID(MSysConfig.getIntValue("currency_gain_charge", 0, paymentFrom.getAD_Client_ID()));
-						allocCharge.setAmount(selisihAP.negate().add(alloclineLossvsGain.getAmount()).negate());
-					}					
-					allocCharge.saveEx();
-				}
-			
 			}				
 			
 			allocHdr.processIt(DocAction.ACTION_Complete);
