@@ -431,8 +431,12 @@ System.out.println(MSysConfig.getIntValue("ChargeSelisih", 0));
 						else if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==-1)
 							alloclineLossvsGain.setAmount(cFrom.negate());
 					}
-					else
-						alloclineLossvsGain.setAmount(getChargeAmt());
+					else {
+						if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1)
+							alloclineLossvsGain.setAmount(getChargeAmt());						
+						else
+							alloclineLossvsGain.setAmount(getChargeAmt().negate());
+					}
 					
 				}
 					
@@ -446,7 +450,10 @@ System.out.println(MSysConfig.getIntValue("ChargeSelisih", 0));
 							alloclineLossvsGain.setAmount(cTo.negate());
 					}
 					else
-						alloclineLossvsGain.setAmount(getChargeAmt());
+						if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1)
+							alloclineLossvsGain.setAmount(getChargeAmt());						
+						else
+							alloclineLossvsGain.setAmount(getChargeAmt().negate());
 					
 				}
 				alloclineLossvsGain.saveEx();
