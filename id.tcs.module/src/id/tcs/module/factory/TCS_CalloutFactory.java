@@ -14,6 +14,7 @@ import id.tcs.callout.CalloutProductCategoryAcct;
 import id.tcs.callout.CalloutProjectAcct;
 import id.tcs.callout.CalloutTaxRateAcct;
 import id.tcs.callout.CalloutWarehouseLocator;
+import id.tcs.callout.TCS_CalloutAmortizationPlan;
 import id.tcs.callout.TCS_CalloutAsset;
 import id.tcs.callout.TCS_CalloutAssetMovement;
 import id.tcs.callout.TCS_CalloutAssetReval;
@@ -21,6 +22,7 @@ import id.tcs.callout.TCS_CalloutAssetTransfer;
 import id.tcs.callout.TCS_CalloutInquiryLine;
 import id.tcs.callout.TCS_CalloutPayment;
 import id.tcs.callout.TCS_CalloutQuotationLine;
+import id.tcs.model.MTCSAmortizationPlan;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +106,8 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 		if(tableName.equals("C_InquiryLine"))
 			list.add(new TCS_CalloutInquiryLine());
 
+		if(tableName.equals(MTCSAmortizationPlan.Table_Name))
+			list.add(new TCS_CalloutAmortizationPlan());
 		
 		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];
 	}
