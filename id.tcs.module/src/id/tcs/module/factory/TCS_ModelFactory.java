@@ -44,7 +44,9 @@ import id.tcs.model.MInquiryLine;
 import id.tcs.model.MQuotation;
 import id.tcs.model.MQuotationLine;
 import id.tcs.model.MQuotationTax;
+import id.tcs.model.MTCSAmortizationLine;
 import id.tcs.model.MTCSAmortizationPlan;
+import id.tcs.model.MTCSAmortizationRun;
 
 
 
@@ -79,6 +81,8 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(MInquiry.Table_Name, "id.tcs.model.MInquiry");
 		mapTableModels.put(MInquiryLine.Table_Name, "id.tcs.model.MInquiryLine");
 		mapTableModels.put(MTCSAmortizationPlan.Table_Name, "id.tcs.model.MTCSAmortizationPlan");
+		mapTableModels.put(MTCSAmortizationLine.Table_Name, "id.tcs.model.MTCSAmortizationLine");
+		mapTableModels.put(MTCSAmortizationRun.Table_Name, "id.tcs.model.MTCSAmortizationRun");
 		
 	}
 	
