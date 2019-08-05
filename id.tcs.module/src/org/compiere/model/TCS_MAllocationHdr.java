@@ -53,7 +53,7 @@ import org.compiere.util.Msg;
  *				<li>BF [ 2880182 ] Error you can allocate a payment to invoice that was paid
  *				<li> https://sourceforge.net/tracker/index.php?func=detail&aid=2880182&group_id=176962&atid=879332
 */
-public class TCS_MAllocationHdr extends X_C_AllocationHdr implements DocAction
+public class TCS_MAllocationHdr extends MAllocationHdr
 {
 	/**
 	 * 
