@@ -85,7 +85,7 @@ public class TCSBankRegister extends SvrProcess{
 		sb.append("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
 				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo) " 
-				+ "VALUES("+getAD_Client_ID()+","+Env.getAD_Org_ID(getCtx())+",null,null,null,null,null,"+p_C_BankAccount_ID+",null,'"+p_DateFrom+"','Reconciled Transactions',null,null,null,"+getAD_PInstance_ID()+",null,"+acc.getName()+",null,null,2, null, null, null, null, '"+p_DateFrom+"','"+p_DateTo+"')");
+				+ "VALUES("+getAD_Client_ID()+","+Env.getAD_Org_ID(getCtx())+",null,null,null,null,null,"+p_C_BankAccount_ID+",null,'"+p_DateFrom+"','Reconciled Transactions',null,null,null,"+getAD_PInstance_ID()+",null,'"+acc.getName()+"',null,null,2, null, null, null, null, '"+p_DateFrom+"','"+p_DateTo+"')");
 		
 		int no = DB.executeUpdate(sb.toString(), get_TrxName());
 		log.fine("#" + no);
