@@ -31,7 +31,7 @@ public interface I_TCS_AmortizationRun
     public static final String Table_Name = "TCS_AmortizationRun";
 
     /** AD_Table_ID=300191 */
-    public static final int Table_ID = 300312;
+    public static final int Table_ID = 300532;
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 

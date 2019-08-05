@@ -8,6 +8,7 @@ import org.adempiere.base.IDocFactory;
 import org.compiere.acct.Doc;
 //import org.compiere.acct.Doc_AssetAddition;
 import org.compiere.acct.Doc_BankTransfer;
+import org.compiere.acct.Doc_DDOrder;
 import org.compiere.acct.TCS_Doc_AmortizationRun;
 import org.compiere.acct.TCS_Doc_AssetAddition;
 import org.compiere.acct.TCS_Doc_Payment;
@@ -18,6 +19,7 @@ import org.compiere.model.MTable;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.eevolution.model.MDDOrder;
 
 import id.tcs.model.MBankTransfer;
 import id.tcs.model.MTCSAmortizationRun;
@@ -84,6 +86,9 @@ public class TCS_DocFactory implements IDocFactory {
 
 		if(tableName.equals(MTCSAmortizationRun.Table_Name))
 			return new TCS_Doc_AmortizationRun(as, rs, trxName);
+
+		if(tableName.equals(MDDOrder.Table_Name))
+			return new Doc_DDOrder(as, rs, trxName);
 
 		return null;
 

@@ -2,7 +2,7 @@ package id.tcs.module.factory;
 
 import id.tcs.callout.CalloutAccountingSchemaDefault;
 import id.tcs.callout.CalloutAccountingSchemaGL;
-import id.tcs.callout.TCS_CalloutAssetAddition;
+//import id.tcs.callout.TCS_CalloutAssetAddition;
 import id.tcs.callout.CalloutBPAcct;
 import id.tcs.callout.CalloutBPGroupAcct;
 import id.tcs.callout.CalloutBankCash;
@@ -19,6 +19,7 @@ import id.tcs.callout.TCS_CalloutAsset;
 import id.tcs.callout.TCS_CalloutAssetMovement;
 import id.tcs.callout.TCS_CalloutAssetReval;
 import id.tcs.callout.TCS_CalloutAssetTransfer;
+import id.tcs.callout.TCS_CalloutDDOrderLine;
 import id.tcs.callout.TCS_CalloutInquiryLine;
 import id.tcs.callout.TCS_CalloutPayment;
 import id.tcs.callout.TCS_CalloutQuotationLine;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import org.adempiere.base.IColumnCallout;
 import org.adempiere.base.IColumnCalloutFactory;
+import org.eevolution.model.MDDOrderLine;
 
 
 public class TCS_CalloutFactory implements IColumnCalloutFactory {
@@ -109,6 +111,9 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 		if(tableName.equals(MTCSAmortizationPlan.Table_Name))
 			list.add(new TCS_CalloutAmortizationPlan());
 		
+		if(tableName.equals(MDDOrderLine.Table_Name))
+			list.add(new TCS_CalloutDDOrderLine());
+
 		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];
 	}
 

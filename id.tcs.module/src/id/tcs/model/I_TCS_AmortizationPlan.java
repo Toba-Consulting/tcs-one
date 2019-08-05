@@ -33,7 +33,7 @@ public interface I_TCS_AmortizationPlan
     public static final String Table_Name = "TCS_AmortizationPlan";
 
     /** AD_Table_ID=300189 */
-    public static final int Table_ID = 300310;
+    public static final int Table_ID = 300530;
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 

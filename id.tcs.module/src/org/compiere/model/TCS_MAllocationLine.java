@@ -34,7 +34,7 @@ import org.compiere.util.Msg;
  *  @author Jorg Janke
  *  @version $Id: MAllocationLine.java,v 1.3 2006/07/30 00:51:03 jjanke Exp $
  */
-public class TCS_MAllocationLine extends X_C_AllocationLine
+public class TCS_MAllocationLine extends MAllocationLine
 {
 	/**
 	 * 
