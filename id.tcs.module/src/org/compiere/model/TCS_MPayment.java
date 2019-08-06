@@ -409,10 +409,10 @@ public class TCS_MPayment extends MPayment {
 		//	Invoices of a AP Payment Selection
 		if (allocatePaySelection())
 			return true;
-		
+		/*
 		if (getC_Order_ID() != 0)
 			return false;
-			
+		*/
 		//	Allocate to multiple Payments based on entry
 		MPaymentAllocate[] pAllocs = MPaymentAllocate.get(this);
 		//if (pAllocs.length == 0)

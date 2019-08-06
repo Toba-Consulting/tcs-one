@@ -9,7 +9,7 @@ import org.compiere.process.DocAction;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Msg;
 
-import id.tcs.model.TCS_MAllocationHdr;
+import org.compiere.model.TCS_MAllocationHdr;
 import org.compiere.model.TCS_MPayment;
 
 public class GenerateAllocation_PaymentCharge extends SvrProcess{

@@ -28,7 +28,7 @@ public class TCS_PaymentValidator {
 							+ " AND NOT EXISTS ("
 							+ " SELECT 1 FROM C_PaymentAllocate cpa WHERE C_AllocationLine.C_Payment_ID=cpa.C_Payment_ID)";
 		boolean match = new Query(payment.getCtx(), MAllocationLine.Table_Name, whereClause, payment.get_TrxName())
-				.addJoinClause("JOIN C_AllocationHdr cdr ON cdr.c_AllocationHdr_ID = C_AllocationLine.C_AllocationHdr_ID"
+				.addJoinClause("JOIN C_AllocationHdr cdr ON cdr.c_AllocationHdr_ID = C_AllocationLine.C_AllocationHdr_ID "
 							+  "JOIN C_Payment cp on cp.C_Payment_ID=C_AllocationLine.C_Payment_ID")
 				.setParameters(new Object[]{payment.getC_Payment_ID()})
 				.match();

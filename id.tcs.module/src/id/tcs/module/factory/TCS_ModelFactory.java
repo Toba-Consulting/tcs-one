@@ -37,6 +37,7 @@ import org.compiere.model.I_M_Requisition;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 
+import id.tcs.model.I_M_MatchRequest;
 import id.tcs.model.I_TCS_AllocateCharge;
 import id.tcs.model.MBankTransfer;
 import id.tcs.model.MInquiry;
