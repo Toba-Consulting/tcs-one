@@ -27,7 +27,7 @@ public class TCS_MInvoice extends MInvoice implements DocOptions {
 		index = 0;
 
 		if (docStatus.equals(DocAction.STATUS_Drafted)) {
-			options[index++] = DocAction.ACTION_Prepare;
+			options[index++] = DocAction.ACTION_Complete;
 			options[index++] = DocAction.ACTION_Void;
 		} else if (docStatus.equals(DocAction.STATUS_InProgress)) {
 			options[index++] = DocAction.ACTION_Complete;
