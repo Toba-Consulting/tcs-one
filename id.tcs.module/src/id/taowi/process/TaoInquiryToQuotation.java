@@ -54,10 +54,10 @@ public class TaoInquiryToQuotation extends SvrProcess{
 				C_PaymentTerm_ID = para[i].getParameterAsInt();
 			} else if (para[i].getParameterName().equalsIgnoreCase("C_Tax_ID")) {
 				C_Tax_ID = para[i].getParameterAsInt();
-			} else if (para[i].getParameterName().equalsIgnoreCase("M_PriceList_ID")) {
+			} /*else if (para[i].getParameterName().equalsIgnoreCase("M_PriceList_ID")) {
 				p_M_PriceList_ID = para[i].getParameterAsInt();
 			
-			}
+			}*/
 			
 			else {
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
@@ -74,9 +74,9 @@ public class TaoInquiryToQuotation extends SvrProcess{
 			return "Fill the Inquiry";
 		}
 		
-		if (p_M_PriceList_ID <= 0) {
-			return "Price List is Mandatory";
-		}
+//		if (p_M_PriceList_ID <= 0) {
+//			return "Price List is Mandatory";
+//		}
 		
 		MPriceList priceList = new MPriceList(getCtx(), p_M_PriceList_ID, get_TrxName());
 		
@@ -195,7 +195,8 @@ public class TaoInquiryToQuotation extends SvrProcess{
 		quotation.setC_DocType_ID(C_DocTypeTarget_ID);
 		quotation.setC_DocTypeTarget_ID(C_DocTypeTarget_ID);
 		quotation.setC_PaymentTerm_ID(C_PaymentTerm_ID);
-		quotation.setM_PriceList_ID(p_M_PriceList_ID);
+		//Get Price List From BPartner on Inquiry
+		quotation.setM_PriceList_ID(inquiry.getC_BPartner().getM_PriceList_ID());
 		quotation.setC_Tax_ID(C_Tax_ID);
 		if (inquiry.getSalesRep_ID() > 0) {
 		quotation.setSalesRep_ID(inquiry.getSalesRep_ID());
@@ -215,7 +216,8 @@ public class TaoInquiryToQuotation extends SvrProcess{
 				
 				MProductPricing pp = new MProductPricing (inqLine.getM_Product_ID(), 
 						inquiry.getC_BPartner_ID(), inqLine.getQty(), true);
-				pp.setM_PriceList_ID(p_M_PriceList_ID);
+				//Get Price List From BPartner on Inquiry
+				pp.setM_PriceList_ID(inquiry.getC_BPartner().getM_PriceList_ID());
 				pp.setM_PriceList_Version_ID(M_PriceList_Version_ID);
 				pp.setPriceDate(today);
 
