@@ -6,7 +6,14 @@ import java.sql.ResultSet;
 import org.adempiere.base.event.IEventTopics;
 import id.tcs.model.MQuotation;
 import id.tcs.model.MQuotationLine;
+
+import org.compiere.model.MMatchPO;
+import org.compiere.model.MOrder;
+import org.compiere.model.MOrderLine;
+import org.compiere.model.MPayment;
 import org.compiere.model.PO;
+import org.compiere.model.Query;
+
 import id.tcs.model.X_M_MatchQuotation;
 import org.compiere.util.DB;
 import org.osgi.service.event.Event;
@@ -24,6 +31,10 @@ public class TCS_QuotationValidator {
 
 		if (event.getTopic().equals(IEventTopics.DOC_AFTER_VOID)){
 			msgQuotation = removeMatchQuotation(quotation);
+		}
+		
+		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
+			msgQuotation = checkLinkedOrder(quotation);
 		}
 		
 		
@@ -93,5 +104,15 @@ public class TCS_QuotationValidator {
 
 	}
 	
+	public static String checkLinkedOrder(MQuotation quotation){
+		String sqlWhere="q.C_Quotation_ID="+quotation.getC_Quotation_ID()+" AND q.DocStatus IN ('CO','CL','IP')";
+		boolean match = new Query(quotation.getCtx(), MOrder.Table_Name, sqlWhere, quotation.get_TrxName())
+						.addJoinClause("JOIN M_MatchQuotation mq ON mq.C_Order_ID=C_Order.C_Order_ID ")
+						.addJoinClause("JOIN C_Quotation q ON q.C_Quotation_ID=mq.C_Quotation_ID")
+						.match();
+		
+		if (match) return "Cannot Reactivate / Void : Linked Order Exist";
+		return "";
+	}
 
 }
