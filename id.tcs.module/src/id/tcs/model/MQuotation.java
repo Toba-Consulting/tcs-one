@@ -15,6 +15,7 @@ import org.compiere.model.I_C_OrderTax;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCurrency;
+import org.compiere.model.MOrder;
 import org.compiere.model.MOrderTax;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MPriceListVersion;
@@ -259,7 +260,10 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 
 	@Override
 	public boolean reActivateIt() {
-		
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_REACTIVATE);
+		if (m_processMsg != null)
+			return false;		
+
 		setProcessed(false);
 		setDocAction(DocAction.ACTION_Complete);
 		setDocStatus(MQuotation.DOCSTATUS_InProgress);
