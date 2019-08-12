@@ -1,11 +1,15 @@
 package id.tcs.process;
 
 import java.sql.Timestamp;
+import java.util.Iterator;
 import java.util.logging.Level;
 
+import org.compiere.model.I_C_Order;
 import org.compiere.model.MDocType;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
+
+import id.tcs.model.I_M_MatchQuotation;
 import id.tcs.model.MQuotation;
 import id.tcs.model.MQuotationLine;
 import id.tcs.model.X_M_MatchQuotation;
@@ -76,7 +80,7 @@ public class TCSQuotationToOrder extends SvrProcess{
 		}
 		*/
 
-		MQuotationLine[] quoteLines = quotation.getLines();
+		MQuotationLine[] quoteLines = quotation.getLines();		
 		
 		//Validate: Quotation has lines
 		if (quoteLines.length == 0) {
@@ -88,8 +92,8 @@ public class TCSQuotationToOrder extends SvrProcess{
 			return "Quotation Status is not Completed";
 		
 		//Validate: Quotation must be winner
-		if (!quotation.isQuotationAccepted())
-			return "Quotation has not been declared as winner";
+//		if (!quotation.isQuotationAccepted())
+//			return "Quotation has not been declared as winner";
 		
 		//Validate: All quotation lines must have M_Product_ID
 		boolean checkProductID = true;
@@ -99,8 +103,8 @@ public class TCSQuotationToOrder extends SvrProcess{
 				checkProductID = false;
 		}
 
-		if (!checkProductID)
-		return "Only Completed and Winning Quotation with Products/Charge Can be Converted to Sales Order";
+//		if (!checkProductID)
+//		return "Only Completed and Winning Quotation with Products/Charge Can be Converted to Sales Order";
 
 		MOrder order = new MOrder(getCtx(), 0, get_TrxName());
 
@@ -168,7 +172,7 @@ public class TCSQuotationToOrder extends SvrProcess{
 		order.saveEx();
 		for (MQuotationLine quoteLine : quoteLines) {
 			MOrderLine orderLine = new MOrderLine(order);
-			if(quoteLine.get_ValueAsBoolean("IsAccepted")==true){
+//			if(quoteLine.get_ValueAsBoolean("IsAccepted")==true){
 				if (quoteLine.getM_Product_ID() > 0)
 					orderLine.setM_Product_ID(quoteLine.getM_Product_ID());
 				if (quoteLine.getC_Charge_ID() > 0)
@@ -205,7 +209,7 @@ public class TCSQuotationToOrder extends SvrProcess{
 			matchQuote.setDateTrx(new Timestamp(System.currentTimeMillis()));
 			matchQuote.setQtyOrdered(quoteLine.getQtyOrdered());
 			matchQuote.saveEx();
-			}
+//			}
 			
 		}
 		
