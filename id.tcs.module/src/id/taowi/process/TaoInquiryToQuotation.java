@@ -303,13 +303,13 @@ public class TaoInquiryToQuotation extends SvrProcess{
 					MProductPrice productprice= new MProductPrice(Env.getCtx(),M_ProductPrice_ID,get_TrxName());
 					quoLine.set_ValueOfColumn("PriceKondisi", productprice.getPriceList());
 				}else{
-					quoLine.set_ValueOfColumn("PriceKondisi",(BigDecimal)respLine.get_Value("PriceKondisi"));
+//					quoLine.set_ValueOfColumn("PriceKondisi",(BigDecimal)respLine.get_Value("PriceKondisi"));
 				}
-				quoLine.setPriceActual((BigDecimal)respLine.get_Value("Price"));
-				quoLine.setPriceList((BigDecimal)respLine.get_Value("Price"));
-				quoLine.setDeliveryDays(respLine.getDeliveryDays());
-				MRfQResponse resp = new MRfQResponse(getCtx(), respLine.getC_RfQResponse_ID(), get_TrxName());
-				quotation.set_ValueOfColumn("DeliveryDays", resp.getDeliveryDays());
+//				quoLine.setPriceActual((BigDecimal)respLine.get_Value("Price"));
+//				quoLine.setPriceList((BigDecimal)respLine.get_Value("Price"));
+//				quoLine.setDeliveryDays(respLine.getDeliveryDays());
+//				MRfQResponse resp = new MRfQResponse(getCtx(), respLine.getC_RfQResponse_ID(), get_TrxName());
+//				quotation.set_ValueOfColumn("DeliveryDays", resp.getDeliveryDays());
 				quotation.saveEx();
 				quoLine.setDescription(inqLine.getDescription());
 				quoLine.setQtyEntered(inqLine.getQty());
