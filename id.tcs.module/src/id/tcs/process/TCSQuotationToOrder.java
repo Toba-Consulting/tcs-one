@@ -4,15 +4,21 @@ import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.I_C_Order;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInOutLine;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.Query;
 
 import id.tcs.model.I_M_MatchQuotation;
 import id.tcs.model.MQuotation;
 import id.tcs.model.MQuotationLine;
+import id.tcs.model.X_M_MatchInquiry;
 import id.tcs.model.X_M_MatchQuotation;
+import id.tcs.model.X_TCS_AllocateCharge;
+
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
@@ -22,6 +28,7 @@ import org.compiere.util.Msg;
 public class TCSQuotationToOrder extends SvrProcess{
 
 	int C_Quotation_ID = 0;
+	int C_QuotationLine_ID = 0;
 	int p_C_DocType_ID = 0;
 	int p_M_Warehouse_ID = 0;
 	
@@ -79,7 +86,7 @@ public class TCSQuotationToOrder extends SvrProcess{
 			return "Quotation has been converted";
 		}
 		*/
-
+		
 		MQuotationLine[] quoteLines = quotation.getLines();		
 		
 		//Validate: Quotation has lines
@@ -95,17 +102,20 @@ public class TCSQuotationToOrder extends SvrProcess{
 //		if (!quotation.isQuotationAccepted())
 //			return "Quotation has not been declared as winner";
 		
+		
+		
 		//Validate: All quotation lines must have M_Product_ID
 		boolean checkProductID = true;
 		
 		for (MQuotationLine quoteLine : quoteLines) {
+			
 			if (quoteLine.getM_Product_ID() == 0 && quoteLine.getC_Charge_ID() == 0)
 				checkProductID = false;
 		}
-
+		
 //		if (!checkProductID)
 //		return "Only Completed and Winning Quotation with Products/Charge Can be Converted to Sales Order";
-
+		
 		MOrder order = new MOrder(getCtx(), 0, get_TrxName());
 
 		order.setClientOrg(Env.getContextAsInt(getCtx(), Env.AD_CLIENT_ID), quotation.getAD_Org_ID());
@@ -170,9 +180,16 @@ public class TCSQuotationToOrder extends SvrProcess{
 			order.setAD_OrgTrx_ID(quotation.getAD_OrgTrx_ID());
 		
 		order.saveEx();
+			
+		
 		for (MQuotationLine quoteLine : quoteLines) {
+			String whereClause = " C_QuotationLine_ID=? AND C_OrderLine_ID IS NOT NULL";
+			boolean match = new Query(getCtx(), X_M_MatchQuotation.Table_Name, whereClause, get_TrxName())
+					.setParameters(quoteLine.get_ID()).match();
+			
+			if(!match) {
 			MOrderLine orderLine = new MOrderLine(order);
-//			if(quoteLine.get_ValueAsBoolean("IsAccepted")==true){
+	//		if(quoteLine.get_ValueAsBoolean("IsAccepted")==true){
 				if (quoteLine.getM_Product_ID() > 0)
 					orderLine.setM_Product_ID(quoteLine.getM_Product_ID());
 				if (quoteLine.getC_Charge_ID() > 0)
@@ -196,26 +213,26 @@ public class TCSQuotationToOrder extends SvrProcess{
 				orderLine.setDescription(quoteLine.getDescription());
 				orderLine.setPriceList(quoteLine.getPriceList());
 				orderLine.setLine(quoteLine.getLine());
+				orderLine.set_ValueOfColumn("commissioncustomer", quoteLine.get_Value("commissioncustomer"));
 				orderLine.saveEx();
-			
-			
-			//Create Match Quotation Records
-			X_M_MatchQuotation matchQuote = new X_M_MatchQuotation(getCtx(), 0, get_TrxName());
-			matchQuote.setAD_Org_ID(quotation.getAD_Org_ID());
-			matchQuote.setC_Quotation_ID(quotation.getC_Quotation_ID());
-			matchQuote.setC_QuotationLine_ID(quoteLine.getC_QuotationLine_ID());
-			matchQuote.setC_Order_ID(order.getC_Order_ID());
-			matchQuote.setC_OrderLine_ID(orderLine.get_ID());
-			matchQuote.setDateTrx(new Timestamp(System.currentTimeMillis()));
-			matchQuote.setQtyOrdered(quoteLine.getQtyOrdered());
-			matchQuote.saveEx();
-//			}
-			
+				
+				
+				//Create Match Quotation Records
+				X_M_MatchQuotation matchQuote = new X_M_MatchQuotation(getCtx(), 0, get_TrxName());
+				matchQuote.setAD_Org_ID(quotation.getAD_Org_ID());
+				matchQuote.setC_Quotation_ID(quotation.getC_Quotation_ID());
+				matchQuote.setC_QuotationLine_ID(quoteLine.getC_QuotationLine_ID());
+				matchQuote.setC_Order_ID(order.getC_Order_ID());
+				matchQuote.setC_OrderLine_ID(orderLine.get_ID());
+				matchQuote.setDateTrx(new Timestamp(System.currentTimeMillis()));
+				matchQuote.setQtyOrdered(quoteLine.getQtyOrdered());
+				matchQuote.saveEx();
+		//	}
+			}
 		}
 		
 		String message = Msg.parseTranslation(getCtx(), "@GeneratedOrder@ " +order.getDocumentNo());
 		addBufferLog(0, null, null, message, order.get_Table_ID(), order.getC_Order_ID());
 		return "";
 	}
-	
 }
