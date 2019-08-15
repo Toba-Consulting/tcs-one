@@ -34,7 +34,9 @@ public class TCSInquiryToRfQ extends SvrProcess{
 			String name = para[i].getParameterName();
 			if (para[i].getParameter() == null) {
 				;
-			} else if (para[i].getParameterName().equalsIgnoreCase("C_RfQ_Topic_ID")) {
+			}else if (para[i].getParameterName().equalsIgnoreCase("C_Inquiry_ID")) {
+				p_C_Inquiry_ID = para[i].getParameterAsInt();
+			}else if (para[i].getParameterName().equalsIgnoreCase("C_RfQ_Topic_ID")) {
 				C_RfQ_Topic_ID = para[i].getParameterAsInt();
 			}else if (para[i].getParameterName().equalsIgnoreCase("C_Currency_ID")) {
 				C_Currency_ID = para[i].getParameterAsInt();
@@ -44,7 +46,8 @@ public class TCSInquiryToRfQ extends SvrProcess{
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 			}
 		}
-		p_C_Inquiry_ID = getRecord_ID();
+		//Commented, change as parameter
+//		p_C_Inquiry_ID = getRecord_ID();
 	}
 
 	@Override
