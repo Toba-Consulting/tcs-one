@@ -116,6 +116,23 @@ public class TCSQuotationToOrder extends SvrProcess{
 //		if (!checkProductID)
 //		return "Only Completed and Winning Quotation with Products/Charge Can be Converted to Sales Order";
 		
+		
+		//Validate : Check all quotationline has matchSO
+		boolean checkMatch = true;
+		
+		for (MQuotationLine quoteLine : quoteLines) {
+			String whereClause = " C_QuotationLine.C_QuotationLine_ID=? AND mm.C_OrderLine_ID IS NULL";
+			boolean match = new Query(getCtx(), MQuotationLine.Table_Name, whereClause, get_TrxName())
+					.addJoinClause("LEFT JOIN M_MatchQuotation mm ON C_QuotationLine.C_QuotationLine_ID = mm.C_QuotationLine_ID")
+					.setParameters(quoteLine.get_ID()).match();
+			
+			if (match)
+				checkMatch = false;
+		}
+		
+		if (checkMatch)
+			throw new AdempiereException("All QuotationLine has MatchSO");
+		
 		MOrder order = new MOrder(getCtx(), 0, get_TrxName());
 
 		order.setClientOrg(Env.getContextAsInt(getCtx(), Env.AD_CLIENT_ID), quotation.getAD_Org_ID());
