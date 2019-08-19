@@ -28,6 +28,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 	private int p_Locator = 0;
 	private int p_C_DocType_ID = 0;
 	private int p_DD_Order_ID = 0;
+	private int p_M_WarehouseTransit_ID = 0;
 //	private Timestamp p_MovementDate = null;
 	
 	protected void prepare() {
@@ -46,6 +47,8 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			else if (name.equals("MovementDate"))
 				p_MovementDate = para[i].getParameterAsTimestamp();
 			*/
+			else if (name.equals("M_WarehouseTo_ID"))
+				p_M_WarehouseTransit_ID = para[i].getParameterAsInt();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
@@ -65,6 +68,8 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			return "Error: Only Completed Inter-warehouse Document Can be Processed";
 		}
 		
+		/* Custom from FBI?
+		 
 		//Validate Transit Warehouse Is Set
 		String sqlCheck = "SELECT AD_OrgInv_ID FROM AD_InventoryOrg WHERE AD_InventoryOrg_ID=?";
 		int OrgTo = DB.getSQLValueEx(get_TrxName(), sqlCheck, new Object[]{interWH.get_ValueAsInt("AD_InventoryOrg_ID")});
@@ -75,6 +80,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			MOrg org = new MOrg(getCtx(), interWH.getAD_Org_ID(), get_TrxName());
 			return "Missing Setup: Transit Warehouse for Org "+ org.getName();
 		}
+		*/
 		
 		//only allow running process for role with access to warehouse destination
 		boolean match = new Query(getCtx(), X_AD_Role_WHAccess.Table_Name, "AD_Role_ID=? AND M_Warehouse_ID=?", get_TrxName())
@@ -132,14 +138,16 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		outbound.set_ValueOfColumn("M_Warehouse_ID", interWH.getM_Warehouse_ID());
 		//outbound.setM_WarehouseZone_ID(interWH.getM_WarehouseZone_ID());
 		//outbound.setM_WarehouseTo_ID(orgInfo.getTransit_Warehouse_ID());
-		outbound.set_ValueOfColumn("M_WarehouseTo_ID", orgInfo.get_ValueAsInt("Transit_Warehouse_ID"));
+		//outbound.set_ValueOfColumn("M_WarehouseTo_ID", orgInfo.get_ValueAsInt("Transit_Warehouse_ID"));
+		outbound.set_ValueOfColumn("M_WarehouseTo_ID", p_M_WarehouseTransit_ID);
 		outbound.setDD_Order_ID(interWH.getDD_Order_ID());
 		outbound.saveEx();
 		
 		//Create outbound movement lines
 		MDDOrderLine[] lines = interWH.getLines();
 		//MWarehouse whTransit = new MWarehouse(getCtx(), orgInfo.getTransit_Warehouse_ID(), get_TrxName());
-		MWarehouse whTransit = new MWarehouse(getCtx(), orgInfo.get_ValueAsInt("Transit_Warehouse_ID"), get_TrxName());
+		//MWarehouse whTransit = new MWarehouse(getCtx(), orgInfo.get_ValueAsInt("Transit_Warehouse_ID"), get_TrxName());
+		MWarehouse whTransit = new MWarehouse(getCtx(), p_M_WarehouseTransit_ID, get_TrxName());
 		MLocator locatorTransit = whTransit.getDefaultLocator();
 		//MWarehouse whSource = new MWarehouse(getCtx(), outbound.getM_Warehouse_ID(), get_TrxName());
 		MWarehouse whSource = new MWarehouse(getCtx(), outbound.get_ValueAsInt("M_Warehouse_ID"), get_TrxName());
