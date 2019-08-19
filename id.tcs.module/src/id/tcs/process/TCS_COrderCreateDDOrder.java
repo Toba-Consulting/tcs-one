@@ -19,7 +19,8 @@ public class TCS_COrderCreateDDOrder extends SvrProcess{
 	//Create DD_Order with lines from C_Order
 	private int p_C_Order_ID = 0;
 	private int p_C_DocType_ID = 0;
-	private int p_M_WarehouseFrom_ID = 0;
+	private int p_M_Warehouse_ID = 0;
+	private int p_M_WarehouseTo_ID = 0;
 	private Timestamp p_DateOrdered = null;
 	
 	@Override
@@ -36,7 +37,9 @@ public class TCS_COrderCreateDDOrder extends SvrProcess{
 			else if (name.equals("C_DocType_ID"))
 				p_C_DocType_ID = para[i].getParameterAsInt();
 			else if (name.equals("M_Warehouse_ID"))
-				p_M_WarehouseFrom_ID = para[i].getParameterAsInt();
+				p_M_Warehouse_ID = para[i].getParameterAsInt();
+			else if (name.equals("M_WarehouseTo_ID"))
+				p_M_WarehouseTo_ID = para[i].getParameterAsInt();
 			else if (name.equals("DateOrdered"))
 				p_DateOrdered = para[i].getParameterAsTimestamp();
 			else
@@ -51,10 +54,14 @@ public class TCS_COrderCreateDDOrder extends SvrProcess{
 			throw new AdempiereException("Order is mandatory");
 		if (p_C_DocType_ID == 0) 
 			throw new AdempiereException("Document Type is mandatory");
-		if (p_M_WarehouseFrom_ID == 0) 
+		if (p_M_Warehouse_ID == 0) 
 			throw new AdempiereException("Warehouse is mandatory");
 		if (p_DateOrdered == null) 
 			throw new AdempiereException("DateOrdered is mandatory");
+		if (p_DateOrdered == null) 
+			throw new AdempiereException("DateOrdered is mandatory");
+		if (p_M_WarehouseTo_ID == 0) 
+			throw new AdempiereException("Warehouse To is mandatory");
 		
 		MOrder order = new MOrder(getCtx(), p_C_Order_ID, get_TrxName());
 		MDDOrder inter = new MDDOrder(getCtx(), 0, get_TrxName());
@@ -63,7 +70,8 @@ public class TCS_COrderCreateDDOrder extends SvrProcess{
 		inter.setC_DocType_ID(p_C_DocType_ID);
 		inter.setDateOrdered(p_DateOrdered);
 		inter.setC_Order_ID(p_C_Order_ID);
-		inter.setM_Warehouse_ID(p_M_WarehouseFrom_ID);
+		inter.setM_Warehouse_ID(p_M_Warehouse_ID);
+		inter.set_ValueOfColumn("M_WarehouseTo_ID", p_M_WarehouseTo_ID);;
 		inter.setIsInDispute(false);
 		inter.setIsInTransit(false);
 		inter.saveEx();
