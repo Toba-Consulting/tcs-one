@@ -136,20 +136,21 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		 *Case 2
 		 * M_WarehouseFrom.AD_Org_ID != M_WarehouseTo.AD_Org_ID
 		 */
-		MWarehouse whTransit;
 		MWarehouse whFrom = new MWarehouse(getCtx(), interWH.getM_Warehouse_ID(), get_TrxName());
-		MWarehouse whTo = new MWarehouse(getCtx(), p_M_Warehouse_ID, get_TrxName());
+		MWarehouse whTo = new MWarehouse(getCtx(), interWH.get_ValueAsInt("M_WarehouseTo_ID"), get_TrxName());
+		MWarehouse whTransit;
 		if (whFrom.getAD_Org_ID() == whTo.getAD_Org_ID()) {
-			whTransit = new MWarehouse(getCtx(), p_M_Warehouse_ID, get_TrxName());			
+			whTransit = whFrom;
 		}
 		else {
-			String sqlWHTransit = "IsIntransit='Y' AND IsActive='Y'";
+			String sqlWHTransit = "SELECT M_Warehouse_ID FROM M_Warehouse WHERE IsIntransit='Y' AND IsActive='Y' AND AD_Org_ID="+whFrom.getAD_Org_ID();
 			int M_WareHouse_InTransit_ID = DB.getSQLValue(get_TrxName(), sqlWHTransit);
 			if (M_WareHouse_InTransit_ID<=0)
 				throw new AdempiereException("Warehouse.InTransit='Y' not exist");
 			whTransit = new MWarehouse(getCtx(), M_WareHouse_InTransit_ID, get_TrxName());	
 		}
-		String sqlLocatorTransit = "IsIntransit='Y' AND IsActive='Y'";
+
+		String sqlLocatorTransit = "SELECT M_Locator_ID FROM M_Locator WHERE IsIntransit='Y' AND IsActive='Y' AND M_Warehouse_ID="+whTransit.getM_Warehouse_ID();
 		int locator_InTransit_ID = DB.getSQLValue(get_TrxName(), sqlLocatorTransit);
 		if (locator_InTransit_ID<=0)
 			throw new AdempiereException("Locator.IsIntransit='Y' not exist");
