@@ -18,11 +18,13 @@ import org.compiere.model.MRfQ;
 import org.compiere.model.X_AD_WF_Activity;
 import org.compiere.util.CLogger;
 import org.compiere.wf.MWFActivity;
+import org.eevolution.model.MDDOrder;
 import org.osgi.service.event.Event;
 
 import id.tcs.model.MQuotation;
 import id.tcs.model.MQuotationLine;
 import id.tcs.validator.TCS_BankStatementDocValidator;
+import id.tcs.validator.TCS_DDOrderValidator;
 import id.tcs.validator.TCS_InOutValidator;
 import id.tcs.validator.TCS_InvoiceValidator;
 import id.tcs.validator.TCS_OrderValidator;
@@ -75,6 +77,7 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, MRequisition.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_VOID, MRequisition.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_DELETE, MOrderLine.Table_Name);
+		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, MDDOrder.Table_Name);
 		log.info("PROJECT MANAGEMENT EVENT MANAGER // INITIALIZED");
 	}
 
@@ -132,6 +135,10 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 			msg = TCS_RequisitionValidator.executeEvent(event, getPO(event));
 		}
 		
+		else if(getPO(event).get_TableName().equals(MDDOrder.Table_Name)) {
+			msg = TCS_DDOrderValidator.executeEvent(event, getPO(event));
+		}
+
 		if (msg.length() > 0)
 			throw new AdempiereException(msg);
 
