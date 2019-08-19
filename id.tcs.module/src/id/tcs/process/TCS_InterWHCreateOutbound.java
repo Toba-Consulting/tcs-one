@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MDocType;
 import org.compiere.model.MLocator;
 import org.compiere.model.MMovement;
@@ -14,7 +15,9 @@ import org.compiere.model.MProduct;
 import org.compiere.model.MStorageOnHand;
 import org.compiere.model.MWarehouse;
 import org.compiere.model.Query;
+
 import id.tcs.model.X_AD_Role_WHAccess;
+
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
@@ -60,6 +63,9 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		//Validate DD_Order_ID
 		if (p_DD_Order_ID <= 0) {
 			return "Error: No Selected Inter-warehouse Document";
+		}
+		if (p_M_WarehouseTo_ID <= 0) {
+			return "Error: Warehouse To is mandatory";
 		}
 		
 		//Validate status of InterWarehouse Movement= CO
@@ -147,8 +153,33 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		MDDOrderLine[] lines = interWH.getLines();
 		//MWarehouse whTransit = new MWarehouse(getCtx(), orgInfo.getTransit_Warehouse_ID(), get_TrxName());
 		//MWarehouse whTransit = new MWarehouse(getCtx(), orgInfo.get_ValueAsInt("Transit_Warehouse_ID"), get_TrxName());
-		MWarehouse whTransit = new MWarehouse(getCtx(), p_M_WarehouseTo_ID, get_TrxName());
-		MLocator locatorTransit = whTransit.getDefaultLocator();
+		
+		//@David
+		//Warehouse In-Transit
+		/*Case 1
+		 * M_WarehouseFrom.AD_Org_ID == M_WarehouseTo.AD_Org_ID
+		 *
+		 *Case 2
+		 * M_WarehouseFrom.AD_Org_ID != M_WarehouseTo.AD_Org_ID
+		 */
+		MWarehouse whTransit;
+		MWarehouse whFrom = new MWarehouse(getCtx(), interWH.getM_Warehouse_ID(), get_TrxName());
+		MWarehouse whTo = new MWarehouse(getCtx(), p_M_WarehouseTo_ID, get_TrxName());
+		if (whFrom.getAD_Org_ID() == whTo.getAD_Org_ID()) {
+			whTransit = new MWarehouse(getCtx(), p_M_WarehouseTo_ID, get_TrxName());			
+		}
+		else {
+			String sqlWHTransit = "IsIntransit='Y' AND IsActive='Y'";
+			int M_WareHouse_InTransit_ID = DB.getSQLValue(get_TrxName(), sqlWHTransit);
+			if (M_WareHouse_InTransit_ID<=0)
+				throw new AdempiereException("Warehouse.InTransit='Y' not exist");
+			whTransit = new MWarehouse(getCtx(), M_WareHouse_InTransit_ID, get_TrxName());	
+		}
+		String sqlLocatorTransit = "IsIntransit='Y' AND IsActive='Y'";
+		int locator_InTransit_ID = DB.getSQLValue(get_TrxName(), sqlLocatorTransit);
+		if (locator_InTransit_ID<=0)
+			throw new AdempiereException("Locator.IsIntransit='Y' not exist");
+		//MLocator locatorTransit = whTransit.getDefaultLocator();
 		//MWarehouse whSource = new MWarehouse(getCtx(), outbound.getM_Warehouse_ID(), get_TrxName());
 		MWarehouse whSource = new MWarehouse(getCtx(), outbound.get_ValueAsInt("M_Warehouse_ID"), get_TrxName());
 		
@@ -174,7 +205,8 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			}
 			
 			moveLine.setM_Locator_ID(p_Locator);
-			moveLine.setM_LocatorTo_ID(locatorTransit.get_ID());
+//			moveLine.setM_LocatorTo_ID(locatorTransit.get_ID());
+			moveLine.setM_LocatorTo_ID(locator_InTransit_ID);
 			moveLine.set_ValueOfColumn("C_UOM_ID", line.getC_UOM_ID());
 			moveLine.setDD_OrderLine_ID(line.getDD_OrderLine_ID());
 			moveLine.saveEx();
