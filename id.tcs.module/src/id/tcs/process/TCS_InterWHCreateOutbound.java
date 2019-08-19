@@ -28,7 +28,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 	private int p_Locator = 0;
 	private int p_C_DocType_ID = 0;
 	private int p_DD_Order_ID = 0;
-	private int p_M_WarehouseTransit_ID = 0;
+	private int p_M_WarehouseTo_ID = 0;
 //	private Timestamp p_MovementDate = null;
 	
 	protected void prepare() {
@@ -48,7 +48,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 				p_MovementDate = para[i].getParameterAsTimestamp();
 			*/
 			else if (name.equals("M_WarehouseTo_ID"))
-				p_M_WarehouseTransit_ID = para[i].getParameterAsInt();
+				p_M_WarehouseTo_ID = para[i].getParameterAsInt();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
@@ -139,7 +139,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		//outbound.setM_WarehouseZone_ID(interWH.getM_WarehouseZone_ID());
 		//outbound.setM_WarehouseTo_ID(orgInfo.getTransit_Warehouse_ID());
 		//outbound.set_ValueOfColumn("M_WarehouseTo_ID", orgInfo.get_ValueAsInt("Transit_Warehouse_ID"));
-		outbound.set_ValueOfColumn("M_WarehouseTo_ID", p_M_WarehouseTransit_ID);
+		outbound.set_ValueOfColumn("M_WarehouseTo_ID", p_M_WarehouseTo_ID);
 		outbound.setDD_Order_ID(interWH.getDD_Order_ID());
 		outbound.saveEx();
 		
@@ -147,7 +147,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		MDDOrderLine[] lines = interWH.getLines();
 		//MWarehouse whTransit = new MWarehouse(getCtx(), orgInfo.getTransit_Warehouse_ID(), get_TrxName());
 		//MWarehouse whTransit = new MWarehouse(getCtx(), orgInfo.get_ValueAsInt("Transit_Warehouse_ID"), get_TrxName());
-		MWarehouse whTransit = new MWarehouse(getCtx(), p_M_WarehouseTransit_ID, get_TrxName());
+		MWarehouse whTransit = new MWarehouse(getCtx(), p_M_WarehouseTo_ID, get_TrxName());
 		MLocator locatorTransit = whTransit.getDefaultLocator();
 		//MWarehouse whSource = new MWarehouse(getCtx(), outbound.getM_Warehouse_ID(), get_TrxName());
 		MWarehouse whSource = new MWarehouse(getCtx(), outbound.get_ValueAsInt("M_Warehouse_ID"), get_TrxName());

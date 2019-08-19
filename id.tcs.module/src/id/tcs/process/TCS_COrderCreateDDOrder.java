@@ -20,7 +20,6 @@ public class TCS_COrderCreateDDOrder extends SvrProcess{
 	private int p_C_Order_ID = 0;
 	private int p_C_DocType_ID = 0;
 	private int p_M_WarehouseFrom_ID = 0;
-	private int p_C_BPartner_ID = 0;
 	private Timestamp p_DateOrdered = null;
 	
 	@Override
@@ -38,8 +37,6 @@ public class TCS_COrderCreateDDOrder extends SvrProcess{
 				p_C_DocType_ID = para[i].getParameterAsInt();
 			else if (name.equals("M_Warehouse_ID"))
 				p_M_WarehouseFrom_ID = para[i].getParameterAsInt();
-			else if (name.equals("C_BPartner_ID"))
-				p_C_BPartner_ID = para[i].getParameterAsInt();
 			else if (name.equals("DateOrdered"))
 				p_DateOrdered = para[i].getParameterAsTimestamp();
 			else
@@ -56,8 +53,6 @@ public class TCS_COrderCreateDDOrder extends SvrProcess{
 			throw new AdempiereException("Document Type is mandatory");
 		if (p_M_WarehouseFrom_ID == 0) 
 			throw new AdempiereException("Warehouse is mandatory");
-		if (p_C_BPartner_ID == 0) 
-			throw new AdempiereException("Business Partner is mandatory");
 		if (p_DateOrdered == null) 
 			throw new AdempiereException("DateOrdered is mandatory");
 		
@@ -69,7 +64,6 @@ public class TCS_COrderCreateDDOrder extends SvrProcess{
 		inter.setDateOrdered(p_DateOrdered);
 		inter.setC_Order_ID(p_C_Order_ID);
 		inter.setM_Warehouse_ID(p_M_WarehouseFrom_ID);
-		inter.setC_BPartner_ID(p_C_BPartner_ID);
 		inter.setIsInDispute(false);
 		inter.setIsInTransit(false);
 		inter.saveEx();
