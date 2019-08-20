@@ -5,7 +5,7 @@ import org.adempiere.base.event.IEventTopics;
 import org.adempiere.base.event.LoginEventData;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.I_C_Order;
-import org.compiere.model.MAllocationHdr;
+//import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MBankStatement;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
@@ -52,9 +52,9 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, MInOut.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, MInOut.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, X_AD_WF_Activity.Table_Name);
-		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MAllocationHdr.Table_Name);
-		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MAllocationHdr.Table_Name);
-		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MAllocationHdr.Table_Name);		
+//		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MAllocationHdr.Table_Name);
+//		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MAllocationHdr.Table_Name);
+//		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MAllocationHdr.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MPayment.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MPayment.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, MPayment.Table_Name);		
@@ -98,9 +98,9 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		else if(getPO(event).get_TableName().equals(MWFActivity.Table_Name)){
 			msg = TCS_WFActivityValidator.executeEvent(event, getPO(event));
 		}
-		else if(getPO(event).get_TableName().equals(MAllocationHdr.Table_Name)) {
-			msg = TCS_MAllocationHdrValidator.executeEvent(event, getPO(event));
-		}
+//		else if(getPO(event).get_TableName().equals(MAllocationHdr.Table_Name)) {
+//			msg = TCS_MAllocationHdrValidator.executeEvent(event, getPO(event));
+//		}
 		else if(getPO(event).get_TableName().equals(MBankStatement.Table_Name)) {
 			msg = TCS_BankStatementDocValidator.executeEvent(event, getPO(event));
 		}
