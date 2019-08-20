@@ -17,7 +17,7 @@ import id.tcs.model.MQuotation;
 import id.tcs.model.MQuotationLine;
 import id.tcs.model.X_M_MatchInquiry;
 import id.tcs.model.X_M_MatchQuotation;
-import id.tcs.model.X_TCS_AllocateCharge;
+import org.compiere.model.X_TCS_AllocateCharge;
 
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;

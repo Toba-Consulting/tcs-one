@@ -1,6 +1,6 @@
 package org.compiere.model;
 
-import id.tcs.model.MTCS_AllocateCharge;
+import org.compiere.model.MTCS_AllocateCharge;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -20,8 +20,6 @@ import org.compiere.util.IBAN;
 import org.compiere.util.Msg;
 import org.compiere.util.TimeUtil;
 import org.compiere.util.Util;
-
-import id.tcs.model.MTCS_AllocateCharge;
 
 public class TCS_MPayment extends MPayment {
 

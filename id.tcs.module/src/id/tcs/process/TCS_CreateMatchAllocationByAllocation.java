@@ -10,15 +10,15 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
 import org.compiere.model.Query;
-import org.compiere.model.TCS_MAllocationHdr;
+import org.compiere.model.MAllocationHdr;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
-import id.tcs.model.MTCS_AllocateCharge;
-import id.tcs.model.X_TCS_AllocateCharge;
-import id.tcs.model.X_T_MatchAllocation;
+import org.compiere.model.MTCS_AllocateCharge;
+import org.compiere.model.X_TCS_AllocateCharge;
+import org.compiere.model.X_T_MatchAllocation;
 
 public class TCS_CreateMatchAllocationByAllocation extends SvrProcess {
 
@@ -32,7 +32,7 @@ public class TCS_CreateMatchAllocationByAllocation extends SvrProcess {
 			String name = para[i].getParameterName();
 			if (para[i].getParameter() == null)
 				;
-			else if (name.equals(TCS_MAllocationHdr.COLUMNNAME_C_AllocationHdr_ID))
+			else if (name.equals(MAllocationHdr.COLUMNNAME_C_AllocationHdr_ID))
 				p_C_AllocationHdr_ID = para[i].getParameterAsInt();
 			
 			else
@@ -49,7 +49,7 @@ public class TCS_CreateMatchAllocationByAllocation extends SvrProcess {
 			throw new AdempiereException("Allocation is mandatory!");
 		}
 
-		TCS_MAllocationHdr alloc = new TCS_MAllocationHdr(getCtx(), p_C_AllocationHdr_ID, get_TrxName());
+		MAllocationHdr alloc = new MAllocationHdr(getCtx(), p_C_AllocationHdr_ID, get_TrxName());
 		deleteExistingMatchAllocation(String.valueOf(p_C_AllocationHdr_ID));
 		
 		//Split Up ID and Amount Based On Amount, as ArrayList

@@ -10,17 +10,17 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
 import org.compiere.model.Query;
-import org.compiere.model.TCS_MAllocationHdr;
-import org.compiere.model.TCS_MAllocationLine;
+import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MAllocationLine;
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
-import id.tcs.model.MTCS_AllocateCharge;
-import id.tcs.model.X_TCS_AllocateCharge;
-import id.tcs.model.X_T_MatchAllocation;
+import org.compiere.model.MTCS_AllocateCharge;
+import org.compiere.model.X_TCS_AllocateCharge;
+import org.compiere.model.X_T_MatchAllocation;
 
 public class TCS_CreateMatchAllocationByCreatedDate extends SvrProcess {
 
@@ -68,7 +68,7 @@ public class TCS_CreateMatchAllocationByCreatedDate extends SvrProcess {
 		
 		for(int AllocationID : AllocationIDs)
 		{
-			TCS_MAllocationHdr alloc = new TCS_MAllocationHdr(getCtx(), AllocationID, get_TrxName());
+			MAllocationHdr alloc = new MAllocationHdr(getCtx(), AllocationID, get_TrxName());
 			
 			//Split Up ID and Amount Based On Amount, as ArrayList
 			

@@ -8,15 +8,15 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
 import org.compiere.model.Query;
-import org.compiere.model.TCS_MAllocationHdr;
-import org.compiere.model.TCS_MAllocationLine;
+import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MAllocationLine;
 import org.compiere.process.DocAction;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 
-import id.tcs.model.MTCS_AllocateCharge;
-import id.tcs.model.X_TCS_AllocateCharge;
-import id.tcs.model.X_T_MatchAllocation;
+import org.compiere.model.MTCS_AllocateCharge;
+import org.compiere.model.X_TCS_AllocateCharge;
+import org.compiere.model.X_T_MatchAllocation;
 
 public class TCS_CreateMatchAllocation extends SvrProcess {
 
@@ -36,7 +36,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 		
 		for(int AllocationID : AllocationIDs)
 		{
-			TCS_MAllocationHdr hdr = new TCS_MAllocationHdr(getCtx(), AllocationID, get_TrxName());
+			MAllocationHdr hdr = new MAllocationHdr(getCtx(), AllocationID, get_TrxName());
 			
 
 			
@@ -87,7 +87,7 @@ public class TCS_CreateMatchAllocation extends SvrProcess {
 			//5. If Line is Charge
 			//6. If Line have both Invoice ID and Payment ID and Payment is AP Payment
 			//7. If Line have both Invoice ID and Payment ID and Payment is AR Receipt
-			for(TCS_MAllocationLine line : hdr.getLines(true)){
+			for(MAllocationLine line : hdr.getLines(true)){
 				
 				if(line.getC_Payment_ID()==0 && line.getC_Invoice_ID()>0 && line.getAmount().compareTo(Env.ZERO)>0){					//1
 					plusInvoiceID.add(line.getC_Invoice_ID());
