@@ -110,6 +110,7 @@ public class TCS_MPayment extends MPayment {
 			if (!alloc.processIt(DocAction.ACTION_Complete))
 				throw new AdempiereException("Failed when processing document - " + alloc.getProcessMsg());
 			
+			alloc.save(get_TrxName());
 			setIsAllocated(true);
 		}
 		else
