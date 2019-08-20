@@ -99,10 +99,12 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			return "Error: User Role Does Not Access to Warehouse Destination";
 		}
 		
+		/*Bug #2990 Create multiple Outbound and Inbound
 		//Check whether an existing inbound is already exists
 		if (interWH.get_ValueAsInt("M_MovementTo_ID") <= 0) {
 			return "Error: Must Create Outbound Movement Before Create Inbound";
 		}
+		*/
 		
 		if (interWH.get_ValueAsInt("M_MovementIn_ID") > 0) {
 			return "Error: Inbound Movement Has Been Created";
@@ -176,6 +178,8 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		inbound.setDocAction(DocAction.ACTION_Complete);
 		inbound.setDD_Order_ID(interWH.getDD_Order_ID());
 		inbound.setC_Project_ID(interWH.getC_Project_ID());
+		inbound.set_ValueOfColumn("IsInbound", "Y");
+
 		inbound.saveEx();
 		
 		//Create inbound movement lines
@@ -203,9 +207,11 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		inbound.processIt(DocAction.ACTION_Complete);
 		inbound.saveEx();
 		
+		/*Bug #2990 Create multiple Outbound and Inbound
 		//Set Inbound Movement Link to Inter-warehouse
 		//interWH.setM_MovementIn_ID(inbound.get_ID());
 		interWH.set_ValueOfColumn("M_MovementIn_ID", inbound.get_ID());
+		*/
 		interWH.saveEx();
 		
 		String message = Msg.parseTranslation(getCtx(), "@GeneratedInbound@"+ inbound.getDocumentNo());

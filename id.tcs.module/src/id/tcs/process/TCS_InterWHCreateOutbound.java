@@ -91,11 +91,13 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		if (!match) {
 			return "Error: User Role Does Not Access to Warehouse Source";
 		}
-				
+			
+		/*Bug #2990 Create multiple Outbound and Inbound		
 		//Check whether an existing inbound is already exists
 		if (interWH.get_ValueAsInt("M_MovementTo_ID") > 0) {
 			return "Outbound Movement Has Been Created";
 		}
+		*/
 
 		//Validate DocType = Material Movement
 		if (p_C_DocType_ID <= 0) {
@@ -141,6 +143,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		//outbound.set_ValueOfColumn("M_WarehouseTo_ID", orgInfo.get_ValueAsInt("Transit_Warehouse_ID"));
 		outbound.set_ValueOfColumn("M_WarehouseTo_ID", M_WarehouseTo_ID);
 		outbound.setDD_Order_ID(interWH.getDD_Order_ID());
+		outbound.set_ValueOfColumn("IsOutbound", "Y");
 		outbound.saveEx();
 		
 		//Create outbound movement lines
@@ -211,7 +214,8 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		outbound.processIt(DocAction.ACTION_Complete);
 		outbound.saveEx();
 
-		interWH.set_ValueOfColumn("M_MovementTo_ID", outbound.get_ID());
+		//Bug #2990 Create multiple Outbound and Inbound
+		//interWH.set_ValueOfColumn("M_MovementTo_ID", outbound.get_ID());
 		interWH.saveEx();
 		
 		return "Successfully Created Outbound Movement #" + outbound.getDocumentNo();
