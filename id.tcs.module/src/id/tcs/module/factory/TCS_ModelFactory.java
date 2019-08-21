@@ -48,6 +48,7 @@ import id.tcs.model.MQuotationTax;
 import id.tcs.model.MTCSAmortizationLine;
 import id.tcs.model.MTCSAmortizationPlan;
 import id.tcs.model.MTCSAmortizationRun;
+import id.tcs.model.TCS_MDDOrder;
 import id.tcs.model.TCS_MRequestLine;
 import id.tcs.model.TCS_MRfQ;
 import id.tcs.model.TCS_MRfQLine;
@@ -105,6 +106,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MRfQTopic.Table_Name, "id.tcs.model.TCS_MRfQTopic");
 		mapTableModels.put(TCS_MRfQTopicSubscriber.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriber");
 		mapTableModels.put(TCS_MRfQTopicSubscriberOnly.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriberOnly");
+		mapTableModels.put(TCS_MDDOrder.Table_Name, "id.tcs.model.TCS_MDDOrder");
 		
 	}
 	
