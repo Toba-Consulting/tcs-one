@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.MBankStatement;
+import org.compiere.model.MMovement;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
@@ -19,6 +20,10 @@ public class TCS_DDOrderValidator {
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
 			msg = checkUsedOrderLineQty(ddOrder);
 		} 
+		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)) {
+			msg = checkActiveInOutBound(ddOrder);
+		} 
+		
 		return msg;
 	}
 	
@@ -49,4 +54,15 @@ public class TCS_DDOrderValidator {
 		}
 		return "";
 	}
+	
+	private static String checkActiveInOutBound(MDDOrder ddOrder){
+		String sqlWhere = "DD_Order_ID="+ddOrder.getDD_Order_ID()+" AND DocStatus IN ('CO','CL') AND AD_Client_ID="+ddOrder.getAD_Client_ID();
+		boolean match = new Query(ddOrder.getCtx(), MMovement.Table_Name, sqlWhere, ddOrder.get_TrxName())
+						.match();
+		if (match)
+			return "Active OutBound Or InBound Exist";
+		
+		return "";
+	}
+
 }
