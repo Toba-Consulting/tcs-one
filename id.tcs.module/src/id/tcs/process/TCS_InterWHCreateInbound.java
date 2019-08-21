@@ -31,6 +31,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 	private int p_Locator = 0;
 	private int p_C_DocType_ID = 0;
 	private int p_DD_Order_ID = 0;
+	private int p_M_MovementOutBound_ID = 0;
 	//private Timestamp p_MovementDate = null;
 	
 	protected void prepare() {
@@ -51,6 +52,8 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 				p_Locator = para[i].getParameterAsInt();
 			else if (name.equals("C_DocType_ID"))
 				p_C_DocType_ID = para[i].getParameterAsInt();
+			else if (name.equals("M_Movement_ID"))
+				p_M_MovementOutBound_ID = para[i].getParameterAsInt();
 			/*
 			else if (name.equals("MovementDate"))
 				p_MovementDate = para[i].getParameterAsTimestamp();
@@ -68,6 +71,10 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			return "Error: No Selected Inter-warehouse Document";
 		}
 		
+		
+		if (p_M_MovementOutBound_ID <= 0) {
+			return "Error: No Outbound Document";
+		}
 		
 		//Validate status of InterWarehouse Movement= CO
 		MDDOrder interWH = new MDDOrder(getCtx(), p_DD_Order_ID, get_TrxName());
@@ -179,14 +186,21 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		inbound.setDD_Order_ID(interWH.getDD_Order_ID());
 		inbound.setC_Project_ID(interWH.getC_Project_ID());
 		inbound.set_ValueOfColumn("IsInbound", "Y");
-
+		inbound.set_ValueOfColumn("M_OutBoundFrom_ID", p_DD_Order_ID);
 		inbound.saveEx();
 		
 		//Create inbound movement lines
+		/*2994 - Set Link antara Inbound dan Outbound
+		Change create lines method to get from outbound (M_Movement) provided by parameter
 		MDDOrderLine[] lines = interWH.getLines();
+		*/
+		MMovement outbound = new MMovement(getCtx(), p_M_MovementOutBound_ID, get_TrxName());
+		MMovementLine [] lines = outbound.getLines(true);
 		//MWarehouse whTransit = new MWarehouse(getCtx(), orgInfo.get_ValueAsInt("Transit_Warehouse_ID"), get_TrxName());
 		//MLocator locatorTransit = whTransit.getDefaultLocator();
 		
+		/*2994 - Set Link antara Inbound dan Outbound
+			Change create lines method to get from outbound (M_Movement) provided by parameter
 		for (MDDOrderLine line : lines) {
 			MMovementLine moveLine = new MMovementLine(inbound);
 			moveLine.setLine(line.getLine());
@@ -202,6 +216,24 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			moveLine.setDD_OrderLine_ID(line.getDD_OrderLine_ID());
 			moveLine.saveEx();
 		}
+		*/
+		for (MMovementLine line : lines) {
+			MMovementLine moveLine = new MMovementLine(inbound);
+			moveLine.setLine(line.getLine());
+			moveLine.setAD_Org_ID(interWH.getAD_Org_ID());
+			moveLine.setM_Product_ID(line.getM_Product_ID());
+			//moveLine.setQtyEntered(line.getQtyEntered());
+			moveLine.set_ValueOfColumn("QtyEntered", line.get_Value("QtyEntered"));
+			moveLine.setMovementQty(line.getMovementQty());
+			moveLine.setM_Locator_ID(locator_InTransit_ID);
+			moveLine.setM_LocatorTo_ID(p_Locator);
+			//moveLine.setC_UOM_ID(line.getC_UOM_ID());
+			moveLine.set_ValueOfColumn("C_UOM_ID", line.get_Value("C_UOM_ID"));
+			moveLine.setDD_OrderLine_ID(line.getDD_OrderLine_ID());
+			moveLine.set_ValueOfColumn("M_OutBoundLineFrom_ID", line.getM_MovementLine_ID());
+			moveLine.saveEx();
+		}
+		
 		
 		//Complete movement
 		inbound.processIt(DocAction.ACTION_Complete);
