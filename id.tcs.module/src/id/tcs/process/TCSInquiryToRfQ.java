@@ -15,6 +15,8 @@ import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
+import org.compiere.util.Msg;
+
 import id.tcs.model.I_C_InquiryLine;
 import id.tcs.model.MInquiry;
 import id.tcs.model.MInquiryLine;
@@ -95,6 +97,7 @@ public class TCSInquiryToRfQ extends SvrProcess{
 		
 		Collections.sort(listCategory);
 		
+		List<MRfQ> createdRFQ = new ArrayList<MRfQ>();
 		for(int i=0;i<listCategory.size();i++){
 			MInquiryLine inqLines[] = getLines(p_C_Inquiry_ID, listCategory.get(i));
 			if (inqLines.length == 0)
@@ -185,6 +188,7 @@ public class TCSInquiryToRfQ extends SvrProcess{
 					
 				}
 			}
+			createdRFQ.add(rfq);
 		}
 		
 		if(listDocument.isEmpty()){
@@ -206,6 +210,13 @@ public class TCSInquiryToRfQ extends SvrProcess{
 		
 		inquiry.set_ValueOfColumn("PHDNO",msg.toString());
 		inquiry.saveEx();
+		
+		//Pop-up window after process
+		for (MRfQ mRfQ : createdRFQ) {
+			String message = Msg.parseTranslation(getCtx(), "@GeneratedInbound@"+ mRfQ.getDocumentNo());
+			addBufferLog(0, null, null, message, mRfQ.get_Table_ID(),mRfQ.getC_RfQ_ID());			
+		}
+
 		return msg.toString();	
 	}
 	
