@@ -11,6 +11,7 @@ import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
+import org.compiere.util.Msg;
 import org.eevolution.model.MDDOrder;
 import org.eevolution.model.MDDOrderLine;
 
@@ -97,7 +98,11 @@ public class TCS_COrderCreateDDOrder extends SvrProcess{
 			ddLine.setQtyOrdered(remainingQty);
 			ddLine.saveEx();
 		}
-		return "Created DD_Order : '"+inter.getDocumentNo()+"'";
+		
+		String message = Msg.parseTranslation(getCtx(), "@Generated DD_Order@"+ inter.getDocumentNo());
+		addBufferLog(0, null, null, message, inter.get_Table_ID(),inter.getDD_Order_ID());
+
+		return "";
 	}
 
 }

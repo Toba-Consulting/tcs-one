@@ -23,6 +23,7 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Msg;
 import org.eevolution.model.MDDOrder;
 import org.eevolution.model.MDDOrderLine;
 
@@ -209,7 +210,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			moveLine.setDD_OrderLine_ID(line.getDD_OrderLine_ID());
 			moveLine.saveEx();
 		}
-	
+		
 		//Complete movement
 		outbound.processIt(DocAction.ACTION_Complete);
 		outbound.saveEx();
@@ -218,6 +219,9 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		//interWH.set_ValueOfColumn("M_MovementTo_ID", outbound.get_ID());
 		interWH.saveEx();
 		
+		String message = Msg.parseTranslation(getCtx(), "@GeneratedOutbound@"+ outbound.getDocumentNo());
+		addBufferLog(0, null, null, message, outbound.get_Table_ID(),outbound.getM_Movement_ID());
+
 		return "Successfully Created Outbound Movement #" + outbound.getDocumentNo();
 		
 	}
