@@ -211,8 +211,10 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			moveLine.saveEx();
 		}
 		
+		/*leave as drafted to allow partial outbound
 		//Complete movement
-		outbound.processIt(DocAction.ACTION_Complete);
+		//outbound.processIt(DocAction.ACTION_Complete);
+		 */
 		outbound.saveEx();
 
 		//Bug #2990 Create multiple Outbound and Inbound
