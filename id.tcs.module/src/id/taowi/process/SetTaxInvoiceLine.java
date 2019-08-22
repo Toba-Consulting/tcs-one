@@ -3,7 +3,6 @@ package id.taowi.process;
 import java.math.BigDecimal;
 import java.util.logging.Level;
 
-import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MPriceList;
@@ -12,8 +11,6 @@ import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
-
-import id.tcs.model.MQuotationLine;
 
 public class SetTaxInvoiceLine extends SvrProcess{
 
@@ -41,7 +38,12 @@ public class SetTaxInvoiceLine extends SvrProcess{
 		int C_Invoice_ID = getRecord_ID();
 		
 		MInvoice invoice = new MInvoice(getCtx(), C_Invoice_ID , get_TrxName());
+		MTax tax = new MTax(getCtx(), p_C_Tax_ID, get_TrxName());
 		MInvoiceLine[] invoiceLines = invoice.getLines();
+		
+		BigDecimal grandTotal = invoice.getGrandTotal();
+		BigDecimal totalLine = invoice.getTotalLines();
+		BigDecimal taxRate = tax.getRate();
 		
 		// Validate : Check Parameter Value
 		if (p_C_Tax_ID == 0)
@@ -56,7 +58,6 @@ public class SetTaxInvoiceLine extends SvrProcess{
 			invoiceLine.setC_Tax_ID(p_C_Tax_ID);
 
 			// Calculate TaxAmt after Tax change
-			MTax tax = new MTax(getCtx(), p_C_Tax_ID, null);
 			TaxAmt = tax.calculateTax(invoiceLine.getLineNetAmt(), false, StdPrecission);
 			
 			// Set TaxAmt and LineTotalAmt 
@@ -78,12 +79,12 @@ public class SetTaxInvoiceLine extends SvrProcess{
 		
 		if (!check) {
 			if (invoice.getTotalLines().compareTo(invoice.getGrandTotal()) != 0) {
-				invoice.setGrandTotal(invoice.getGrandTotal().subtract(invoice.getTotalLines().multiply(BigDecimal.valueOf(0.1))));
+				invoice.setGrandTotal(grandTotal.subtract(totalLine.multiply(taxRate.divide(Env.ONEHUNDRED))));
 				invoice.saveEx();
 			}
 		}else {
 			if (invoice.getTotalLines().compareTo(invoice.getGrandTotal()) == 0) {
-				invoice.setGrandTotal(invoice.getTotalLines().add(invoice.getTotalLines().multiply(BigDecimal.valueOf(0.1))));
+				invoice.setGrandTotal(totalLine.add(totalLine.multiply(taxRate.divide(Env.ONEHUNDRED))));
 				invoice.saveEx();
 			}
 		}
