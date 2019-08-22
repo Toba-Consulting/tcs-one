@@ -18,12 +18,12 @@ public class TCS_DDOrderValidator {
 		String msg = "";
 		MDDOrder ddOrder = (MDDOrder) po;
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
-			msg = checkUsedOrderLineQty(ddOrder);
+			msg += checkUsedOrderLineQty(ddOrder);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)) {
-			msg = checkActiveInOutBound(ddOrder);
+			msg += checkActiveInOutBound(ddOrder);
+			msg += unReferenceToCOrder(ddOrder);
 		} 
-		
 		return msg;
 	}
 	
@@ -65,4 +65,15 @@ public class TCS_DDOrderValidator {
 		return "";
 	}
 
+	private static String unReferenceToCOrder(MDDOrder ddOrder){
+		
+		ddOrder.set_ValueOfColumn("C_Order_ID", null);
+		ddOrder.saveEx();
+		MDDOrderLine [] lines = ddOrder.getLines();
+		for (MDDOrderLine line : lines) {
+			line.set_ValueOfColumn("C_OrderLine_ID", null);
+			line.saveEx();
+		}
+		return "";
+	}
 }
