@@ -232,46 +232,26 @@ public class TaoInquiryToQuotation extends SvrProcess{
 				//@KevinY end
 				quoLine.setC_UOM_ID(inqLine.getC_UOM_ID());
 				
+				//@leo HWH-3009 set price on quotation line from price list
+				BigDecimal priceStd = Env.ZERO;
+				BigDecimal priceLst = Env.ZERO;
 				
-				//if includeRfQ, then getprice from responseLine, else from pricelist
-				if(inqLine.isIncludeRfQ()){
-					//int rfqLineID = inqLine.getC_RfQLine_ID();
-					String sqlGet = "SELECT C_RfQLine_ID FROM M_MatchInquiry WHERE C_InquiryLine_ID=? AND C_RfQLine_ID IS NOT NULL";
-					int rfqLineID = DB.getSQLValue(get_TrxName(), sqlGet, inqLine.getC_InquiryLine_ID());
-				
-					MRfQResponseLine respLine = rfqResponseMap.get(rfqLineID);
-					quotation.set_ValueOfColumn("PHDNO",inquiry.get_Value("PHDNO"));
-//					quoLine.setPriceEntered((BigDecimal)respLine.get_Value("Price"));
-//					quoLine.setPriceActual((BigDecimal)respLine.get_Value("Price"));
-//					quoLine.setPriceList((BigDecimal)respLine.get_Value("Price"));
-//					quoLine.set_ValueOfColumn("BasePrice", (BigDecimal)respLine.get_Value("Price"));
-//					quoLine.setDeliveryDays(respLine.getDeliveryDays());
-//					quoLine.set_ValueOfColumn("Help", respLine.getHelp());
-//					MRfQResponse resp = new MRfQResponse(getCtx(), respLine.getC_RfQResponse_ID(), get_TrxName());
-//					quotation.set_ValueOfColumn("DeliveryDays", resp.getDeliveryDays());
-//					quotation.setDaysDue((Integer)resp.get_Value("DaysDue"));
-					quotation.saveEx();
-				}else{
-					BigDecimal priceStd = Env.ZERO;
-					BigDecimal priceLst = Env.ZERO;
-					
-					if (pp.getPriceStd()!= null) {
-						priceStd = pp.getPriceStd();
-					}
-					if (pp.getPriceList()!= null) {
-						priceLst = pp.getPriceList();
-					}
-					
-					quoLine.setPriceEntered(priceStd);
-					quoLine.setPriceActual(priceStd);
-					quoLine.set_CustomColumn("BasePrice", priceStd);
-					quoLine.setPriceList(priceLst);
+				if (pp.getPriceStd()!= null) {
+					priceStd = pp.getPriceStd();
+				}
+				if (pp.getPriceList()!= null) {
+					priceLst = pp.getPriceList();
 				}
 				
+				quoLine.setPriceEntered(priceStd);
+				quoLine.setPriceActual(priceStd);
+				quoLine.set_CustomColumn("BasePrice", priceStd);
+				quoLine.setPriceList(priceLst);
 				quoLine.setProduct(inqLine.getProduct());
 				quoLine.setM_Product_ID(inqLine.getM_Product_ID());
 				quoLine.setQtyEntered(inqLine.getQty());
 				quoLine.setQtyOrdered(inqLine.getQty());
+				//@end
 			}
 			
 			//if inquiry line is new item
