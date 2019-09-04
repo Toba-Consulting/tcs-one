@@ -211,6 +211,7 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 				//@KevinY end
 				quoLine.setC_UOM_ID(inqLine.getC_UOM_ID());
 //				quoLine.setPriceEntered((BigDecimal)respLine.get_Value("Price"));
+				quoLine.setPriceEntered(Env.ZERO);
 //				quoLine.set_ValueOfColumn("BasePrice", (BigDecimal)respLine.get_Value("Price"));
 				
 				
