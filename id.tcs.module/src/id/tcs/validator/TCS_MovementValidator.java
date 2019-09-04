@@ -30,10 +30,10 @@ public class TCS_MovementValidator {
 		MMovementLine [] moveLines = move.getLines(true);
 		for (MMovementLine moveLine : moveLines) {
 
-			int C_OrderLine_ID = moveLine.get_ValueAsInt("C_OrderLine_ID");
-			if (C_OrderLine_ID != 0) {
+			int DD_OrderLine_ID = moveLine.get_ValueAsInt("DD_OrderLine_ID");
+			if (DD_OrderLine_ID != 0) {
 
-				MDDOrderLine ddLine = new MDDOrderLine(move.getCtx(), C_OrderLine_ID, move.get_TrxName());
+				MDDOrderLine ddLine = new MDDOrderLine(move.getCtx(), DD_OrderLine_ID, move.get_TrxName());
 				BigDecimal lineQty = moveLine.getMovementQty();
 
 				String sqlSumUsedQty = "DD_OrderLine_ID="+moveLine.getDD_OrderLine_ID()+" AND mm.DocStatus IN ('CO','CL') ";
