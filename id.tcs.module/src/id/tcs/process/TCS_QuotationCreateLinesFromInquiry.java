@@ -254,6 +254,7 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 			quoLine.setProduct(inqLine.getProduct());
 			quoLine.setLine(inqLine.getLineNo());
 			quoLine.set_ValueOfColumn("FaktorKondisi", Env.ONE);
+			quoLine.set_ValueOfColumn("C_InquiryLine_ID", inqLine.getC_InquiryLine_ID());			
 			quoLine.saveEx();
 			
 			if(quoLine.get_Value("BasePrice")==null){
