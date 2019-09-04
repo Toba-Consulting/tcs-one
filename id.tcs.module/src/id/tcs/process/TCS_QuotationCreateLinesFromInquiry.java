@@ -164,7 +164,8 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 //					quotation.set_ValueOfColumn("DeliveryDays", resp.getDeliveryDays());
 //					quotation.setDaysDue((Integer)resp.get_Value("DaysDue"));
 					quot.saveEx();
-				}else{
+				}
+				//else{
 					BigDecimal priceStd = Env.ZERO;
 					BigDecimal priceLst = Env.ZERO;
 					
@@ -179,7 +180,7 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 					quoLine.setPriceActual(priceStd);
 					quoLine.set_CustomColumn("BasePrice", priceStd);
 					quoLine.setPriceList(priceLst);
-				}
+//				}
 				
 				quoLine.setProduct(inqLine.getProduct());
 				quoLine.setM_Product_ID(inqLine.getM_Product_ID());
