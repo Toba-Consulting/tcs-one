@@ -169,12 +169,12 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 					BigDecimal priceStd = Env.ZERO;
 					BigDecimal priceLst = Env.ZERO;
 					
-					if (pp.getPriceStd()!= null) {
-						priceStd = pp.getPriceStd();
-					}
-					if (pp.getPriceList()!= null) {
-						priceLst = pp.getPriceList();
-					}
+//					if (pp.getPriceStd()!= null) {
+//						priceStd = pp.getPriceStd();
+//					}
+//					if (pp.getPriceList()!= null) {
+//						priceLst = pp.getPriceList();
+//					}
 					
 					quoLine.setPriceEntered(priceStd);
 					quoLine.setPriceActual(priceStd);
