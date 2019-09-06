@@ -73,6 +73,9 @@ public class TCS_Doc_AssetAddition extends Doc
 			fact.createLine(null, getP_Asset_Acct(as), as.getC_Currency_ID(), Env.ZERO, remainingAmt);
 
 		}
+		else{
+			fact.createLine(null, getP_Asset_Acct(as), as.getC_Currency_ID(), Env.ZERO, assetValueAmt);
+		}
 
 		/* Set BPartner and C_Project dimension for "Imobilizari in curs / Property Being"
 		final int invoiceBP_ID = getInvoicePartner_ID();
