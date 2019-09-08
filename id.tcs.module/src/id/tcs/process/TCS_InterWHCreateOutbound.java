@@ -187,8 +187,10 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			moveLine.setLine(line.getLine());
 			moveLine.setM_Product_ID(line.getM_Product_ID());
 			//moveLine.setQtyEntered(line.getQtyEntered());
+			int qtyout = line.get_ValueAsInt("qtyoutbound");
+			BigDecimal qty = line.getQtyEntered().subtract(BigDecimal.valueOf(qtyout));
 			moveLine.set_ValueOfColumn("QtyEntered", line.getQtyEntered());
-			moveLine.setMovementQty(line.getQtyEntered());
+			moveLine.setMovementQty(qty);
 			
 			if (moveLine.getM_Product_ID() > 0 && isDisallowNegativeInv(whSource)) {
 				//@David Commented because warehouse zone not implemented yet
@@ -208,7 +210,11 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			moveLine.setM_LocatorTo_ID(locator_InTransit_ID);
 			moveLine.set_ValueOfColumn("C_UOM_ID", line.getC_UOM_ID());
 			moveLine.setDD_OrderLine_ID(line.getDD_OrderLine_ID());
-			moveLine.saveEx();
+			
+			//Validate : Just create outbound when qty-qtyoutbound > 0
+			if (qty.compareTo(Env.ZERO) != 0) {
+				moveLine.saveEx();	
+			}			
 		}
 		
 		/*leave as drafted to allow partial outbound
