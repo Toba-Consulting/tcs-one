@@ -81,6 +81,7 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.PO_BEFORE_DELETE, MOrderLine.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, MDDOrder.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_VOID, MDDOrder.Table_Name);
+		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, MDDOrder.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, MMovement.Table_Name);
 		log.info("PROJECT MANAGEMENT EVENT MANAGER // INITIALIZED");
 	}

@@ -24,6 +24,9 @@ public class TCS_DDOrderValidator {
 			msg += checkActiveInOutBound(ddOrder);
 			msg += unReferenceToCOrder(ddOrder);
 		} 
+		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
+			msg += checkActiveInOutBound(ddOrder);
+		} 
 		return msg;
 	}
 	
