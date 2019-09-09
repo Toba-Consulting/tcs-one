@@ -3,6 +3,7 @@ package id.tcs.process;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MDocType;
 import org.compiere.model.MLocator;
 import org.compiere.model.MMovement;
@@ -11,7 +12,9 @@ import org.compiere.model.MOrg;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MWarehouse;
 import org.compiere.model.Query;
+
 import id.tcs.model.X_AD_Role_WHAccess;
+
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
@@ -28,7 +31,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 	private int p_Locator = 0;
 	private int p_C_DocType_ID = 0;
 	private int p_DD_Order_ID = 0;
-	private int p_M_WarehouseTransit_ID = 0;
+	private int p_M_MovementOutBound_ID = 0;
 	//private Timestamp p_MovementDate = null;
 	
 	protected void prepare() {
@@ -49,8 +52,8 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 				p_Locator = para[i].getParameterAsInt();
 			else if (name.equals("C_DocType_ID"))
 				p_C_DocType_ID = para[i].getParameterAsInt();
-			else if (name.equals("M_WarehouseTransit_ID"))
-				p_M_WarehouseTransit_ID = para[i].getParameterAsInt();
+			else if (name.equals("M_Movement_ID"))
+				p_M_MovementOutBound_ID = para[i].getParameterAsInt();
 			/*
 			else if (name.equals("MovementDate"))
 				p_MovementDate = para[i].getParameterAsTimestamp();
@@ -69,6 +72,10 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		}
 		
 		
+		if (p_M_MovementOutBound_ID <= 0) {
+			return "Error: No Outbound Document";
+		}
+		
 		//Validate status of InterWarehouse Movement= CO
 		MDDOrder interWH = new MDDOrder(getCtx(), p_DD_Order_ID, get_TrxName());
 		if (!interWH.getDocStatus().equals(DocAction.ACTION_Complete)) {
@@ -79,7 +86,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		//Validate Transit Warehouse Is Set
 		String sqlCheck = "SELECT AD_OrgInv_ID FROM AD_InventoryOrg WHERE AD_InventoryOrg_ID=?";
 		int OrgTo = DB.getSQLValueEx(get_TrxName(), sqlCheck, new Object[]{interWH.get_ValueAsInt("AD_InventoryOrg_ID")});
-
+		 
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), OrgTo, get_TrxName());
 
 		//MOrgInfo orgInfo = MOrgInfo.get(getCtx(), interWH.getAD_Org_ID(), get_TrxName());
@@ -99,10 +106,12 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			return "Error: User Role Does Not Access to Warehouse Destination";
 		}
 		
+		/*Bug #2990 Create multiple Outbound and Inbound
 		//Check whether an existing inbound is already exists
 		if (interWH.get_ValueAsInt("M_MovementTo_ID") <= 0) {
 			return "Error: Must Create Outbound Movement Before Create Inbound";
 		}
+		*/
 		
 		if (interWH.get_ValueAsInt("M_MovementIn_ID") > 0) {
 			return "Error: Inbound Movement Has Been Created";
@@ -128,6 +137,36 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			}
 		}
 		
+		//@David
+		//Warehouse In-Transit
+		/*Case 1
+		 * M_WarehouseFrom.AD_Org_ID == M_WarehouseTo.AD_Org_ID
+		 *
+		 *Case 2
+		 * M_WarehouseFrom.AD_Org_ID != M_WarehouseTo.AD_Org_ID
+		 */
+		MWarehouse whFrom = new MWarehouse(getCtx(), interWH.getM_Warehouse_ID(), get_TrxName());
+		MWarehouse whTo = new MWarehouse(getCtx(), interWH.get_ValueAsInt("M_WarehouseTo_ID"), get_TrxName());
+//		MWarehouse whTransit;
+//		if (whFrom.getAD_Org_ID() == whTo.getAD_Org_ID()) {
+//			whTransit = whFrom;
+//		}
+//		else {
+//			String sqlWHTransit = "SELECT M_Warehouse_ID FROM M_Warehouse WHERE IsIntransit='Y' AND IsActive='Y' AND AD_Org_ID="+whFrom.getAD_Org_ID();
+//			int M_WareHouse_InTransit_ID = DB.getSQLValue(get_TrxName(), sqlWHTransit);
+//			if (M_WareHouse_InTransit_ID<=0)
+//				throw new AdempiereException("Warehouse.InTransit='Y' not exist");
+//			whTransit = new MWarehouse(getCtx(), M_WareHouse_InTransit_ID, get_TrxName());	
+//		}
+
+//		String sqlLocatorTransit = "SELECT M_Locator_ID FROM M_Locator WHERE IsIntransit='Y' AND IsActive='Y' AND M_Warehouse_ID="+whTransit.getM_Warehouse_ID();
+//		int locator_InTransit_ID = DB.getSQLValue(get_TrxName(), sqlLocatorTransit);
+//		if (locator_InTransit_ID<=0)
+//			throw new AdempiereException("Locator.IsIntransit='Y' not exist");
+
+		MMovement outbound = new MMovement(getCtx(), p_M_MovementOutBound_ID, get_TrxName());
+		MMovementLine [] lines = outbound.getLines(true);
+		
 		//Create inbound movement
 		MMovement inbound = new MMovement(getCtx(), 0, get_TrxName());
 		inbound.setAD_Org_ID(interWH.getAD_Org_ID());
@@ -136,7 +175,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		//inbound.setM_Warehouse_ID(orgInfo.getTransit_Warehouse_ID());
 		
 		//inbound.set_ValueOfColumn("M_Warehouse_ID", orgInfo.get_ValueAsInt("Transit_Warehouse_ID"));
-		inbound.set_ValueOfColumn("M_Warehouse_ID", p_M_WarehouseTransit_ID);
+		inbound.set_ValueOfColumn("M_Warehouse_ID", outbound.get_Value("M_WarehouseTo_ID"));
 		//inbound.setM_WarehouseTo_ID(p_M_Warehouse_ID);
 		inbound.set_ValueOfColumn("M_WarehouseTo_ID", p_M_Warehouse_ID);
 		/*
@@ -148,14 +187,20 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		inbound.setDocAction(DocAction.ACTION_Complete);
 		inbound.setDD_Order_ID(interWH.getDD_Order_ID());
 		inbound.setC_Project_ID(interWH.getC_Project_ID());
+		inbound.set_ValueOfColumn("IsInbound", "Y");
+		inbound.set_ValueOfColumn("M_OutBoundFrom_ID", p_DD_Order_ID);
 		inbound.saveEx();
 		
 		//Create inbound movement lines
+		/*2994 - Set Link antara Inbound dan Outbound
+		Change create lines method to get from outbound (M_Movement) provided by parameter
 		MDDOrderLine[] lines = interWH.getLines();
+		*/
 		//MWarehouse whTransit = new MWarehouse(getCtx(), orgInfo.get_ValueAsInt("Transit_Warehouse_ID"), get_TrxName());
-		MWarehouse whTransit = new MWarehouse(getCtx(), p_M_WarehouseTransit_ID, get_TrxName());
-		MLocator locatorTransit = whTransit.getDefaultLocator();
+		//MLocator locatorTransit = whTransit.getDefaultLocator();
 		
+		/*2994 - Set Link antara Inbound dan Outbound
+			Change create lines method to get from outbound (M_Movement) provided by parameter
 		for (MDDOrderLine line : lines) {
 			MMovementLine moveLine = new MMovementLine(inbound);
 			moveLine.setLine(line.getLine());
@@ -164,21 +209,41 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			//moveLine.setQtyEntered(line.getQtyEntered());
 			moveLine.set_ValueOfColumn("QtyEntered", line.getQtyEntered());
 			moveLine.setMovementQty(line.getQtyEntered());
-			moveLine.setM_Locator_ID(locatorTransit.get_ID());
+			moveLine.setM_Locator_ID(locator_InTransit_ID);
 			moveLine.setM_LocatorTo_ID(p_Locator);
 			//moveLine.setC_UOM_ID(line.getC_UOM_ID());
 			moveLine.set_ValueOfColumn("C_UOM_ID", line.getC_UOM_ID());
 			moveLine.setDD_OrderLine_ID(line.getDD_OrderLine_ID());
 			moveLine.saveEx();
 		}
+		*/
+		for (MMovementLine line : lines) {
+			MMovementLine moveLine = new MMovementLine(inbound);
+			moveLine.setLine(line.getLine());
+			moveLine.setAD_Org_ID(interWH.getAD_Org_ID());
+			moveLine.setM_Product_ID(line.getM_Product_ID());
+			//moveLine.setQtyEntered(line.getQtyEntered());
+			moveLine.set_ValueOfColumn("QtyEntered", line.get_Value("QtyEntered"));
+			moveLine.setMovementQty(line.getMovementQty());
+			moveLine.setM_Locator_ID(line.getM_LocatorTo_ID());
+			moveLine.setM_LocatorTo_ID(p_Locator);
+			//moveLine.setC_UOM_ID(line.getC_UOM_ID());
+			moveLine.set_ValueOfColumn("C_UOM_ID", line.get_Value("C_UOM_ID"));
+			moveLine.setDD_OrderLine_ID(line.getDD_OrderLine_ID());
+			moveLine.set_ValueOfColumn("M_OutBoundLineFrom_ID", line.getM_MovementLine_ID());
+			moveLine.saveEx();
+		}
+		
 		
 		//Complete movement
 		inbound.processIt(DocAction.ACTION_Complete);
 		inbound.saveEx();
 		
+		/*Bug #2990 Create multiple Outbound and Inbound
 		//Set Inbound Movement Link to Inter-warehouse
 		//interWH.setM_MovementIn_ID(inbound.get_ID());
 		interWH.set_ValueOfColumn("M_MovementIn_ID", inbound.get_ID());
+		*/
 		interWH.saveEx();
 		
 		String message = Msg.parseTranslation(getCtx(), "@GeneratedInbound@"+ inbound.getDocumentNo());

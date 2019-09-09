@@ -727,7 +727,7 @@ boolean isNewProductDes = false;
 		Integer M_Product_ID = (Integer)value;
 		MProduct product = new MProduct(ctx, M_Product_ID, null);
 		mTab.setValue("M_Product_Category_ID", product.getM_Product_Category_ID());
-		mTab.setValue("Size", product.get_Value("Size"));
+		//mTab.setValue("Size", product.get_Value("Size"));
 		
 		
 		//Integer M_Product_ID = (Integer)value;
@@ -1295,6 +1295,7 @@ boolean isNewProductDes = false;
 		}
 		else if(mField.getColumnName().equals(MQuotationLine.COLUMNNAME_M_Product_ID)){
 			msg += product(ctx, WindowNo, mTab, mField, value);
+			msg += amt(ctx, WindowNo, mTab, mField, oldValue);
 			return msg;
 		}
 		else if(mField.getColumnName().equals(MQuotationLine.COLUMNNAME_C_UOM_ID)){

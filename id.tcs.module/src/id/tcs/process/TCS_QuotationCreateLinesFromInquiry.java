@@ -164,22 +164,23 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 //					quotation.set_ValueOfColumn("DeliveryDays", resp.getDeliveryDays());
 //					quotation.setDaysDue((Integer)resp.get_Value("DaysDue"));
 					quot.saveEx();
-				}else{
+				}
+				//else{
 					BigDecimal priceStd = Env.ZERO;
 					BigDecimal priceLst = Env.ZERO;
 					
-					if (pp.getPriceStd()!= null) {
-						priceStd = pp.getPriceStd();
-					}
-					if (pp.getPriceList()!= null) {
-						priceLst = pp.getPriceList();
-					}
+//					if (pp.getPriceStd()!= null) {
+//						priceStd = pp.getPriceStd();
+//					}
+//					if (pp.getPriceList()!= null) {
+//						priceLst = pp.getPriceList();
+//					}
 					
 					quoLine.setPriceEntered(priceStd);
 					quoLine.setPriceActual(priceStd);
 					quoLine.set_CustomColumn("BasePrice", priceStd);
 					quoLine.setPriceList(priceLst);
-				}
+//				}
 				
 				quoLine.setProduct(inqLine.getProduct());
 				quoLine.setM_Product_ID(inqLine.getM_Product_ID());
@@ -210,6 +211,7 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 				//@KevinY end
 				quoLine.setC_UOM_ID(inqLine.getC_UOM_ID());
 //				quoLine.setPriceEntered((BigDecimal)respLine.get_Value("Price"));
+				quoLine.setPriceEntered(Env.ZERO);
 //				quoLine.set_ValueOfColumn("BasePrice", (BigDecimal)respLine.get_Value("Price"));
 				
 				
@@ -254,6 +256,7 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 			quoLine.setProduct(inqLine.getProduct());
 			quoLine.setLine(inqLine.getLineNo());
 			quoLine.set_ValueOfColumn("FaktorKondisi", Env.ONE);
+			quoLine.set_ValueOfColumn("C_InquiryLine_ID", inqLine.getC_InquiryLine_ID());			
 			quoLine.saveEx();
 			
 			if(quoLine.get_Value("BasePrice")==null){

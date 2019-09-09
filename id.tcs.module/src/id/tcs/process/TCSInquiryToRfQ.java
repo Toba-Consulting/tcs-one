@@ -15,6 +15,8 @@ import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
+import org.compiere.util.Msg;
+
 import id.tcs.model.I_C_InquiryLine;
 import id.tcs.model.MInquiry;
 import id.tcs.model.MInquiryLine;
@@ -25,6 +27,8 @@ public class TCSInquiryToRfQ extends SvrProcess{
 	int p_C_Inquiry_ID = 0;
 	int C_RfQ_Topic_ID = 0;
 	int C_Currency_ID = 0;
+	int p_C_Doctype_ID = 0;
+	Timestamp p_DateDoc = null;
 	Timestamp DateResponse = null;
 	
 	@Override
@@ -36,13 +40,19 @@ public class TCSInquiryToRfQ extends SvrProcess{
 				;
 			}else if (para[i].getParameterName().equalsIgnoreCase("C_Inquiry_ID")) {
 				p_C_Inquiry_ID = para[i].getParameterAsInt();
-			}else if (para[i].getParameterName().equalsIgnoreCase("C_RfQ_Topic_ID")) {
-				C_RfQ_Topic_ID = para[i].getParameterAsInt();
-			}else if (para[i].getParameterName().equalsIgnoreCase("C_Currency_ID")) {
-				C_Currency_ID = para[i].getParameterAsInt();
-			}else if (para[i].getParameterName().equalsIgnoreCase("DateResponse")) {
-				DateResponse = para[i].getParameterAsTimestamp();
-			}else {
+			}else if (para[i].getParameterName().equalsIgnoreCase("C_DocType_ID")) {
+				p_C_Doctype_ID = para[i].getParameterAsInt();
+			}else if (para[i].getParameterName().equalsIgnoreCase("DateDoc")) {
+				p_DateDoc = para[i].getParameterAsTimestamp();
+			}
+//				else if (para[i].getParameterName().equalsIgnoreCase("C_RfQ_Topic_ID")) {
+//				C_RfQ_Topic_ID = para[i].getParameterAsInt();
+//			}else if (para[i].getParameterName().equalsIgnoreCase("C_Currency_ID")) {
+//				C_Currency_ID = para[i].getParameterAsInt();
+//			}else if (para[i].getParameterName().equalsIgnoreCase("DateResponse")) {
+//				DateResponse = para[i].getParameterAsTimestamp();
+//			}
+			else {
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 			}
 		}
@@ -87,6 +97,7 @@ public class TCSInquiryToRfQ extends SvrProcess{
 		
 		Collections.sort(listCategory);
 		
+		List<MRfQ> createdRFQ = new ArrayList<MRfQ>();
 		for(int i=0;i<listCategory.size();i++){
 			MInquiryLine inqLines[] = getLines(p_C_Inquiry_ID, listCategory.get(i));
 			if (inqLines.length == 0)
@@ -94,11 +105,12 @@ public class TCSInquiryToRfQ extends SvrProcess{
 					
 			MRfQ rfq = new MRfQ(getCtx(), 0, get_TrxName());
 			rfq.setAD_Org_ID(inquiry.getAD_Org_ID());
-			rfq.setC_RfQ_Topic_ID(C_RfQ_Topic_ID);
+//			rfq.setC_RfQ_Topic_ID(C_RfQ_Topic_ID);
 			rfq.setIsSelfService(false);
 			rfq.setIsQuoteAllQty(false);
 			rfq.setIsInvitedVendorsOnly(true);
-			rfq.set_ValueOfColumn("DateDoc", (new Timestamp(System.currentTimeMillis())));
+//			rfq.set_ValueOfColumn("DateDoc", (new Timestamp(System.currentTimeMillis())));
+			rfq.set_ValueOfColumn("DateDoc", p_DateDoc);
 			rfq.setIsQuoteTotalAmt(false);
 			rfq.setIsRfQResponseAccepted(false);
 			//@KevinY FBI - 2530 
@@ -122,11 +134,12 @@ public class TCSInquiryToRfQ extends SvrProcess{
 			if (inquiry.get_ValueAsString("Help").length()>0){
 				rfq.setHelp(inquiry.get_ValueAsString("Help"));
 			}
-			rfq.setC_Currency_ID(C_Currency_ID);
-			rfq.setDateResponse(DateResponse);
+//			rfq.setC_Currency_ID(C_Currency_ID);
+//			rfq.setDateResponse(DateResponse);
 			rfq.setDescription(inquiry.getDescription());
 			rfq.set_ValueOfColumn("M_Product_Category_ID",listCategory.get(i));
-			rfq.set_ValueOfColumn("C_DocType_ID",MDocType.getDocType("RFQ"));
+//			rfq.set_ValueOfColumn("C_DocType_ID",MDocType.getDocType("RFQ"));
+			rfq.set_ValueOfColumn("C_DocType_ID", p_C_Doctype_ID);
 			rfq.setDateWorkStart(new Timestamp(System.currentTimeMillis()));
 			rfq.setDateWorkComplete(new Timestamp(System.currentTimeMillis()));
 			rfq.saveEx();
@@ -175,6 +188,7 @@ public class TCSInquiryToRfQ extends SvrProcess{
 					
 				}
 			}
+			createdRFQ.add(rfq);
 		}
 		
 		if(listDocument.isEmpty()){
@@ -196,6 +210,13 @@ public class TCSInquiryToRfQ extends SvrProcess{
 		
 		inquiry.set_ValueOfColumn("PHDNO",msg.toString());
 		inquiry.saveEx();
+		
+		//Pop-up window after process
+		for (MRfQ mRfQ : createdRFQ) {
+			String message = Msg.parseTranslation(getCtx(), "@GeneratedInbound@"+ mRfQ.getDocumentNo());
+			addBufferLog(0, null, null, message, mRfQ.get_Table_ID(),mRfQ.getC_RfQ_ID());			
+		}
+
 		return msg.toString();	
 	}
 	
