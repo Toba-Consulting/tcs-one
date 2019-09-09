@@ -43,7 +43,8 @@ public class TCS_MAllocationHdrValidator {
 		
 		TCS_MAllocationHdr docAllocationHdr = new TCS_MAllocationHdr(Env.getCtx(), allocationHdr.getC_AllocationHdr_ID(), allocationHdr.get_TrxName());
 		if (!docAllocationHdr.isReversal()) {
-			docAllocationHdr.createMatchAllocation();			
+			//docAllocationHdr.createMatchAllocation();		
+			createMatchAllocation(allocationHdr);			
 		}
 		
 
@@ -57,7 +58,7 @@ public class TCS_MAllocationHdrValidator {
 		return "";
 	}
 	
-	private void createMatchAllocation(MAllocationHdr alloc){
+	private static void createMatchAllocation(MAllocationHdr alloc){
 		
 		//Split Up ID and Amount Based On Amount, as ArrayList
 		
@@ -796,7 +797,7 @@ public class TCS_MAllocationHdrValidator {
 		pWriteOffAmt.clear();
 		nWriteOffAmt.clear();
 }
-	private String getMatchAllocationDescription(X_T_MatchAllocation match){
+	private static String getMatchAllocationDescription(X_T_MatchAllocation match){
 		
 		/* Case:
 		 * 1. Payment Allocate Charge, Get Description From TCS_AllocateCharge

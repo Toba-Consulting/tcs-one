@@ -22,6 +22,7 @@ import id.tcs.callout.TCS_CalloutAssetTransfer;
 import id.tcs.callout.TCS_CalloutDDOrderLine;
 import id.tcs.callout.TCS_CalloutInquiryLine;
 import id.tcs.callout.TCS_CalloutPayment;
+import id.tcs.callout.TCS_CalloutQuotation;
 import id.tcs.callout.TCS_CalloutQuotationLine;
 import id.tcs.model.MTCSAmortizationPlan;
 
@@ -101,6 +102,9 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 		
 		if(tableName.equals("C_BankTransfer"))
 			list.add(new CalloutBankTransfer());
+		
+		if(tableName.equals("C_Quotation"))
+			list.add(new TCS_CalloutQuotation());
 
 		if(tableName.equals("C_QuotationLine"))
 			list.add(new TCS_CalloutQuotationLine());

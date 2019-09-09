@@ -37,6 +37,7 @@ import org.compiere.model.I_M_Requisition;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 
+import id.tcs.model.I_M_MatchRequest;
 import id.tcs.model.I_TCS_AllocateCharge;
 import id.tcs.model.MBankTransfer;
 import id.tcs.model.MInquiry;
@@ -47,6 +48,16 @@ import id.tcs.model.MQuotationTax;
 import id.tcs.model.MTCSAmortizationLine;
 import id.tcs.model.MTCSAmortizationPlan;
 import id.tcs.model.MTCSAmortizationRun;
+import id.tcs.model.TCS_MRequestLine;
+import id.tcs.model.TCS_MRfQ;
+import id.tcs.model.TCS_MRfQLine;
+import id.tcs.model.TCS_MRfQLineQty;
+import id.tcs.model.TCS_MRfQResponse;
+import id.tcs.model.TCS_MRfQResponseLine;
+import id.tcs.model.TCS_MRfQResponseLineQty;
+import id.tcs.model.TCS_MRfQTopic;
+import id.tcs.model.TCS_MRfQTopicSubscriber;
+import id.tcs.model.TCS_MRfQTopicSubscriberOnly;
 
 
 
@@ -83,6 +94,17 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(MTCSAmortizationPlan.Table_Name, "id.tcs.model.MTCSAmortizationPlan");
 		mapTableModels.put(MTCSAmortizationLine.Table_Name, "id.tcs.model.MTCSAmortizationLine");
 		mapTableModels.put(MTCSAmortizationRun.Table_Name, "id.tcs.model.MTCSAmortizationRun");
+		mapTableModels.put(TCS_MRequestLine.Table_Name, "id.tcs.model.TCS_MRequestLine");
+		mapTableModels.put(TCS_MRfQResponse.Table_Name, "id.tcs.model.TCS_MRfQResponse");
+		mapTableModels.put(TCS_MRfQResponseLine.Table_Name, "id.tcs.model.TCS_MRfQResponseLine");
+		mapTableModels.put(TCS_MRfQResponseLineQty.Table_Name, "id.tcs.model.TCS_MRfQResponseLineQty");
+		mapTableModels.put(I_M_MatchRequest.Table_Name, "id.tcs.model.I_M_MatchRequest");
+		mapTableModels.put(TCS_MRfQ.Table_Name, "id.tcs.model.TCS_MRfQ");
+		mapTableModels.put(TCS_MRfQLine.Table_Name, "id.tcs.model.TCS_MRfQLine");
+		mapTableModels.put(TCS_MRfQLineQty.Table_Name, "id.tcs.model.TCS_MRfQLineQty");
+		mapTableModels.put(TCS_MRfQTopic.Table_Name, "id.tcs.model.TCS_MRfQTopic");
+		mapTableModels.put(TCS_MRfQTopicSubscriber.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriber");
+		mapTableModels.put(TCS_MRfQTopicSubscriberOnly.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriberOnly");
 		
 	}
 	

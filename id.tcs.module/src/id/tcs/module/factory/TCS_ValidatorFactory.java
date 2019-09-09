@@ -10,6 +10,7 @@ import org.compiere.model.MBankStatement;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
+import org.compiere.model.MOrderLine;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MRequisition;
@@ -17,11 +18,13 @@ import org.compiere.model.MRfQ;
 import org.compiere.model.X_AD_WF_Activity;
 import org.compiere.util.CLogger;
 import org.compiere.wf.MWFActivity;
+import org.eevolution.model.MDDOrder;
 import org.osgi.service.event.Event;
 
 import id.tcs.model.MQuotation;
 import id.tcs.model.MQuotationLine;
 import id.tcs.validator.TCS_BankStatementDocValidator;
+import id.tcs.validator.TCS_DDOrderValidator;
 import id.tcs.validator.TCS_InOutValidator;
 import id.tcs.validator.TCS_InvoiceValidator;
 import id.tcs.validator.TCS_OrderValidator;
@@ -33,6 +36,7 @@ import id.tcs.validator.TCS_RequisitionValidator;
 import id.tcs.validator.TCS_RfQValidator;
 import id.tcs.validator.TCS_WFActivityValidator;
 import id.tcs.validator.TCS_MAllocationHdrValidator;
+import id.tcs.validator.TCS_OrderLineValidator;
 
 public class TCS_ValidatorFactory extends AbstractEventHandler {
 	private CLogger log = CLogger.getCLogger(TCS_ValidatorFactory.class);
@@ -64,6 +68,7 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, MQuotationLine.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, MQuotationLine.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_DELETE, MQuotationLine.Table_Name);
+		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, MQuotation.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_VOID, MQuotation.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_VOID, MQuotation.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_VOID, MRfQ.Table_Name);
@@ -71,6 +76,8 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, MRequisition.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, MRequisition.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_VOID, MRequisition.Table_Name);
+		registerTableEvent(IEventTopics.PO_BEFORE_DELETE, MOrderLine.Table_Name);
+		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, MDDOrder.Table_Name);
 		log.info("PROJECT MANAGEMENT EVENT MANAGER // INITIALIZED");
 	}
 
@@ -100,6 +107,9 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		else if(getPO(event).get_TableName().equals(MOrder.Table_Name)) {
 			msg = TCS_OrderValidator.executeEvent(event, getPO(event));
 		}
+		else if (getPO(event).get_TableName().equals(MOrderLine.Table_Name)) {
+			msg = TCS_OrderLineValidator.executeEvent(event, getPO(event));
+		}
 		else if(getPO(event).get_TableName().equals(MPayment.Table_Name)) {
 			msg = TCS_PaymentValidator.executeEvent(event, getPO(event));
 		}
@@ -125,6 +135,10 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 			msg = TCS_RequisitionValidator.executeEvent(event, getPO(event));
 		}
 		
+		else if(getPO(event).get_TableName().equals(MDDOrder.Table_Name)) {
+			msg = TCS_DDOrderValidator.executeEvent(event, getPO(event));
+		}
+
 		if (msg.length() > 0)
 			throw new AdempiereException(msg);
 
