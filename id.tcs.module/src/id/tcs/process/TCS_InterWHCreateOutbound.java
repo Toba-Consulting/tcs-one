@@ -187,11 +187,20 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			moveLine.setLine(line.getLine());
 			moveLine.setM_Product_ID(line.getM_Product_ID());
 			//moveLine.setQtyEntered(line.getQtyEntered());
-			int qtyout = line.get_ValueAsInt("qtyoutbound");
-			BigDecimal qty = line.getQtyEntered().subtract(BigDecimal.valueOf(qtyout));
 			moveLine.set_ValueOfColumn("QtyEntered", line.getQtyEntered());
-			moveLine.setMovementQty(qty);
 			
+			//@David
+			//Set Qty = DD_OrderLine.Qty - SUM(M_MovementLine.Qty, CO & CL only
+			//moveLine.setMovementQty(line.getQtyEntered());
+			String sqlQtyWhere = "DD_OrderLine_ID="+line.getDD_OrderLine_ID()+" AND IsOutbound='Y' AND DocStatus IN ('CO','CL')";
+			BigDecimal qtyOutbound = new Query(getCtx(), MMovementLine.Table_Name, sqlQtyWhere, get_TrxName())
+									.addJoinClause("JOIN M_Movement ON M_Movement.M_Movement_ID = M_MovementLine.M_Movement_ID")
+									.sum("MovementQty");
+			BigDecimal qtyMove = line.getQtyEntered().subtract(qtyOutbound);
+			if (qtyMove.signum()<1) {
+				continue;
+			}
+			moveLine.setMovementQty(qtyMove);
 			if (moveLine.getM_Product_ID() > 0 && isDisallowNegativeInv(whSource)) {
 				//@David Commented because warehouse zone not implemented yet
 				/*BigDecimal qtyOnHand = MStorageOnHand.getQtyOnHandForWarehouseZone(moveLine.getM_Product_ID(),
@@ -210,11 +219,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			moveLine.setM_LocatorTo_ID(locator_InTransit_ID);
 			moveLine.set_ValueOfColumn("C_UOM_ID", line.getC_UOM_ID());
 			moveLine.setDD_OrderLine_ID(line.getDD_OrderLine_ID());
-			
-			//Validate : Just create outbound when qty-qtyoutbound > 0
-			if (qty.compareTo(Env.ZERO) != 0) {
-				moveLine.saveEx();	
-			}			
+			moveLine.saveEx();
 		}
 		
 		/*leave as drafted to allow partial outbound
