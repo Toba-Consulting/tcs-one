@@ -1,5 +1,6 @@
 package org.compiere.model;
 
+import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.compiere.process.DocAction;
@@ -14,6 +15,10 @@ public class TCS_MMovement extends MMovement implements DocOptions {
 
 	public TCS_MMovement(Properties ctx, int M_Movement_ID, String trxName) {
 		super(ctx, M_Movement_ID, trxName);
+	}
+
+	public TCS_MMovement(Properties ctx, ResultSet rs, String trxName) {
+		super(ctx, rs, trxName);
 	}
 
 	@Override

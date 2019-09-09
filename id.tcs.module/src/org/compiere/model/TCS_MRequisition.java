@@ -1,5 +1,6 @@
 package org.compiere.model;
 
+import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.compiere.process.DocAction;
@@ -16,6 +17,11 @@ public class TCS_MRequisition extends MRequisition implements DocOptions {
 		super(ctx, M_Requisition_ID, trxName);
 	}
 
+	public TCS_MRequisition(Properties ctx, ResultSet rs, String trxName) {
+		super(ctx, rs, trxName);
+	}
+
+	
 	@Override
 	public int customizeValidActions(String docStatus, Object processing, String orderType, String isSOTrx,
 			int AD_Table_ID, String[] docAction, String[] options, int index) {

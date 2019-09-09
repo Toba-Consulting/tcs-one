@@ -1,5 +1,6 @@
 package org.compiere.model;
 
+import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.compiere.process.DocAction;
@@ -14,6 +15,10 @@ public class TCS_MInventory extends MInventory implements DocOptions {
 
 	public TCS_MInventory(Properties ctx, int M_Inventory_ID, String trxName) {
 		super(ctx, M_Inventory_ID, trxName);
+	}
+
+	public TCS_MInventory(Properties ctx, ResultSet rs, String trxName) {
+		super(ctx, rs, trxName);
 	}
 
 	@Override
