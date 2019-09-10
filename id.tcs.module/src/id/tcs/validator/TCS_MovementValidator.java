@@ -16,13 +16,13 @@ public class TCS_MovementValidator {
 
 	public static String executeEvent(Event event, PO po) {
 		String msg = "";
-		MMovement ddOrder = (MMovement) po;
+		MMovement move = (MMovement) po;
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
-			msg = checkUsedDDOrderLineQty(ddOrder);
+			msg += checkUsedDDOrderLineQty(move);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL) ||
 				event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT)) {
-			msg = checkUsedDDOrderLineQty(ddOrder);
+			msg += checkOutboundHasNoActiveInbound(move);
 		}
 		return msg;
 	}
@@ -54,7 +54,7 @@ public class TCS_MovementValidator {
 
 				BigDecimal remainingQty = ddLine.getQtyEntered().subtract(UsedQty);
 				if (remainingQty.compareTo(lineQty)<0) {
-					return "Line "+moveLine.getLine()+" : Qty after complete is more than order qty, reamining qty = "+remainingQty;
+					return "Line "+moveLine.getLine()+" : Qty after complete is more than order qty, reamining qty = "+remainingQty+". ";
 				}
 			}
 
@@ -64,7 +64,7 @@ public class TCS_MovementValidator {
 	
 	private static String checkOutboundHasNoActiveInbound(MMovement move){
 
-		if (move.get_ValueAsBoolean("IsInbound")) {
+		if (move.get_ValueAsBoolean("IsOutbound")) {
 
 			//Get Line IDs for next query
 			String sqlWhereIDs = "M_Movement_ID="+move.getM_Movement_ID();
@@ -83,7 +83,7 @@ public class TCS_MovementValidator {
 			.addJoinClause("JOIN M_Movement ON M_Movement.M_Movement_ID = M_MovementLine.M_Movement_ID")
 			.match();
 			if (match) {
-				return "Active Inbound Referencing This Outbound Exist";
+				return "Active Inbound Referencing This Outbound Exist. ";
 			}
 		}
 
