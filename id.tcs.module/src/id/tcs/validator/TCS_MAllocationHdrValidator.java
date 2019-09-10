@@ -1,9 +1,9 @@
 package id.tcs.validator;
 
 
-import id.tcs.model.MTCS_AllocateCharge;
-import id.tcs.model.X_TCS_AllocateCharge;
-import id.tcs.model.X_T_MatchAllocation;
+import org.compiere.model.MTCS_AllocateCharge;
+import org.compiere.model.X_TCS_AllocateCharge;
+import org.compiere.model.X_T_MatchAllocation;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,11 +15,9 @@ import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
-import org.compiere.model.TCS_MAllocationLine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
-import org.compiere.model.TCS_MAllocationHdr;
 
 public class TCS_MAllocationHdrValidator {
 
@@ -41,7 +39,7 @@ public class TCS_MAllocationHdrValidator {
 	
 	public static String afterComplete(MAllocationHdr allocationHdr){
 		
-		TCS_MAllocationHdr docAllocationHdr = new TCS_MAllocationHdr(Env.getCtx(), allocationHdr.getC_AllocationHdr_ID(), allocationHdr.get_TrxName());
+		MAllocationHdr docAllocationHdr = new MAllocationHdr(Env.getCtx(), allocationHdr.getC_AllocationHdr_ID(), allocationHdr.get_TrxName());
 		if (!docAllocationHdr.isReversal()) {
 			//docAllocationHdr.createMatchAllocation();		
 			createMatchAllocation(allocationHdr);			
