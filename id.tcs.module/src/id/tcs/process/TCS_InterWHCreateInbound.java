@@ -188,7 +188,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		inbound.setDD_Order_ID(interWH.getDD_Order_ID());
 		inbound.setC_Project_ID(interWH.getC_Project_ID());
 		inbound.set_ValueOfColumn("IsInbound", "Y");
-		inbound.set_ValueOfColumn("M_OutBoundFrom_ID", p_DD_Order_ID);
+		inbound.set_ValueOfColumn("M_OutBoundFrom_ID", p_M_MovementOutBound_ID);
 		inbound.saveEx();
 		
 		//Create inbound movement lines
