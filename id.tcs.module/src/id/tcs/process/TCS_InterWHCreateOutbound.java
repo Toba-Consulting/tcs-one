@@ -206,18 +206,21 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 				continue;
 			}
 			moveLine.setMovementQty(qtyMove);
-			if (moveLine.getM_Product_ID() > 0 && isDisallowNegativeInv(whSource)) {
-				//@David Commented because warehouse zone not implemented yet
-				/*BigDecimal qtyOnHand = MStorageOnHand.getQtyOnHandForWarehouseZone(moveLine.getM_Product_ID(),
-						outbound.getM_WarehouseZone_ID(), 0, get_TrxName());
-				*/
-				BigDecimal qtyOnHand = MStorageOnHand.getQtyOnHandForLocator(moveLine.getM_Product_ID(),
-						outbound.get_ValueAsInt("M_Locator_ID"), 0, get_TrxName());
-				MProduct product = MProduct.get(getCtx(), moveLine.getM_Product_ID());
-				
-				if (qtyOnHand.compareTo((BigDecimal)moveLine.get_Value("QtyEntered")) < 0)	
-					return product.getName() + " Out Of Stock";
-			}
+			
+			//Comment check negative inventory because process leave outbound as drafted
+			
+//			if (moveLine.getM_Product_ID() > 0 && isDisallowNegativeInv(whSource)) {
+//				//@David Commented because warehouse zone not implemented yet
+//				/*BigDecimal qtyOnHand = MStorageOnHand.getQtyOnHandForWarehouseZone(moveLine.getM_Product_ID(),
+//						outbound.getM_WarehouseZone_ID(), 0, get_TrxName());
+//				*/
+//				BigDecimal qtyOnHand = MStorageOnHand.getQtyOnHandForLocator(moveLine.getM_Product_ID(),
+//						outbound.get_ValueAsInt("M_Locator_ID"), 0, get_TrxName());
+//				MProduct product = MProduct.get(getCtx(), moveLine.getM_Product_ID());
+//				
+//				if (qtyOnHand.compareTo((BigDecimal)moveLine.get_Value("QtyEntered")) < 0)	
+//					return product.getName() + " Out Of Stock";
+//			}
 			
 			moveLine.setM_Locator_ID(p_Locator);
 //			moveLine.setM_LocatorTo_ID(locatorTransit.get_ID());
