@@ -34,7 +34,8 @@ public class TCSInquiryComplete extends SvrProcess {
 		
 		MInquiry inq = new MInquiry(getCtx(), p_C_Inquiry_ID, get_TrxName());
 		
-		if (inq.get_ValueAsString("DocStatus").equalsIgnoreCase("DR")) {
+		if (inq.get_ValueAsString("DocStatus").equalsIgnoreCase("DR") ||
+			inq.get_ValueAsString("DocStatus").equalsIgnoreCase("IP")) {
 			inq.setProcessed(true);
 			inq.set_ValueOfColumn("DocStatus", "CO");
 			
