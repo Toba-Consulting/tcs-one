@@ -116,7 +116,7 @@ public class TCS_QuotationValidator {
 		if (match) return "Cannot Reactivate / Void : Linked Order Exist";
 */
 
-		String sqlWhere="C_Quotation_ID="+quotation.getC_Quotation_ID();
+		String sqlWhere="C_Quotation_ID="+quotation.getC_Quotation_ID()+" AND C_OrderLine_ID IS NOT NULL";
 		boolean match = new Query(quotation.getCtx(), X_M_MatchQuotation.Table_Name, sqlWhere, quotation.get_TrxName())
 						.match();
 
