@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MProductPrice;
 import org.compiere.model.MProductPricing;
@@ -64,6 +65,15 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 		MInquiry inq = new MInquiry(getCtx(), p_C_Inquiry_ID, get_TrxName());
 		MQuotation quot = new MQuotation(getCtx(), p_C_Quotation_ID, get_TrxName());
 		MInquiryLine [] inqLines = inq.getLines();
+		
+		//Validate : Check inquiry has quotation
+		String sqlWhere = " C_Inquiry_ID=? AND C_Quotation_ID IS NOT NULL";
+		boolean check = new Query(getCtx(), X_M_MatchQuotation.Table_Name, sqlWhere, get_TrxName())
+		.setParameters(inq.get_ID()).match();
+
+		if (check) {
+			throw new AdempiereException("Inquiry already has Quotation");
+		}
 		
 //		MPriceList priceList = new MPriceList(getCtx(), p_M_PriceList_ID, get_TrxName());
 		if (inqLines.length == 0) 
