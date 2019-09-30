@@ -32,7 +32,7 @@ public class TCS_MRequisition extends MRequisition implements DocOptions {
 		if (m_processMsg != null)
 			return false;
 
-	//	setProcessed(false);
+		setProcessed(false);
 //		if (! reverseCorrectIt())
 		//	return false;
 
