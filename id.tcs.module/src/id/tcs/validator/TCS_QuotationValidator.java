@@ -27,6 +27,7 @@ public class TCS_QuotationValidator {
 		
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)){
 			msgQuotation = checkQuotationDependency(quotation);
+			msgQuotation = checkLinkedOrder(quotation);
 		}
 
 		if (event.getTopic().equals(IEventTopics.DOC_AFTER_VOID)){
@@ -105,6 +106,7 @@ public class TCS_QuotationValidator {
 	}
 	
 	public static String checkLinkedOrder(MQuotation quotation){
+		/*
 		String sqlWhere="q.C_Quotation_ID="+quotation.getC_Quotation_ID()+" AND q.DocStatus IN ('CO','CL','IP')";
 		boolean match = new Query(quotation.getCtx(), MOrder.Table_Name, sqlWhere, quotation.get_TrxName())
 						.addJoinClause("JOIN M_MatchQuotation mq ON mq.C_Order_ID=C_Order.C_Order_ID ")
@@ -112,6 +114,14 @@ public class TCS_QuotationValidator {
 						.match();
 		
 		if (match) return "Cannot Reactivate / Void : Linked Order Exist";
+*/
+
+		String sqlWhere="C_Quotation_ID="+quotation.getC_Quotation_ID()+" AND C_OrderLine_ID IS NOT NULL";
+		boolean match = new Query(quotation.getCtx(), X_M_MatchQuotation.Table_Name, sqlWhere, quotation.get_TrxName())
+						.match();
+
+		if (match) return "Cannot Reactivate / Void : Match Quotation Exist";
+
 		return "";
 	}
 

@@ -127,7 +127,7 @@ public class TCS_ForeignBankRevaluationNoBankStatement extends SvrProcess {
 		for (MBankAccount bankAcct: bankAccounts) {
 			int bankPrecision = bankAcct.getC_Currency().getStdPrecision();
 			
-			String sqlTrxBalance = "SELECT COALESCE(currencyconvert((SELECT SUM(PayAmt) FROM C_Payment WHERE DateAcct <= ? AND C_BankAccount_ID = ?), ?, ?, ?, ?, ?, ?),0) FROM dual";
+			String sqlTrxBalance = "SELECT COALESCE(currencyconvert((SELECT SUM(PayAmt) FROM C_Payment_v WHERE DateAcct <= ? AND C_BankAccount_ID = ? AND DocStatus IN ('CO','CL')), ?, ?, ?, ?, ?, ?),0) FROM dual";
 			Object[] params = new Object[]{period.getEndDate(), bankAcct.get_ID(), bankAcct.getC_Currency_ID(), 
 					as.getC_Currency_ID(), period.getEndDate(), p_C_ConversionTypeReval_ID, Env.getAD_Client_ID(getCtx()), p_AD_Org_ID};
 

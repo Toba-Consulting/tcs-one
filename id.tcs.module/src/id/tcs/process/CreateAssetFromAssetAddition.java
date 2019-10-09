@@ -50,6 +50,7 @@ public class CreateAssetFromAssetAddition extends SvrProcess{
 //		asset.setA_Asset_Status(MAsset.A_ASSET_STATUS_Activated);
 		System.out.println(p_ManufacturedYear);
 		asset.setManufacturedYear(p_ManufacturedYear);
+		asset.setLocationComment(assetAdditiion.getLocationComment());
 		asset.saveEx();
 		
 		

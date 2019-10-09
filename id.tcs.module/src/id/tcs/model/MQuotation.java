@@ -245,7 +245,14 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 
 	@Override
 	public boolean closeIt() {
-		return false;
+		MQuotationLine [] lines = getLines();
+		for (MQuotationLine line : lines) {
+			if (line.getQtyEntered().compareTo(line.getQtyOrdered())>0) {
+				line.setQtyEntered(line.getQtyOrdered());
+			}
+		}
+		
+		return true;
 	}
 
 	@Override
@@ -369,6 +376,7 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 		} else if (docStatus.equals(DocAction.STATUS_Completed)) {
 			options[index++] = DocAction.ACTION_Void;
 			options[index++] = DocAction.ACTION_ReActivate;
+			options[index++] = DocAction.ACTION_Close;
 		} else if (docStatus.equals(DocAction.STATUS_Invalid)) {
 			options[index++] = DocAction.ACTION_Complete;
 			options[index++] = DocAction.ACTION_Void;

@@ -1,6 +1,6 @@
 package org.compiere.model;
 
-import id.tcs.model.MTCS_AllocateCharge;
+import org.compiere.model.MTCS_AllocateCharge;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -20,8 +20,6 @@ import org.compiere.util.IBAN;
 import org.compiere.util.Msg;
 import org.compiere.util.TimeUtil;
 import org.compiere.util.Util;
-
-import id.tcs.model.MTCS_AllocateCharge;
 
 public class TCS_MPayment extends MPayment {
 
@@ -112,6 +110,7 @@ public class TCS_MPayment extends MPayment {
 			if (!alloc.processIt(DocAction.ACTION_Complete))
 				throw new AdempiereException("Failed when processing document - " + alloc.getProcessMsg());
 			
+			alloc.save(get_TrxName());
 			setIsAllocated(true);
 		}
 		else
