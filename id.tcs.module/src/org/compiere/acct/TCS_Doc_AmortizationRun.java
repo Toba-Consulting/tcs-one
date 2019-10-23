@@ -52,8 +52,8 @@ public class TCS_Doc_AmortizationRun extends Doc{
 			MTCSAmortizationLine line = (MTCSAmortizationLine) p_lines[i].getPO();
 			BigDecimal amt = line.getAmtAcct();
 			
-			MAccount drAccount = (MAccount) line.getDebit_Account();
-			MAccount crAccount = (MAccount) line.getCredit_Account();
+			MAccount drAccount = (MAccount) line.getDebit_Account_A();
+			MAccount crAccount = (MAccount) line.getCredit_Account_A();
 			
 			FactUtil.createSimpleOperation(fact, p_lines[i], drAccount, crAccount, getC_Currency_ID(), amt, false);
 		}

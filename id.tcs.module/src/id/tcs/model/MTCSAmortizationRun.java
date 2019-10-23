@@ -256,7 +256,7 @@ public class MTCSAmortizationRun extends X_TCS_AmortizationRun implements DocAct
 		
 		for (MTCSAmortizationLine aline : getLines()) {
 			MTCSAmortizationPlan aPlan = (MTCSAmortizationPlan) aline.getTCS_AmortizationPlan();
-			int numberOfPeriod = aPlan.getAmortizationPeriod();
+			int numberOfPeriod = aPlan.getamortizationperiod();
 			int countOfPeriod = 0;
 			for (MTCSAmortizationLine line : aPlan.getLines()) {
 				if(line.getTCS_AmortizationRun_ID() > 0)
@@ -264,7 +264,7 @@ public class MTCSAmortizationRun extends X_TCS_AmortizationRun implements DocAct
 			}
 			
 			if(numberOfPeriod == countOfPeriod){
-				aPlan.setIsFullyAmortized(true);
+				aPlan.setisfullyamortized(true);
 				aPlan.saveEx();
 			}
 			

@@ -32,7 +32,7 @@ public interface I_TCS_AmortizationLine
     /** TableName=TCS_AmortizationLine */
     public static final String Table_Name = "TCS_AmortizationLine";
 
-    /** AD_Table_ID=300311 */
+    /** AD_Table_ID=300531 */
     public static final int Table_ID = 300531;
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -243,16 +243,16 @@ public interface I_TCS_AmortizationLine
 	  */
 	public int getCreatedBy();
 
-    /** Column name Credit_Account_ID */
-    public static final String COLUMNNAME_Credit_Account_ID = "Credit_Account_ID";
+    /** Column name Credit_Account_Acct */
+    public static final String COLUMNNAME_Credit_Account_Acct = "Credit_Account_Acct";
 
-	/** Set Credit Account	  */
-	public void setCredit_Account_ID (int Credit_Account_ID);
+	/** Set Credit_Account_Acct	  */
+	public void setCredit_Account_Acct (int Credit_Account_Acct);
 
-	/** Get Credit Account	  */
-	public int getCredit_Account_ID();
+	/** Get Credit_Account_Acct	  */
+	public int getCredit_Account_Acct();
 
-	public I_C_ValidCombination getCredit_Account() throws RuntimeException;
+	public I_C_ValidCombination getCredit_Account_A() throws RuntimeException;
 
     /** Column name DateAcct */
     public static final String COLUMNNAME_DateAcct = "DateAcct";
@@ -267,16 +267,16 @@ public interface I_TCS_AmortizationLine
 	  */
 	public Timestamp getDateAcct();
 
-    /** Column name Debit_Account_ID */
-    public static final String COLUMNNAME_Debit_Account_ID = "Debit_Account_ID";
+    /** Column name Debit_Account_Acct */
+    public static final String COLUMNNAME_Debit_Account_Acct = "Debit_Account_Acct";
 
-	/** Set Debit Account	  */
-	public void setDebit_Account_ID (int Debit_Account_ID);
+	/** Set Debit_Account_Acct	  */
+	public void setDebit_Account_Acct (int Debit_Account_Acct);
 
-	/** Get Debit Account	  */
-	public int getDebit_Account_ID();
+	/** Get Debit_Account_Acct	  */
+	public int getDebit_Account_Acct();
 
-	public I_C_ValidCombination getDebit_Account() throws RuntimeException;
+	public I_C_ValidCombination getDebit_Account_A() throws RuntimeException;
 
     /** Column name Description */
     public static final String COLUMNNAME_Description = "Description";
@@ -359,7 +359,7 @@ public interface I_TCS_AmortizationLine
 	/** Get TCS_AmortizationPlan	  */
 	public int getTCS_AmortizationPlan_ID();
 
-	public id.tcs.model.I_TCS_AmortizationPlan getTCS_AmortizationPlan() throws RuntimeException;
+	public I_TCS_AmortizationPlan getTCS_AmortizationPlan() throws RuntimeException;
 
     /** Column name TCS_AmortizationRun_ID */
     public static final String COLUMNNAME_TCS_AmortizationRun_ID = "TCS_AmortizationRun_ID";
@@ -370,7 +370,7 @@ public interface I_TCS_AmortizationLine
 	/** Get TCS_AmortizationRun	  */
 	public int getTCS_AmortizationRun_ID();
 
-	public id.tcs.model.I_TCS_AmortizationRun getTCS_AmortizationRun() throws RuntimeException;
+	public I_TCS_AmortizationRun getTCS_AmortizationRun() throws RuntimeException;
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";

@@ -21,25 +21,19 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
-
-import org.compiere.model.I_C_ValidCombination;
-import org.compiere.model.I_Persistent;
-import org.compiere.model.MTable;
-import org.compiere.model.PO;
-import org.compiere.model.POInfo;
+import org.compiere.model.*;
 import org.compiere.util.Env;
-import org.compiere.util.KeyNamePair;
 
 /** Generated Model for TCS_AmortizationPlan
  *  @author iDempiere (generated) 
- *  @version Release 3.1 - $Id$ */
+ *  @version Release 5.1 - $Id$ */
 public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20170223L;
+	private static final long serialVersionUID = 20191023L;
 
     /** Standard Constructor */
     public X_TCS_AmortizationPlan (Properties ctx, int TCS_AmortizationPlan_ID, String trxName)
@@ -47,7 +41,7 @@ public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan
       super (ctx, TCS_AmortizationPlan_ID, trxName);
       /** if (TCS_AmortizationPlan_ID == 0)
         {
-			setAmortizationPlanNo (null);
+			setamortizationplanno (null);
 			setTCS_AmortizationPlan_ID (0);
         } */
     }
@@ -81,48 +75,48 @@ public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan
     }
 
 	/** Set Amortization Period.
-		@param AmortizationPeriod Amortization Period	  */
-	public void setAmortizationPeriod (int AmortizationPeriod)
+		@param amortizationperiod Amortization Period	  */
+	public void setamortizationperiod (int amortizationperiod)
 	{
-		set_Value (COLUMNNAME_AmortizationPeriod, Integer.valueOf(AmortizationPeriod));
+		set_Value (COLUMNNAME_amortizationperiod, Integer.valueOf(amortizationperiod));
 	}
 
 	/** Get Amortization Period.
 		@return Amortization Period	  */
-	public int getAmortizationPeriod () 
+	public int getamortizationperiod () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_AmortizationPeriod);
+		Integer ii = (Integer)get_Value(COLUMNNAME_amortizationperiod);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
 	}
 
 	/** Set Amortization Plan No.
-		@param AmortizationPlanNo Amortization Plan No	  */
-	public void setAmortizationPlanNo (String AmortizationPlanNo)
+		@param amortizationplanno Amortization Plan No	  */
+	public void setamortizationplanno (String amortizationplanno)
 	{
-		set_ValueNoCheck (COLUMNNAME_AmortizationPlanNo, AmortizationPlanNo);
+		set_Value (COLUMNNAME_amortizationplanno, amortizationplanno);
 	}
 
 	/** Get Amortization Plan No.
 		@return Amortization Plan No	  */
-	public String getAmortizationPlanNo () 
+	public String getamortizationplanno () 
 	{
-		return (String)get_Value(COLUMNNAME_AmortizationPlanNo);
+		return (String)get_Value(COLUMNNAME_amortizationplanno);
 	}
 
-	/** Set Amortization Start Date.
-		@param AmortizationStartDate Amortization Start Date	  */
-	public void setAmortizationStartDate (Timestamp AmortizationStartDate)
+	/** Set amortizationstartdate.
+		@param amortizationstartdate amortizationstartdate	  */
+	public void setamortizationstartdate (Timestamp amortizationstartdate)
 	{
-		set_Value (COLUMNNAME_AmortizationStartDate, AmortizationStartDate);
+		set_Value (COLUMNNAME_amortizationstartdate, amortizationstartdate);
 	}
 
-	/** Get Amortization Start Date.
-		@return Amortization Start Date	  */
-	public Timestamp getAmortizationStartDate () 
+	/** Get amortizationstartdate.
+		@return amortizationstartdate	  */
+	public Timestamp getamortizationstartdate () 
 	{
-		return (Timestamp)get_Value(COLUMNNAME_AmortizationStartDate);
+		return (Timestamp)get_Value(COLUMNNAME_amortizationstartdate);
 	}
 
 	public org.compiere.model.I_C_Activity getC_Activity() throws RuntimeException
@@ -349,31 +343,6 @@ public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan
 		return ii.intValue();
 	}
 
-	public I_C_ValidCombination getCredit_Account() throws RuntimeException
-    {
-		return (I_C_ValidCombination)MTable.get(getCtx(), I_C_ValidCombination.Table_Name)
-			.getPO(getCredit_Account_ID(), get_TrxName());	}
-
-	/** Set Credit Account.
-		@param Credit_Account_ID Credit Account	  */
-	public void setCredit_Account_ID (int Credit_Account_ID)
-	{
-		if (Credit_Account_ID < 1) 
-			set_Value (COLUMNNAME_Credit_Account_ID, null);
-		else 
-			set_Value (COLUMNNAME_Credit_Account_ID, Integer.valueOf(Credit_Account_ID));
-	}
-
-	/** Get Credit Account.
-		@return Credit Account	  */
-	public int getCredit_Account_ID () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_Credit_Account_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
 	public org.compiere.model.I_C_SalesRegion getC_SalesRegion() throws RuntimeException
     {
 		return (org.compiere.model.I_C_SalesRegion)MTable.get(getCtx(), org.compiere.model.I_C_SalesRegion.Table_Name)
@@ -430,6 +399,28 @@ public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan
 		return ii.intValue();
 	}
 
+	public I_C_ValidCombination getCredit_Account_A() throws RuntimeException
+    {
+		return (I_C_ValidCombination)MTable.get(getCtx(), I_C_ValidCombination.Table_Name)
+			.getPO(getCredit_Account_Acct(), get_TrxName());	}
+
+	/** Set Credit_Account_Acct.
+		@param Credit_Account_Acct Credit_Account_Acct	  */
+	public void setCredit_Account_Acct (int Credit_Account_Acct)
+	{
+		set_Value (COLUMNNAME_Credit_Account_Acct, Integer.valueOf(Credit_Account_Acct));
+	}
+
+	/** Get Credit_Account_Acct.
+		@return Credit_Account_Acct	  */
+	public int getCredit_Account_Acct () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Credit_Account_Acct);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Document Date.
 		@param DateDoc 
 		Date of the Document
@@ -447,26 +438,23 @@ public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan
 		return (Timestamp)get_Value(COLUMNNAME_DateDoc);
 	}
 
-	public I_C_ValidCombination getDebit_Account() throws RuntimeException
+	public I_C_ValidCombination getDebit_Account_A() throws RuntimeException
     {
 		return (I_C_ValidCombination)MTable.get(getCtx(), I_C_ValidCombination.Table_Name)
-			.getPO(getDebit_Account_ID(), get_TrxName());	}
+			.getPO(getDebit_Account_Acct(), get_TrxName());	}
 
-	/** Set Debit Account.
-		@param Debit_Account_ID Debit Account	  */
-	public void setDebit_Account_ID (int Debit_Account_ID)
+	/** Set Debit_Account_Acct.
+		@param Debit_Account_Acct Debit_Account_Acct	  */
+	public void setDebit_Account_Acct (int Debit_Account_Acct)
 	{
-		if (Debit_Account_ID < 1) 
-			set_Value (COLUMNNAME_Debit_Account_ID, null);
-		else 
-			set_Value (COLUMNNAME_Debit_Account_ID, Integer.valueOf(Debit_Account_ID));
+		set_Value (COLUMNNAME_Debit_Account_Acct, Integer.valueOf(Debit_Account_Acct));
 	}
 
-	/** Get Debit Account.
-		@return Debit Account	  */
-	public int getDebit_Account_ID () 
+	/** Get Debit_Account_Acct.
+		@return Debit_Account_Acct	  */
+	public int getDebit_Account_Acct () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_Debit_Account_ID);
+		Integer ii = (Integer)get_Value(COLUMNNAME_Debit_Account_Acct);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
@@ -490,17 +478,17 @@ public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan
 	}
 
 	/** Set Is Fully Amortized.
-		@param IsFullyAmortized Is Fully Amortized	  */
-	public void setIsFullyAmortized (boolean IsFullyAmortized)
+		@param isfullyamortized Is Fully Amortized	  */
+	public void setisfullyamortized (boolean isfullyamortized)
 	{
-		set_Value (COLUMNNAME_IsFullyAmortized, Boolean.valueOf(IsFullyAmortized));
+		set_Value (COLUMNNAME_isfullyamortized, Boolean.valueOf(isfullyamortized));
 	}
 
 	/** Get Is Fully Amortized.
 		@return Is Fully Amortized	  */
-	public boolean isFullyAmortized () 
+	public boolean isfullyamortized () 
 	{
-		Object oo = get_Value(COLUMNNAME_IsFullyAmortized);
+		Object oo = get_Value(COLUMNNAME_isfullyamortized);
 		if (oo != null) 
 		{
 			 if (oo instanceof Boolean) 
@@ -533,6 +521,28 @@ public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan
 	public int getM_Product_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_M_Product_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_C_Period getstart_period() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_Period)MTable.get(getCtx(), org.compiere.model.I_C_Period.Table_Name)
+			.getPO(getstart_period_id(), get_TrxName());	}
+
+	/** Set Start Period.
+		@param start_period_id Start Period	  */
+	public void setstart_period_id (int start_period_id)
+	{
+		set_Value (COLUMNNAME_start_period_id, Integer.valueOf(start_period_id));
+	}
+
+	/** Get Start Period.
+		@return Start Period	  */
+	public int getstart_period_id () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_start_period_id);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
@@ -578,19 +588,11 @@ public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan
 		return ii.intValue();
 	}
 
-    /** Get Record ID/ColumnName
-        @return ID/ColumnName pair
-      */
-    public KeyNamePair getKeyNamePair() 
-    {
-        return new KeyNamePair(get_ID(), String.valueOf(getTCS_AmortizationPlan_ID()));
-    }
-
 	/** Set TCS_AmortizationPlan_UU.
 		@param TCS_AmortizationPlan_UU TCS_AmortizationPlan_UU	  */
 	public void setTCS_AmortizationPlan_UU (String TCS_AmortizationPlan_UU)
 	{
-		set_Value (COLUMNNAME_TCS_AmortizationPlan_UU, TCS_AmortizationPlan_UU);
+		set_ValueNoCheck (COLUMNNAME_TCS_AmortizationPlan_UU, TCS_AmortizationPlan_UU);
 	}
 
 	/** Get TCS_AmortizationPlan_UU.

@@ -18,21 +18,21 @@ package id.tcs.model;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-
-import org.compiere.model.I_C_ValidCombination;
+import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for TCS_AmortizationPlan
  *  @author iDempiere (generated) 
- *  @version Release 3.1
+ *  @version Release 5.1
  */
+@SuppressWarnings("all")
 public interface I_TCS_AmortizationPlan 
 {
 
     /** TableName=TCS_AmortizationPlan */
     public static final String Table_Name = "TCS_AmortizationPlan";
 
-    /** AD_Table_ID=300189 */
+    /** AD_Table_ID=300530 */
     public static final int Table_ID = 300530;
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -64,32 +64,32 @@ public interface I_TCS_AmortizationPlan
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name AmortizationPeriod */
-    public static final String COLUMNNAME_AmortizationPeriod = "AmortizationPeriod";
+    /** Column name amortizationperiod */
+    public static final String COLUMNNAME_amortizationperiod = "amortizationperiod";
 
 	/** Set Amortization Period	  */
-	public void setAmortizationPeriod (int AmortizationPeriod);
+	public void setamortizationperiod (int amortizationperiod);
 
 	/** Get Amortization Period	  */
-	public int getAmortizationPeriod();
+	public int getamortizationperiod();
 
-    /** Column name AmortizationPlanNo */
-    public static final String COLUMNNAME_AmortizationPlanNo = "AmortizationPlanNo";
+    /** Column name amortizationplanno */
+    public static final String COLUMNNAME_amortizationplanno = "amortizationplanno";
 
 	/** Set Amortization Plan No	  */
-	public void setAmortizationPlanNo (String AmortizationPlanNo);
+	public void setamortizationplanno (String amortizationplanno);
 
 	/** Get Amortization Plan No	  */
-	public String getAmortizationPlanNo();
+	public String getamortizationplanno();
 
-    /** Column name AmortizationStartDate */
-    public static final String COLUMNNAME_AmortizationStartDate = "AmortizationStartDate";
+    /** Column name amortizationstartdate */
+    public static final String COLUMNNAME_amortizationstartdate = "amortizationstartdate";
 
-	/** Set Amortization Start Date	  */
-	public void setAmortizationStartDate (Timestamp AmortizationStartDate);
+	/** Set amortizationstartdate	  */
+	public void setamortizationstartdate (Timestamp amortizationstartdate);
 
-	/** Get Amortization Start Date	  */
-	public Timestamp getAmortizationStartDate();
+	/** Get amortizationstartdate	  */
+	public Timestamp getamortizationstartdate();
 
     /** Column name C_Activity_ID */
     public static final String COLUMNNAME_C_Activity_ID = "C_Activity_ID";
@@ -211,33 +211,6 @@ public interface I_TCS_AmortizationPlan
 
 	public org.compiere.model.I_C_Project getC_Project() throws RuntimeException;
 
-    /** Column name Created */
-    public static final String COLUMNNAME_Created = "Created";
-
-	/** Get Created.
-	  * Date this record was created
-	  */
-	public Timestamp getCreated();
-
-    /** Column name CreatedBy */
-    public static final String COLUMNNAME_CreatedBy = "CreatedBy";
-
-	/** Get Created By.
-	  * User who created this records
-	  */
-	public int getCreatedBy();
-
-    /** Column name Credit_Account_ID */
-    public static final String COLUMNNAME_Credit_Account_ID = "Credit_Account_ID";
-
-	/** Set Credit Account	  */
-	public void setCredit_Account_ID (int Credit_Account_ID);
-
-	/** Get Credit Account	  */
-	public int getCredit_Account_ID();
-
-	public I_C_ValidCombination getCredit_Account() throws RuntimeException;
-
     /** Column name C_SalesRegion_ID */
     public static final String COLUMNNAME_C_SalesRegion_ID = "C_SalesRegion_ID";
 
@@ -268,6 +241,33 @@ public interface I_TCS_AmortizationPlan
 
 	public org.compiere.model.I_C_SubAcct getC_SubAcct() throws RuntimeException;
 
+    /** Column name Created */
+    public static final String COLUMNNAME_Created = "Created";
+
+	/** Get Created.
+	  * Date this record was created
+	  */
+	public Timestamp getCreated();
+
+    /** Column name CreatedBy */
+    public static final String COLUMNNAME_CreatedBy = "CreatedBy";
+
+	/** Get Created By.
+	  * User who created this records
+	  */
+	public int getCreatedBy();
+
+    /** Column name Credit_Account_Acct */
+    public static final String COLUMNNAME_Credit_Account_Acct = "Credit_Account_Acct";
+
+	/** Set Credit_Account_Acct	  */
+	public void setCredit_Account_Acct (int Credit_Account_Acct);
+
+	/** Get Credit_Account_Acct	  */
+	public int getCredit_Account_Acct();
+
+	public I_C_ValidCombination getCredit_Account_A() throws RuntimeException;
+
     /** Column name DateDoc */
     public static final String COLUMNNAME_DateDoc = "DateDoc";
 
@@ -281,16 +281,16 @@ public interface I_TCS_AmortizationPlan
 	  */
 	public Timestamp getDateDoc();
 
-    /** Column name Debit_Account_ID */
-    public static final String COLUMNNAME_Debit_Account_ID = "Debit_Account_ID";
+    /** Column name Debit_Account_Acct */
+    public static final String COLUMNNAME_Debit_Account_Acct = "Debit_Account_Acct";
 
-	/** Set Debit Account	  */
-	public void setDebit_Account_ID (int Debit_Account_ID);
+	/** Set Debit_Account_Acct	  */
+	public void setDebit_Account_Acct (int Debit_Account_Acct);
 
-	/** Get Debit Account	  */
-	public int getDebit_Account_ID();
+	/** Get Debit_Account_Acct	  */
+	public int getDebit_Account_Acct();
 
-	public I_C_ValidCombination getDebit_Account() throws RuntimeException;
+	public I_C_ValidCombination getDebit_Account_A() throws RuntimeException;
 
     /** Column name Description */
     public static final String COLUMNNAME_Description = "Description";
@@ -318,14 +318,14 @@ public interface I_TCS_AmortizationPlan
 	  */
 	public boolean isActive();
 
-    /** Column name IsFullyAmortized */
-    public static final String COLUMNNAME_IsFullyAmortized = "IsFullyAmortized";
+    /** Column name isfullyamortized */
+    public static final String COLUMNNAME_isfullyamortized = "isfullyamortized";
 
 	/** Set Is Fully Amortized	  */
-	public void setIsFullyAmortized (boolean IsFullyAmortized);
+	public void setisfullyamortized (boolean isfullyamortized);
 
 	/** Get Is Fully Amortized	  */
-	public boolean isFullyAmortized();
+	public boolean isfullyamortized();
 
     /** Column name M_Product_ID */
     public static final String COLUMNNAME_M_Product_ID = "M_Product_ID";
@@ -341,6 +341,17 @@ public interface I_TCS_AmortizationPlan
 	public int getM_Product_ID();
 
 	public org.compiere.model.I_M_Product getM_Product() throws RuntimeException;
+
+    /** Column name start_period_id */
+    public static final String COLUMNNAME_start_period_id = "start_period_id";
+
+	/** Set Start Period	  */
+	public void setstart_period_id (int start_period_id);
+
+	/** Get Start Period	  */
+	public int getstart_period_id();
+
+	public org.compiere.model.I_C_Period getstart_period() throws RuntimeException;
 
     /** Column name StdPrecision */
     public static final String COLUMNNAME_StdPrecision = "StdPrecision";

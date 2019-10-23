@@ -34,7 +34,7 @@ public class TCS_CalculateAmortizationPlan extends SvrProcess{
 		
 		BigDecimal totalAmt = amortizationPlan.getTotalAmt();
 		int stdPrecision = amortizationPlan.getStdPrecision().intValue();
-		int numberOfPeriod = amortizationPlan.getAmortizationPeriod();
+		int numberOfPeriod = amortizationPlan.getamortizationperiod();
 		
 		if(totalAmt.compareTo(Env.ZERO) == 0)
 			throw new AdempiereException("Total Amount cant be zero");
@@ -134,8 +134,8 @@ public class TCS_CalculateAmortizationPlan extends SvrProcess{
 			line.setC_LocFrom_ID(amortizationPlan.getC_LocFrom_ID());
 			line.setC_LocTo_ID(amortizationPlan.getC_LocTo_ID());
 			line.setM_Product_ID(amortizationPlan.getM_Product_ID());
-			line.setDebit_Account_ID(amortizationPlan.getDebit_Account_ID());
-			line.setCredit_Account_ID(amortizationPlan.getCredit_Account_ID());
+			line.setDebit_Account_Acct(amortizationPlan.getDebit_Account_Acct());
+			line.setCredit_Account_Acct(amortizationPlan.getCredit_Account_Acct());
 			line.setC_SubAcct_ID(amortizationPlan.getC_SubAcct_ID());
 			line.setDescription(amortizationPlan.getDescription());
 			//line.setC_Period_ID(nextPeriod.getC_Period_ID());

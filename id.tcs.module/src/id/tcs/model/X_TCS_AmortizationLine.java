@@ -23,7 +23,6 @@ import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.Env;
-import org.compiere.util.KeyNamePair;
 
 /** Generated Model for TCS_AmortizationLine
  *  @author iDempiere (generated) 
@@ -34,7 +33,7 @@ public class X_TCS_AmortizationLine extends PO implements I_TCS_AmortizationLine
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190115L;
+	private static final long serialVersionUID = 20191023L;
 
     /** Standard Constructor */
     public X_TCS_AmortizationLine (Properties ctx, int TCS_AmortizationLine_ID, String trxName)
@@ -374,26 +373,23 @@ public class X_TCS_AmortizationLine extends PO implements I_TCS_AmortizationLine
 		return ii.intValue();
 	}
 
-	public I_C_ValidCombination getCredit_Account() throws RuntimeException
+	public I_C_ValidCombination getCredit_Account_A() throws RuntimeException
     {
 		return (I_C_ValidCombination)MTable.get(getCtx(), I_C_ValidCombination.Table_Name)
-			.getPO(getCredit_Account_ID(), get_TrxName());	}
+			.getPO(getCredit_Account_Acct(), get_TrxName());	}
 
-	/** Set Credit Account.
-		@param Credit_Account_ID Credit Account	  */
-	public void setCredit_Account_ID (int Credit_Account_ID)
+	/** Set Credit_Account_Acct.
+		@param Credit_Account_Acct Credit_Account_Acct	  */
+	public void setCredit_Account_Acct (int Credit_Account_Acct)
 	{
-		if (Credit_Account_ID < 1) 
-			set_Value (COLUMNNAME_Credit_Account_ID, null);
-		else 
-			set_Value (COLUMNNAME_Credit_Account_ID, Integer.valueOf(Credit_Account_ID));
+		set_Value (COLUMNNAME_Credit_Account_Acct, Integer.valueOf(Credit_Account_Acct));
 	}
 
-	/** Get Credit Account.
-		@return Credit Account	  */
-	public int getCredit_Account_ID () 
+	/** Get Credit_Account_Acct.
+		@return Credit_Account_Acct	  */
+	public int getCredit_Account_Acct () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_Credit_Account_ID);
+		Integer ii = (Integer)get_Value(COLUMNNAME_Credit_Account_Acct);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
@@ -416,26 +412,23 @@ public class X_TCS_AmortizationLine extends PO implements I_TCS_AmortizationLine
 		return (Timestamp)get_Value(COLUMNNAME_DateAcct);
 	}
 
-	public I_C_ValidCombination getDebit_Account() throws RuntimeException
+	public I_C_ValidCombination getDebit_Account_A() throws RuntimeException
     {
 		return (I_C_ValidCombination)MTable.get(getCtx(), I_C_ValidCombination.Table_Name)
-			.getPO(getDebit_Account_ID(), get_TrxName());	}
+			.getPO(getDebit_Account_Acct(), get_TrxName());	}
 
-	/** Set Debit Account.
-		@param Debit_Account_ID Debit Account	  */
-	public void setDebit_Account_ID (int Debit_Account_ID)
+	/** Set Debit_Account_Acct.
+		@param Debit_Account_Acct Debit_Account_Acct	  */
+	public void setDebit_Account_Acct (int Debit_Account_Acct)
 	{
-		if (Debit_Account_ID < 1) 
-			set_Value (COLUMNNAME_Debit_Account_ID, null);
-		else 
-			set_Value (COLUMNNAME_Debit_Account_ID, Integer.valueOf(Debit_Account_ID));
+		set_Value (COLUMNNAME_Debit_Account_Acct, Integer.valueOf(Debit_Account_Acct));
 	}
 
-	/** Get Debit Account.
-		@return Debit Account	  */
-	public int getDebit_Account_ID () 
+	/** Get Debit_Account_Acct.
+		@return Debit_Account_Acct	  */
+	public int getDebit_Account_Acct () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_Debit_Account_ID);
+		Integer ii = (Integer)get_Value(COLUMNNAME_Debit_Account_Acct);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
@@ -544,9 +537,9 @@ public class X_TCS_AmortizationLine extends PO implements I_TCS_AmortizationLine
 		return (String)get_Value(COLUMNNAME_TCS_AmortizationLine_UU);
 	}
 
-	public id.tcs.model.I_TCS_AmortizationPlan getTCS_AmortizationPlan() throws RuntimeException
+	public I_TCS_AmortizationPlan getTCS_AmortizationPlan() throws RuntimeException
     {
-		return (id.tcs.model.I_TCS_AmortizationPlan)MTable.get(getCtx(), id.tcs.model.I_TCS_AmortizationPlan.Table_Name)
+		return (I_TCS_AmortizationPlan)MTable.get(getCtx(), I_TCS_AmortizationPlan.Table_Name)
 			.getPO(getTCS_AmortizationPlan_ID(), get_TrxName());	}
 
 	/** Set TCS_AmortizationPlan.
@@ -569,17 +562,9 @@ public class X_TCS_AmortizationLine extends PO implements I_TCS_AmortizationLine
 		return ii.intValue();
 	}
 
-    /** Get Record ID/ColumnName
-        @return ID/ColumnName pair
-      */
-    public KeyNamePair getKeyNamePair() 
+	public I_TCS_AmortizationRun getTCS_AmortizationRun() throws RuntimeException
     {
-        return new KeyNamePair(get_ID(), String.valueOf(getTCS_AmortizationPlan_ID()));
-    }
-
-	public id.tcs.model.I_TCS_AmortizationRun getTCS_AmortizationRun() throws RuntimeException
-    {
-		return (id.tcs.model.I_TCS_AmortizationRun)MTable.get(getCtx(), id.tcs.model.I_TCS_AmortizationRun.Table_Name)
+		return (I_TCS_AmortizationRun)MTable.get(getCtx(), I_TCS_AmortizationRun.Table_Name)
 			.getPO(getTCS_AmortizationRun_ID(), get_TrxName());	}
 
 	/** Set TCS_AmortizationRun.
