@@ -16,6 +16,7 @@ import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MRequisition;
 import org.compiere.model.MRfQ;
+import org.compiere.model.MRfQLine;
 import org.compiere.model.X_AD_WF_Activity;
 import org.compiere.util.CLogger;
 import org.compiere.wf.MWFActivity;
@@ -34,6 +35,7 @@ import id.tcs.validator.TCS_PaymentAllocateValidator;
 import id.tcs.validator.TCS_PaymentValidator;
 import id.tcs.validator.TCS_QuotationLineValidator;
 import id.tcs.validator.TCS_QuotationValidator;
+import id.tcs.validator.TCS_RFQLineValidator;
 import id.tcs.validator.TCS_RequisitionValidator;
 import id.tcs.validator.TCS_RfQValidator;
 import id.tcs.validator.TCS_WFActivityValidator;
@@ -85,6 +87,7 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, MMovement.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, MMovement.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, MMovement.Table_Name);
+		registerTableEvent(IEventTopics.PO_BEFORE_DELETE, MRfQLine.Table_Name);
 		log.info("PROJECT MANAGEMENT EVENT MANAGER // INITIALIZED");
 	}
 
@@ -147,6 +150,9 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		}
 		else if(getPO(event).get_TableName().equals(MMovement.Table_Name)) {
 			msg = TCS_MovementValidator.executeEvent(event, getPO(event));
+		}
+		else if(getPO(event).get_TableName().equals(MRfQLine.Table_Name)) {
+			msg = TCS_RFQLineValidator.executeEvent(event, getPO(event));
 		}
 
 		if (msg.length() > 0)
