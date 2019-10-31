@@ -1,9 +1,11 @@
 package id.tcs.model;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.Query;
 
 public class MTCSAmortizationLine extends X_TCS_AmortizationLine{
 
@@ -31,10 +33,13 @@ public class MTCSAmortizationLine extends X_TCS_AmortizationLine{
 	{
 		if(getTCS_AmortizationRun_ID() > 0){
 			MTCSAmortizationRun aRun = (MTCSAmortizationRun) getTCS_AmortizationRun();
-			aRun.setGrandTotal(aRun.getGrandTotal().add(getAmtAcct()));
+
+			String sql = "TCS_AmortizationRun_ID="+getTCS_AmortizationRun_ID();
+			BigDecimal gTotal = new Query(getCtx(), Table_Name, sql, get_TrxName())
+								.sum("AmtAcct");
+			aRun.setGrandTotal(gTotal);
 			aRun.saveEx();
 		}
-		
 		return true;
 	}
 	
