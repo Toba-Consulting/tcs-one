@@ -132,7 +132,7 @@ public class TCSAllocation
 			+ "c.ISO_Code,p.PayAmt,"                            //  5..6
 			+ "currencyConvert(p.PayAmt,p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"//  7   #1, #2
 			+ "currencyConvert(paymentAvailable(C_Payment_ID),p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"  //  8   #3, #4
-			+ "p.MultiplierAP, cd.name "
+			+ "p.MultiplierAP, cd.name, p.description "
 			+ "FROM C_Payment_v p"		//	Corrected for AP/AR
 			+ " INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID) "
 			//@tegar
@@ -188,7 +188,7 @@ public class TCSAllocation
 				//@tegar
 				line.add(rs.getString(10));							// 	7/9-Doctype
 				//end
-				
+				line.add(rs.getString(11));							// Description
 				//line.add(rs.getBigDecimal(8));
 				data.add(line);
 			}
@@ -224,6 +224,7 @@ public class TCSAllocation
 		//@tegar
 		columnNames.add(Msg.getMsg(Env.getCtx(), "DocType"));
 		//end
+		columnNames.add(Msg.getMsg(Env.getCtx(), "Description"));
 		//columnNames.add(" ");	//	Multiplier
 		
 		return columnNames;
@@ -248,6 +249,9 @@ public class TCSAllocation
 		//@tegar
 		paymentTable.setColumnClass(i++, String.class, true); 	     	//  9-Doct Type
 		//end
+		
+		paymentTable.setColumnClass(i++, String.class, true); 			// 10-Description
+		
 		paymentTable.setColumnClass(i++, String.class, true);
 		//paymentTable.setColumnClass(i++, BigDecimal.class, true);     
 
@@ -284,7 +288,7 @@ public class TCSAllocation
 			+ "currencyConvert(invoiceOpen(C_Invoice_ID,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.MultiplierAP, "  //  8   #3, #4  Converted Open
 			+ "currencyConvert(invoiceDiscount"                               //  9       AllowedDiscount
 			+ "(i.C_Invoice_ID,?,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.Multiplier*i.MultiplierAP,"  //9             //  #5, #6
-			+ " i.MultiplierAP,cd.name, i.dateacct"//10..12
+			+ " i.MultiplierAP,cd.name, i.dateacct, i.description "//10..12
 			+ " FROM C_Invoice_v i"		//  corrected for CM/Split
 			+ " INNER JOIN C_Currency c ON (i.C_Currency_ID=c.C_Currency_ID) "
 			//@tegar
@@ -354,7 +358,8 @@ public class TCSAllocation
 				line.add(rs.getString(11));						//	10/12-docttype
 				//end
 				line.add(rs.getTimestamp(12));					//   11/13-dateacct
-
+				
+				line.add(rs.getString(13));						//	 Description
 				//line.add(rs.getBigDecimal(9));		
 				//	Add when open <> 0 (i.e. not if no conversion rate)
 				if (Env.ZERO.compareTo(open) != 0)
@@ -399,6 +404,7 @@ public class TCSAllocation
 		columnNames.add("Date Accounting");
 		//columnNames.add(" ");	//	Multiplier
 		
+		columnNames.add(Msg.getMsg(Env.getCtx(), "Description"));
 		return columnNames;
 	}
 	
@@ -425,7 +431,7 @@ public class TCSAllocation
 		
 		invoiceTable.setColumnClass(i++, Timestamp.class, true);		// 13 - Date Acct
 		
-		
+		invoiceTable.setColumnClass(i++, String.class, true);
 
 //		invoiceTable.setColumnClass(i++, BigDecimal.class, true);      	//  12-Multiplier
 		//  Table UI
