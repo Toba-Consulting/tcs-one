@@ -38,7 +38,9 @@ import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 import id.tcs.model.I_M_MatchRequest;
+
 import org.compiere.model.I_TCS_AllocateCharge;
+
 import id.tcs.model.MBankTransfer;
 import id.tcs.model.MInquiry;
 import id.tcs.model.MInquiryLine;
@@ -59,6 +61,7 @@ import id.tcs.model.TCS_MRfQResponseLineQty;
 import id.tcs.model.TCS_MRfQTopic;
 import id.tcs.model.TCS_MRfQTopicSubscriber;
 import id.tcs.model.TCS_MRfQTopicSubscriberOnly;
+import id.tcs.model.X_M_MatchQuotation;
 
 
 
@@ -109,6 +112,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MRfQTopicSubscriber.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriber");
 		mapTableModels.put(TCS_MRfQTopicSubscriberOnly.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriberOnly");
 		mapTableModels.put(TCS_MDDOrder.Table_Name, "id.tcs.model.TCS_MDDOrder");
+		mapTableModels.put(X_M_MatchQuotation.Table_Name, "id.tcs.model.X_M_MatchQuotation");
 		
 	}
 	
