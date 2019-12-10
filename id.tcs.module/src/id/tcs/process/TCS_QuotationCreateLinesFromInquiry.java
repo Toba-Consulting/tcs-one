@@ -66,14 +66,15 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 		MQuotation quot = new MQuotation(getCtx(), p_C_Quotation_ID, get_TrxName());
 		MInquiryLine [] inqLines = inq.getLines();
 		
-		//Validate : Check inquiry has quotation
-		String sqlWhere = " C_Inquiry_ID=? AND C_Quotation_ID IS NOT NULL";
-		boolean check = new Query(getCtx(), X_M_MatchQuotation.Table_Name, sqlWhere, get_TrxName())
-		.setParameters(inq.get_ID()).match();
-
-		if (check) {
-			throw new AdempiereException("Inquiry already has Quotation");
-		}
+		//TCS 2019-12-10 - commented to allow partial qty
+//		//Validate : Check inquiry has quotation
+//		String sqlWhere = " C_Inquiry_ID=? AND C_Quotation_ID IS NOT NULL";
+//		boolean check = new Query(getCtx(), X_M_MatchQuotation.Table_Name, sqlWhere, get_TrxName())
+//				.setParameters(inquiry.get_ID()).match();
+//		
+//		if (check) {
+//			throw new AdempiereException("Inquiry already has Quotation");
+//		}
 		
 //		MPriceList priceList = new MPriceList(getCtx(), p_M_PriceList_ID, get_TrxName());
 		if (inqLines.length == 0) 
@@ -127,9 +128,20 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 			}
 		}
 		
+		//if no line is created throw error insted
+		boolean createC_Quotation = false;
 
 		//For each inquiry line create new quotation line
 		for (MInquiryLine inqLine : inqLines) {
+			
+			BigDecimal sumMatch = new Query(getCtx(), X_M_MatchQuotation.Table_Name, "C_InquiryLine_ID="+inqLine.get_ID(), get_TrxName())
+			.sum(X_M_MatchQuotation.COLUMNNAME_QtyOrdered);
+
+			BigDecimal inqLineAvaibleQty = inqLine.getQty().subtract(sumMatch);
+			if (inqLineAvaibleQty.compareTo(Env.ZERO)<=0) {
+				continue;
+			}
+
 			MQuotationLine quoLine = new MQuotationLine(quot);
 			
 			//if inquiry line not new item
@@ -194,8 +206,10 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 				
 				quoLine.setProduct(inqLine.getProduct());
 				quoLine.setM_Product_ID(inqLine.getM_Product_ID());
-				quoLine.setQtyEntered(inqLine.getQty());
-				quoLine.setQtyOrdered(inqLine.getQty());
+//				quoLine.setQtyEntered(inqLine.getQty());
+//				quoLine.setQtyOrdered(inqLine.getQty());
+				quoLine.setQtyEntered(inqLineAvaibleQty);
+				quoLine.setQtyOrdered(inqLineAvaibleQty);
 			}
 			
 			//if inquiry line is new item
@@ -242,8 +256,10 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 //				quot.set_ValueOfColumn("DeliveryDays", resp.getDeliveryDays());
 				quot.saveEx();
 				quoLine.setDescription(inqLine.getDescription());
-				quoLine.setQtyEntered(inqLine.getQty());
-				quoLine.setQtyOrdered(inqLine.getQty());
+//				quoLine.setQtyEntered(inqLine.getQty());
+//				quoLine.setQtyOrdered(inqLine.getQty());
+				quoLine.setQtyEntered(inqLineAvaibleQty);
+				quoLine.setQtyOrdered(inqLineAvaibleQty);
 //				}catch(Exception e){
 //					e.printStackTrace();
 //				}
@@ -282,10 +298,19 @@ public class TCS_QuotationCreateLinesFromInquiry extends SvrProcess{
 			match.setC_Inquiry_ID(p_C_Inquiry_ID);
 			match.setC_InquiryLine_ID(inqLine.getC_InquiryLine_ID());
 			match.setDateTrx(quot.getDateOrdered());
-			match.setQtyOrdered(quoLine.getQtyOrdered());
+//			match.setQtyOrdered(quoLine.getQtyOrdered());
+			match.setQtyOrdered(inqLineAvaibleQty);
 			match.saveEx();
+			
+			if (!createC_Quotation) 
+				createC_Quotation=true;
+
 		}
 		
+		if (!createC_Quotation) {
+			throw new AdempiereException("no lines created");
+		}
+
 		return null;
 	}
 }
