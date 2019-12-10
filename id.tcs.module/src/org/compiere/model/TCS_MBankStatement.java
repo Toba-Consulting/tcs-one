@@ -54,6 +54,9 @@ public class TCS_MBankStatement extends MBankStatement implements DocOptions{
 		if (m_processMsg != null)
 			return false;		
 		
+		//	Std Period open?
+		MPeriod.testPeriodOpen(getCtx(), getStatementDate(), MDocType.DOCBASETYPE_BankStatement, getAD_Org_ID());
+
 		//@win TODO: add check if there are bank statement record with date after current one that is completed.
 		StringBuilder whereClause = new StringBuilder("C_BankAccount_ID=")
 				.append(getC_BankAccount_ID())
