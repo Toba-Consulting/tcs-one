@@ -724,7 +724,7 @@ public class TCSAllocation
 		alloc.setC_DocType_ID(m_C_DocType_ID);
 		//@tegar
 		//alloc.setDescription(alloc.getDescriptionForManualAllocation(m_C_BPartner_ID, trxName));
-		alloc.setDescription(Description+" ("+alloc.getDescriptionForManualAllocation(m_C_BPartner_ID, trxName)+")");
+		alloc.setDescription(Description.toString());
 		//end
 		alloc.saveEx();
 		//	For all invoices
