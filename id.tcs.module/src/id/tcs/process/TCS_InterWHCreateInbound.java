@@ -187,8 +187,21 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		inbound.setDocAction(DocAction.ACTION_Complete);
 		inbound.setDD_Order_ID(interWH.getDD_Order_ID());
 		inbound.setC_Project_ID(interWH.getC_Project_ID());
+		inbound.setC_BPartner_ID(outbound.getC_BPartner_ID());
+		inbound.setC_BPartner_Location_ID(outbound.getC_BPartner_Location_ID());
+		inbound.setM_Shipper_ID(outbound.getM_Shipper_ID());
+		inbound.setAD_User_ID(outbound.getAD_User_ID());
 		inbound.set_ValueOfColumn("IsInbound", "Y");
 		inbound.set_ValueOfColumn("M_OutBoundFrom_ID", p_M_MovementOutBound_ID);
+		inbound.set_ValueOfColumn("kendaraan", outbound.get_Value("kendaraan"));
+		inbound.set_ValueOfColumn("Pengirim", outbound.get_Value("Pengirim"));
+		inbound.set_ValueOfColumn("driver", outbound.get_Value("driver"));
+		inbound.set_ValueOfColumn("datesendmovement", outbound.get_Value("datesendmovement"));
+		inbound.set_ValueOfColumn("datereceivedmovement", outbound.get_Value("datereceivedmovement"));
+		inbound.set_ValueOfColumn("salesrep_id", outbound.get_Value("salesrep_id"));
+		inbound.set_ValueOfColumn("c_order_id", outbound.get_Value("c_order_id"));
+		inbound.set_ValueOfColumn("salesrep_id", outbound.get_Value("salesrep_id"));
+		inbound.set_ValueOfColumn("salesrep_id", outbound.get_Value("salesrep_id"));
 		inbound.saveEx();
 		
 		//Create inbound movement lines

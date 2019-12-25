@@ -3,11 +3,13 @@ package id.tcs.validator;
 import java.math.BigDecimal;
 
 import org.adempiere.base.event.IEventTopics;
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MMovement;
 import org.compiere.model.MMovementLine;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.util.Env;
 import org.eevolution.model.MDDOrder;
 import org.eevolution.model.MDDOrderLine;
 import org.osgi.service.event.Event;
@@ -19,6 +21,7 @@ public class TCS_MovementValidator {
 		MMovement move = (MMovement) po;
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
 			msg += checkUsedDDOrderLineQty(move);
+			msg += updateQtyOutBoundInBound(move);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL) ||
 				event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT)) {
@@ -27,6 +30,28 @@ public class TCS_MovementValidator {
 		return msg;
 	}
 	
+	private static String updateQtyOutBoundInBound(MMovement move) {
+		MMovementLine [] moveLines = move.getLines(true);
+		for(MMovementLine line : moveLines) {
+			MDDOrderLine DDOLine = new MDDOrderLine(move.getCtx(), line.getDD_OrderLine_ID(), move.get_TrxName());
+			if(move.get_ValueAsBoolean("isOutBound") == true) {
+				if(DDOLine.getM_Product().equals(line.getM_Product_ID())) {
+					BigDecimal currQtyOutBound = (BigDecimal) DDOLine.get_Value("qtyoutbound");
+
+					DDOLine.set_ValueOfColumn("qtyoutbound", currQtyOutBound.add(line.getMovementQty()));				
+				}
+			}
+			else if(move.get_ValueAsBoolean("isInBound") == true) {
+				if(DDOLine.getM_Product().equals(line.getM_Product_ID())) {
+					BigDecimal currQtyInBound = (BigDecimal) DDOLine.get_Value("qtyinbound");
+					
+					DDOLine.set_ValueOfColumn("qtyinbound", currQtyInBound.add(line.getMovementQty()));									
+				}
+			}
+		}
+		return "";
+	}
+
 	//If M_MovementLine.DD_OrderLine_ID is not null
 	//check new (M_MovementLine + SUM QtyEntered FROM M_MovementLine BY DD_OrderLine_ID) <= DD_OrderLine.QtyEntered
 	private static String checkUsedDDOrderLineQty(MMovement move){

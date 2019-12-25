@@ -32,7 +32,8 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 	private int p_Locator = 0;
 	private int p_C_DocType_ID = 0;
 	private int p_DD_Order_ID = 0;
-//	private Timestamp p_MovementDate = null;
+
+
 	
 	protected void prepare() {
 		
@@ -46,14 +47,11 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			
 			else if (name.equals("C_DocType_ID"))
 				p_C_DocType_ID = para[i].getParameterAsInt();
-			/*
-			else if (name.equals("MovementDate"))
-				p_MovementDate = para[i].getParameterAsTimestamp();
-			*/
+			else if (name.equals("DD_Order_ID"))
+				p_DD_Order_ID = para[i].getParameterAsInt();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
-		p_DD_Order_ID = getRecord_ID();
 	}
 
 	protected String doIt() throws Exception {
@@ -115,6 +113,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			return "Error: No Source Locator Selected";
 		} else {
 			MLocator locator = new MLocator(getCtx(), p_Locator, get_TrxName());
+
 			if (locator.getM_Warehouse_ID()!= interWH.getM_Warehouse_ID()) {
 				return "Error: Selected Locator Is Not in The Source Warehouse";
 			}
@@ -157,6 +156,9 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		}
 		outbound.setMovementDate(new Timestamp(System.currentTimeMillis()));
 		outbound.setC_Project_ID(interWH.getC_Project_ID());
+		outbound.setC_BPartner_ID(interWH.getC_BPartner_ID());
+		outbound.setC_BPartner_Location_ID(interWH.getC_BPartner_Location_ID());
+		outbound.setM_Shipper_ID(interWH.getM_Shipper_ID());
 		outbound.setDocAction(DocAction.ACTION_Complete);
 		outbound.setDocStatus(DocAction.STATUS_Drafted);
 		outbound.setC_DocType_ID(p_C_DocType_ID);
