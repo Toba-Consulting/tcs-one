@@ -1291,6 +1291,7 @@ boolean isNewProductDes = false;
 		
 		if(mField.getColumnName().equals(MQuotationLine.COLUMNNAME_Discount)){
 			msg += total(ctx, WindowNo, mTab, mField, value);
+			msg += amt(ctx, WindowNo, mTab, mField, oldValue);
 			return msg;
 		}
 		else if(mField.getColumnName().equals(MQuotationLine.COLUMNNAME_M_Product_ID)){
