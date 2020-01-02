@@ -18,6 +18,9 @@ public class TCS_CalloutAssetAddition implements IColumnCallout{
 		if(mField.getColumnName().equals("A_CapvsExp"))
 			return setUseLifeYears(ctx, WindowNo, mTab, mField, value, oldValue);
 		
+		if(mField.getColumnName().equals("A_Asset_Group_ID"))
+			return setUseLifeYears(ctx, WindowNo, mTab, mField, value, oldValue);
+		
 		if(mField.getColumnName().equals("A_CreateAsset"))
 			return setUseLifeYears(ctx, WindowNo, mTab, mField, value, oldValue);
 		
@@ -43,7 +46,8 @@ public class TCS_CalloutAssetAddition implements IColumnCallout{
 			return "";
 		
 		//to set use life years based on asset group acct
-		if(value.equals(MAssetAddition.A_CAPVSEXP_Capital) && mTab.getValueAsBoolean("A_CreateAsset")) {
+		if(value.equals(MAssetAddition.A_CAPVSEXP_Capital) && mTab.getValueAsBoolean("A_CreateAsset") || 
+				mTab.getValueAsBoolean("A_CreateAsset") && mTab.getValue("A_CapvsExp").equals(MAssetAddition.A_CAPVSEXP_Capital)) {
 			String sqlUseLifeYears =
 					"SELECT UseLifeYears FROM "
 				  + "A_Asset_Group_Acct "
@@ -59,7 +63,7 @@ public class TCS_CalloutAssetAddition implements IColumnCallout{
 			
 			mTab.setValue("UseLifeYears", useLifeYears);
 			mTab.setValue("UseLifeYears_F", useLifeYears_F);	
-		}	
+		}
 		//set use life years to 0 if capital/expense = expense or create asset = 'N'
 		else if(value.equals(MAssetAddition.A_CAPVSEXP_Expense) || !mTab.getValueAsBoolean("A_CreateAsset")){
 			mTab.setValue("UseLifeYears", 0);
