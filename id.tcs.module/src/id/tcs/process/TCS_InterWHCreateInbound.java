@@ -69,9 +69,12 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			return "Error: No Selected Inter-warehouse Document";
 		}
 		
-		
 		if (p_M_MovementOutBound_ID <= 0) {
 			return "Error: No Outbound Document";
+		}
+
+		if (p_MovementDate == null) {
+			return "Error: No Movement Date";
 		}
 		
 		//Validate status of InterWarehouse Movement= CO

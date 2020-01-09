@@ -64,6 +64,10 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			return "Error: No Selected Inter-warehouse Document";
 		}
 		
+		if (p_MovementDate == null) {
+			return "Error: No Movement Date";
+		}
+		
 		//Validate status of InterWarehouse Movement= CO
 		MDDOrder interWH = new MDDOrder(getCtx(), p_DD_Order_ID, get_TrxName());
 		if (!interWH.getDocStatus().equals(DocAction.ACTION_Complete)) {
