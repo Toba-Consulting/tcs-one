@@ -32,7 +32,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 	private int p_C_DocType_ID = 0;
 	private int p_DD_Order_ID = 0;
 	private int p_M_MovementOutBound_ID = 0;
-	//private Timestamp p_MovementDate = null;
+	private Timestamp p_MovementDate = null;
 	
 	protected void prepare() {
 		
@@ -54,10 +54,8 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 				p_C_DocType_ID = para[i].getParameterAsInt();
 			else if (name.equals("M_Movement_ID"))
 				p_M_MovementOutBound_ID = para[i].getParameterAsInt();
-			/*
 			else if (name.equals("MovementDate"))
 				p_MovementDate = para[i].getParameterAsTimestamp();
-			*/
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
@@ -170,7 +168,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		//Create inbound movement
 		MMovement inbound = new MMovement(getCtx(), 0, get_TrxName());
 		inbound.setAD_Org_ID(interWH.getAD_Org_ID());
-		inbound.setMovementDate(new Timestamp(System.currentTimeMillis()));
+		inbound.setMovementDate(p_MovementDate);
 		inbound.setC_DocType_ID(p_C_DocType_ID);
 		//inbound.setM_Warehouse_ID(orgInfo.getTransit_Warehouse_ID());
 		

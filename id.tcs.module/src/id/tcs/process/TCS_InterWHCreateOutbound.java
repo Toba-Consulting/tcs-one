@@ -32,6 +32,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 	private int p_Locator = 0;
 	private int p_C_DocType_ID = 0;
 	private int p_DD_Order_ID = 0;
+	private Timestamp p_MovementDate = null;
 
 
 	
@@ -49,6 +50,8 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 				p_C_DocType_ID = para[i].getParameterAsInt();
 			else if (name.equals("DD_Order_ID"))
 				p_DD_Order_ID = para[i].getParameterAsInt();
+			else if (name.equals("MovementDate"))
+				p_MovementDate = para[i].getParameterAsTimestamp();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
@@ -154,7 +157,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 		if (interWH.getAD_OrgTrx_ID() > 0) {
 			outbound.setAD_OrgTrx_ID(interWH.getAD_OrgTrx_ID());
 		}
-		outbound.setMovementDate(new Timestamp(System.currentTimeMillis()));
+		outbound.setMovementDate(p_MovementDate);
 		outbound.setC_Project_ID(interWH.getC_Project_ID());
 		outbound.setC_BPartner_ID(interWH.getC_BPartner_ID());
 		outbound.setC_BPartner_Location_ID(interWH.getC_BPartner_Location_ID());
