@@ -5,7 +5,9 @@ import java.util.Properties;
 
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
+import org.compiere.util.Env;
 import org.eevolution.model.MDDOrder;
+import org.eevolution.model.MDDOrderLine;
 
 public class TCS_MDDOrder extends MDDOrder implements DocOptions{
 
@@ -50,5 +52,15 @@ public class TCS_MDDOrder extends MDDOrder implements DocOptions{
 		
 	}
 	
+	@Override
+	public boolean reActivateIt() {
+		
+		MDDOrderLine [] lines = getLines();
+		for (MDDOrderLine line : lines) {
+			line.setQtyReserved(Env.ZERO);
+			line.saveEx();
+		}
+		return super.reActivateIt();
+	}
 	
 }
