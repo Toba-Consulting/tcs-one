@@ -489,6 +489,8 @@ public class TCS_MPayment extends MPayment {
 				//allocline.setC_Charge_ID(allocharge.getC_Charge_ID());
 				alloclineCr.set_ValueOfColumn("Description", allocharge.get_ValueAsString("Description"));
 				alloclineCr.setC_BPartner_ID(allocChargeBPID);
+				//2020-01-08 add set TCS_AllocateCharge_ID
+				alloclineCr.set_ValueOfColumn("TCS_AllocateCharge_ID", allocharge.getTCS_AllocateCharge_ID());
 				alloclineCr.saveEx();
 				
 				MAllocationLine alloclineDr = new MAllocationLine(alloc);
@@ -503,6 +505,8 @@ public class TCS_MPayment extends MPayment {
 				alloclineDr.set_ValueOfColumn("Description", allocharge.get_ValueAsString("Description"));
 				//end @PhieAlbert
 				alloclineDr.setC_BPartner_ID(allocChargeBPID);
+				//2020-01-08 add set TCS_AllocateCharge_ID
+				alloclineDr.set_ValueOfColumn("TCS_AllocateCharge_ID", allocharge.getTCS_AllocateCharge_ID());
 				alloclineDr.saveEx();
 			}
 		}
