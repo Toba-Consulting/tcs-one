@@ -201,7 +201,13 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			moveLine.setLine(line.getLine());
 			moveLine.setM_Product_ID(line.getM_Product_ID());
 			//moveLine.setQtyEntered(line.getQtyEntered());
-			moveLine.set_ValueOfColumn("QtyEntered", line.getQtyEntered());
+			
+			String sqlQtyEntWhere = "DD_OrderLine_ID="+line.getDD_OrderLine_ID()+" AND IsOutbound='Y' AND DocStatus IN ('CO','CL')";
+			BigDecimal qtyEntOutbound = new Query(getCtx(), MMovementLine.Table_Name, sqlQtyEntWhere, get_TrxName())
+									.addJoinClause("JOIN M_Movement ON M_Movement.M_Movement_ID = M_MovementLine.M_Movement_ID")
+									.sum("QtyEntered");
+			
+			moveLine.set_ValueOfColumn("QtyEntered", line.getQtyEntered().subtract(qtyEntOutbound));
 			
 			//@David
 			//Set Qty = DD_OrderLine.Qty - SUM(M_MovementLine.Qty, CO & CL only
@@ -210,7 +216,7 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			BigDecimal qtyOutbound = new Query(getCtx(), MMovementLine.Table_Name, sqlQtyWhere, get_TrxName())
 									.addJoinClause("JOIN M_Movement ON M_Movement.M_Movement_ID = M_MovementLine.M_Movement_ID")
 									.sum("MovementQty");
-			BigDecimal qtyMove = line.getQtyEntered().subtract(qtyOutbound);
+			BigDecimal qtyMove = line.getQtyOrdered().subtract(qtyOutbound);
 			if (qtyMove.signum()<1) {
 				continue;
 			}
