@@ -211,6 +211,7 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
                 line.add(new Boolean(false));           //  0-Selection
                 
                 KeyNamePair lineKNPair = new KeyNamePair(rs.getInt(1), rs.getString(2)); // 1-Line
+                line.add(rs.getString(11)); // 5 - Vendor
                 line.add(lineKNPair);
                 line.add(rs.getString(3)); //2-Product
                 line.add(rs.getString(9)); //3-Charge                
@@ -227,7 +228,6 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
 //                }
 //                qty = qty.subtract(qtyOrdered);
                 line.add(qty.subtract(qtys));  // 4 - Qty
-                line.add(rs.getString(11)); // 5 - Vendor
                 line.add(rs.getString(5)); //6 - Project
                 line.add(rs.getString(6)); // 7 - UOM
                 if(qty.subtract(qtys).compareTo(Env.ZERO)>0)
@@ -247,13 +247,13 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
 	protected void configureMiniTable (IMiniTable miniTable)
 	{
 		miniTable.setColumnClass(0, Boolean.class, false);      //  0-Selection
-		miniTable.setColumnClass(1, String.class, true);        //  1-Line
-		miniTable.setColumnClass(2, String.class, true);        //  2-Product 
-		miniTable.setColumnClass(3, String.class, true);        //  3-Charge
-		miniTable.setColumnClass(4, BigDecimal.class, false);   //  4-Qty
-		miniTable.setColumnClass(7, String.class, true);        //  5-Vendor
-		miniTable.setColumnClass(5, String.class, true);   		//  6-Project
-		miniTable.setColumnClass(6, String.class, true);        //  7-UOM
+		miniTable.setColumnClass(1, String.class, true);        //  5-Vendor
+		miniTable.setColumnClass(2, String.class, true);        //  1-Line
+		miniTable.setColumnClass(3, String.class, true);        //  2-Product 
+		miniTable.setColumnClass(4, String.class, true);        //  3-Charge
+		miniTable.setColumnClass(5, BigDecimal.class, false);   //  4-Qty
+		miniTable.setColumnClass(6, String.class, true);   		//  6-Project
+		miniTable.setColumnClass(7, String.class, true);        //  7-UOM
 		 
         //  Table UI
 		miniTable.autoSize();
@@ -264,11 +264,11 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
 		//  Header Info
         Vector<String> columnNames = new Vector<String>(7);
         columnNames.add(Msg.getMsg(Env.getCtx(), "Select"));
+        columnNames.add(Msg.translate(Env.getCtx(), "Vendor"));
         columnNames.add("Line");
         columnNames.add(Msg.translate(Env.getCtx(), "M_Product_ID"));
         columnNames.add(Msg.translate(Env.getCtx(), "C_Charge_ID"));
         columnNames.add(Msg.translate(Env.getCtx(), "Quantity"));
-        columnNames.add(Msg.translate(Env.getCtx(), "Vendor"));
         columnNames.add(Msg.translate(Env.getCtx(), "C_Project_ID"));
         columnNames.add(Msg.translate(Env.getCtx(), "C_UOM_ID"));
 	    return columnNames;

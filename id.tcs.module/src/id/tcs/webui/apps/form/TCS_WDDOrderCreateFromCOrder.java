@@ -87,7 +87,7 @@ public class TCS_WDDOrderCreateFromCOrder extends TCS_DDOrderCreateFromCOrder im
 	{
 		initSelectionFieldsOptions();
 
-		orderLabel.setText(Msg.getElement(Env.getCtx(), "C_Order_ID", false));
+		orderLabel.setText("Sales Order");
 //		productLabel.setText(Msg.getElement(Env.getCtx(), "M_Product_ID", false));
 //		dateRequiredLabel.setText(Msg.getElement(Env.getCtx(), "DateRequired", false));
 //		projectLabel.setText(Msg.getElement(Env.getCtx(), "C_Project_ID", false));
