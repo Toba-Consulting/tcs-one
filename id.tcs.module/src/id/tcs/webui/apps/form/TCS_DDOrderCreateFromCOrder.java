@@ -61,7 +61,7 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
         {
             if (((Boolean)miniTable.getValueAt(i, 0)).booleanValue())
             {
-            	BigDecimal qtyEntered = (BigDecimal)miniTable.getValueAt(i, 4); // 3 - Qty
+            	BigDecimal qtyEntered = (BigDecimal)miniTable.getValueAt(i, 5); // 3 - Qty
                 KeyNamePair pp = (KeyNamePair)miniTable.getValueAt(i, 1);   //  1-Line
                 
                 int orderLineID = pp.getKey();                
@@ -167,7 +167,7 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
         sqlStmt.append("FROM C_OrderLine col ");
         sqlStmt.append("INNER JOIN C_Order co ON co.C_Order_ID=col.C_Order_ID ");
         sqlStmt.append("INNER JOIN C_BPartner bp ON co.C_BPartner_ID=bp.C_BPartner_ID ");
-        sqlStmt.append("INNER JOIN C_BPartner vd ON col.Vendor_BPartner_ID=vd.C_BPartner_ID ");
+        sqlStmt.append("LEFT JOIN C_BPartner vd ON col.Vendor_BPartner_ID=vd.C_BPartner_ID ");
         sqlStmt.append("WHERE col.AD_Client_ID=? AND co.DocStatus IN (?) ");
         
 //        if (C_Order_ID > 0) {
@@ -211,8 +211,8 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
                 line.add(new Boolean(false));           //  0-Selection
                 
                 KeyNamePair lineKNPair = new KeyNamePair(rs.getInt(1), rs.getString(2)); // 1-Line
-                line.add(rs.getString(11)); // 5 - Vendor
                 line.add(lineKNPair);
+                line.add(rs.getString(11)); // 5 - Vendor
                 line.add(rs.getString(3)); //2-Product
                 line.add(rs.getString(9)); //3-Charge                
                 BigDecimal qty = rs.getBigDecimal(4); //4-QtyEntered
@@ -247,8 +247,8 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
 	protected void configureMiniTable (IMiniTable miniTable)
 	{
 		miniTable.setColumnClass(0, Boolean.class, false);      //  0-Selection
-		miniTable.setColumnClass(1, String.class, true);        //  5-Vendor
-		miniTable.setColumnClass(2, String.class, true);        //  1-Line
+		miniTable.setColumnClass(1, String.class, true);        //  1-Line
+		miniTable.setColumnClass(2, String.class, true);        //  5-Vendor
 		miniTable.setColumnClass(3, String.class, true);        //  2-Product 
 		miniTable.setColumnClass(4, String.class, true);        //  3-Charge
 		miniTable.setColumnClass(5, BigDecimal.class, false);   //  4-Qty
@@ -264,8 +264,8 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
 		//  Header Info
         Vector<String> columnNames = new Vector<String>(7);
         columnNames.add(Msg.getMsg(Env.getCtx(), "Select"));
-        columnNames.add(Msg.translate(Env.getCtx(), "Vendor"));
         columnNames.add("Line");
+        columnNames.add(Msg.translate(Env.getCtx(), "Vendor"));
         columnNames.add(Msg.translate(Env.getCtx(), "M_Product_ID"));
         columnNames.add(Msg.translate(Env.getCtx(), "C_Charge_ID"));
         columnNames.add(Msg.translate(Env.getCtx(), "Quantity"));
