@@ -138,6 +138,12 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			}
 		}
 		
+		boolean alreadyInbounded = new Query(getCtx(), MDDOrder.Table_Name, "M_OutBoundFrom_ID=", get_TrxName())
+							.setParameters(p_M_MovementOutBound_ID)
+							.match();
+		
+		if (alreadyInbounded) 
+			return "Error: This OutBound is already inbounded";
 		//@David
 		//Warehouse In-Transit
 		/*Case 1
