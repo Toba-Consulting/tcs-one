@@ -667,6 +667,45 @@ public class TCSAllocation
 	 */
 	public MAllocationHdr saveData(int m_WindowNo, Object date, IMiniTable payment, IMiniTable invoice, String trxName,Object Description)
 	{
+		//Iqbal - Validation to only select 2 row
+		if (m_noInvoices + m_noPayments > 2){
+			throw new AdempiereException("Cannot select more than 2");
+		}
+		
+		//Iqbal - Validation to only process 2 row with one of them having positive Open Amount
+		if (m_noInvoices == 2 && m_noPayments == 0)
+		{
+			int rows = invoice.getRowCount();
+			int minusamt = 0;
+			ArrayList<BigDecimal> OpenAmount = new ArrayList<BigDecimal>();
+			for (int i = 0; i < rows; i++) {
+				if((Boolean)invoice.getValueAt(i, 0)){
+					if(((BigDecimal)invoice.getValueAt(i, 5)).signum() == -1){
+						minusamt++;
+					}
+				}
+			}
+			if(minusamt == 2){
+				throw new AdempiereException("Cant have two negative Open Amount");
+			}
+		}
+		if(m_noInvoices == 0 && m_noPayments == 2)
+		{
+			int rows = payment.getRowCount();
+			int minusamt = 0;
+			ArrayList<BigDecimal> OpenAmount = new ArrayList<BigDecimal>();
+			for (int i = 0; i < rows; i++) {
+				if((Boolean)payment.getValueAt(i, 0)){
+					if(((BigDecimal)payment.getValueAt(i, 5)).signum() == -1){
+						minusamt++;
+					}
+				}
+			}
+			if(minusamt == 2){
+				throw new AdempiereException("Cant have two negative Open Amount");
+			}
+		}
+	
 		if (m_noInvoices + m_noPayments == 0)
 			return null;
 
