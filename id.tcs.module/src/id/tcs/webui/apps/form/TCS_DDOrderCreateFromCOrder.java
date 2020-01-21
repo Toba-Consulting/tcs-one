@@ -61,8 +61,8 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
         {
             if (((Boolean)miniTable.getValueAt(i, 0)).booleanValue())
             {
-            	BigDecimal qtyEntered = (BigDecimal)miniTable.getValueAt(i, 5); // 3 - Qty
-                KeyNamePair pp = (KeyNamePair)miniTable.getValueAt(i, 1);   //  1-Line
+            	BigDecimal qtyEntered = (BigDecimal)miniTable.getValueAt(i, 2); // 3 - Qty
+                KeyNamePair pp = (KeyNamePair)miniTable.getValueAt(i, 7);   //  1-Line
                 
                 int orderLineID = pp.getKey();                
                 MOrderLine oLine = new MOrderLine(Env.getCtx(), pp.getKey(), null);
@@ -136,7 +136,7 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
         }
 		
 		MDDOrder dd = new MDDOrder(Env.getCtx(), DD_Order_ID, trxName);
-		KeyNamePair pp = (KeyNamePair)miniTable.getValueAt(1, 1);
+		KeyNamePair pp = (KeyNamePair)miniTable.getValueAt(0, 7);
 		MOrderLine oLine = new MOrderLine(Env.getCtx(), pp.getKey(), trxName);
 		dd.setC_Order_ID(oLine.getC_Order_ID());
 		dd.saveEx(trxName);
@@ -211,11 +211,11 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
                 line.add(new Boolean(false));           //  0-Selection
                 
                 KeyNamePair lineKNPair = new KeyNamePair(rs.getInt(1), rs.getString(2)); // 1-Line
-                line.add(lineKNPair);
                 line.add(rs.getString(11)); // 5 - Vendor
+                BigDecimal qty = rs.getBigDecimal(4); //4-QtyEntered
+                line.add(qty.subtract(qtys));  // 4 - Qty
                 line.add(rs.getString(3)); //2-Product
                 line.add(rs.getString(9)); //3-Charge                
-                BigDecimal qty = rs.getBigDecimal(4); //4-QtyEntered
 //                BigDecimal qtyOrdered = rs.getBigDecimal(7); //7-QtyOrdered
 //                MOrderLine oLine = new MOrderLine(Env.getCtx(), rs.getInt(1), null);
 //                int C_UOM_To_ID = rs.getInt(9);
@@ -227,9 +227,9 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
 //        					qtyOrdered = Env.ZERO;
 //                }
 //                qty = qty.subtract(qtyOrdered);
-                line.add(qty.subtract(qtys));  // 4 - Qty
                 line.add(rs.getString(5)); //6 - Project
                 line.add(rs.getString(6)); // 7 - UOM
+                line.add(lineKNPair);
                 if(qty.subtract(qtys).compareTo(Env.ZERO)>0)
                 data.add(line);
             }
@@ -247,13 +247,13 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
 	protected void configureMiniTable (IMiniTable miniTable)
 	{
 		miniTable.setColumnClass(0, Boolean.class, false);      //  0-Selection
-		miniTable.setColumnClass(1, String.class, true);        //  1-Line
-		miniTable.setColumnClass(2, String.class, true);        //  5-Vendor
+		miniTable.setColumnClass(1, String.class, true);        //  5-Vendor
+		miniTable.setColumnClass(2, BigDecimal.class, false);   //  4-Qty
 		miniTable.setColumnClass(3, String.class, true);        //  2-Product 
 		miniTable.setColumnClass(4, String.class, true);        //  3-Charge
-		miniTable.setColumnClass(5, BigDecimal.class, false);   //  4-Qty
-		miniTable.setColumnClass(6, String.class, true);   		//  6-Project
-		miniTable.setColumnClass(7, String.class, true);        //  7-UOM
+		miniTable.setColumnClass(5, String.class, true);   		//  6-Project
+		miniTable.setColumnClass(6, String.class, true);        //  7-UOM
+		miniTable.setColumnClass(7, String.class, true);        //  1-Line
 		 
         //  Table UI
 		miniTable.autoSize();
@@ -264,13 +264,13 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
 		//  Header Info
         Vector<String> columnNames = new Vector<String>(7);
         columnNames.add(Msg.getMsg(Env.getCtx(), "Select"));
-        columnNames.add("Line");
         columnNames.add(Msg.translate(Env.getCtx(), "Vendor"));
+        columnNames.add(Msg.translate(Env.getCtx(), "Quantity"));
         columnNames.add(Msg.translate(Env.getCtx(), "M_Product_ID"));
         columnNames.add(Msg.translate(Env.getCtx(), "C_Charge_ID"));
-        columnNames.add(Msg.translate(Env.getCtx(), "Quantity"));
         columnNames.add(Msg.translate(Env.getCtx(), "C_Project_ID"));
         columnNames.add(Msg.translate(Env.getCtx(), "C_UOM_ID"));
+        columnNames.add("Line");
 	    return columnNames;
 	}
 	
