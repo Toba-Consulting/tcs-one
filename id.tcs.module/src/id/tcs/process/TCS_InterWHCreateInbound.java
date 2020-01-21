@@ -138,8 +138,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			}
 		}
 		
-		boolean alreadyInbounded = new Query(getCtx(), MDDOrder.Table_Name, "M_OutBoundFrom_ID=", get_TrxName())
-							.setParameters(p_M_MovementOutBound_ID)
+		boolean alreadyInbounded = new Query(getCtx(), MMovement.Table_Name, "M_OutBoundFrom_ID="+p_M_MovementOutBound_ID, get_TrxName())
 							.match();
 		
 		if (alreadyInbounded) 
@@ -256,7 +255,9 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		
 		
 		//Complete movement
-		inbound.processIt(DocAction.ACTION_Complete);
+		if(!inbound.processIt(DocAction.ACTION_Complete)){
+			throw new AdempiereException("Failed to complete inbound");
+		}
 		inbound.saveEx();
 		
 		/*Bug #2990 Create multiple Outbound and Inbound
