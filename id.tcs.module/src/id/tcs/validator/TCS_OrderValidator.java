@@ -12,6 +12,8 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
 
+import id.tcs.model.X_M_MatchQuotation;
+
 public class TCS_OrderValidator {
 
 	
@@ -30,6 +32,7 @@ public class TCS_OrderValidator {
 			msg += checkMatchPO(order);
 			msg += checkLinkedPayment(order);
 			msg += checkActiveLinkedInOut(order);
+			msg += removeMatchQuotation(order);
 		} 
 		return msg;
 	}
@@ -98,4 +101,12 @@ public class TCS_OrderValidator {
 		}
 		return "";
 }
+	private static String removeMatchQuotation(MOrder order) {
+		StringBuilder sql = new StringBuilder("DELETE FROM ").append(X_M_MatchQuotation.Table_Name)
+				.append(" WHERE C_Order_ID=?");
+		DB.executeUpdateEx(sql.toString(), new Object[] {order.get_ID()}, order.get_TrxName());
+
+		return "";
+	}
+
 }
