@@ -204,7 +204,7 @@ public class TCS_DDOrderCreateFromCOrder extends CreateFrom{
             	sqls.append("SELECT COALESCE(sum(ddl.QtyEntered),0) as qty "
             			+ "FROM DD_OrderLine ddl "
 						+ "JOIN DD_Order dd ON ddl.DD_Order_ID=dd.DD_Order_ID "
-						+ "WHERE ddl.C_OrderLine_ID="+rs.getInt(1));
+						+ "WHERE ddl.C_OrderLine_ID="+rs.getInt(1)+" AND dd.DocStatus IN ('DR','IP','CO','CL')");
             	
             	BigDecimal qtys = DB.getSQLValueBD(null, sqls.toString());
                 Vector<Object> line = new Vector<Object>(8);
