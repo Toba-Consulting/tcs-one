@@ -233,7 +233,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			int funcCurrencyID = Env.getContextAsInt(getCtx(), "$C_Currency_ID");
 			
 			MPayment paymentFrom = new MPayment(getCtx(), 0, get_TrxName());			
-			paymentFrom.setAD_Org_ID(getAD_Org_ID());
+			paymentFrom.setAD_Org_ID(getC_BankAccount_From().getAD_Org_ID());
 			paymentFrom.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
 			paymentFrom.setC_BankAccount_ID(getC_BankAccount_From_ID());
 			paymentFrom.setC_BPartner_ID(getC_BPartner_ID());
@@ -262,7 +262,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			//payment from
 			
 			MPayment paymentTo = new MPayment(getCtx(), 0, get_TrxName());
-			paymentTo.setAD_Org_ID(getAD_Org_ID());
+			paymentTo.setAD_Org_ID(getC_BankAccount_To().getAD_Org_ID());
 			paymentTo.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
 			paymentTo.setC_BankAccount_ID(getC_BankAccount_To_ID());
 			paymentTo.setC_BPartner_ID(getC_BPartner_ID());
