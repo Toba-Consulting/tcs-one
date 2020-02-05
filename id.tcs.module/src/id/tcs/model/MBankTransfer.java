@@ -384,7 +384,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			
 			MAllocationLine alloclineAP = new MAllocationLine(allocHdr);
 			
-			alloclineAP.setAD_Org_ID(allocHdr.getAD_Org_ID());
+			alloclineAP.setAD_Org_ID(getC_BankAccount_From().getAD_Org_ID());
 			alloclineAP.setC_BPartner_ID(paymentFrom.getC_BPartner_ID());
 			alloclineAP.setC_Payment_ID(paymentFrom.getC_Payment_ID());
 			if(getC_Currency_From_ID() != getC_Currency_To_ID() && getC_Currency_From_ID() != funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID)
@@ -399,7 +399,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			
 			MAllocationLine alloclineAR = new MAllocationLine(allocHdr);
 			
-			alloclineAR.setAD_Org_ID(allocHdr.getAD_Org_ID());
+			alloclineAR.setAD_Org_ID(getC_BankAccount_To().getAD_Org_ID());
 			alloclineAR.setC_BPartner_ID(paymentTo.getC_BPartner_ID());
 			alloclineAR.setC_Payment_ID(paymentTo.getC_Payment_ID());
 			if(getC_Currency_From_ID() != getC_Currency_To_ID() && getC_Currency_From_ID() != funcCurrencyID && getC_Currency_To_ID() != funcCurrencyID)
