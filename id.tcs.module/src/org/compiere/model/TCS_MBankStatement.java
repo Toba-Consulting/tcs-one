@@ -107,6 +107,9 @@ public class TCS_MBankStatement extends MBankStatement implements DocOptions{
 		//end @PhieAlbert
 		setProcessed(false);
 		setDocStatus(DocAction.STATUS_InProgress);
+		//iqbal
+		setPosted(false);
+		//end
 		setDocAction(DOCACTION_Complete);
 
 		return true;
