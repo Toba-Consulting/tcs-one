@@ -280,8 +280,6 @@ public class TCS_MAllocationHdrValidator {
 						else
 							match1.set_CustomColumn("AllocationAmt", tempInvoiceAmt);
 						
-						
-						
 						match1.set_ValueOfColumn("DateAllocated", alloc.getCreated());
 						match1.set_ValueOfColumn("Description", getMatchAllocationDescription(match1));
 						match1.saveEx();
@@ -292,7 +290,6 @@ public class TCS_MAllocationHdrValidator {
 						nWriteOffAmt.set(j, Env.ZERO);
 						
 					}
-					
 					
 					if(j!=0 && tempInvoiceAmt.compareTo(Env.ZERO)>0 
 							&& minAmount.get(j).compareTo(Env.ZERO)<0){
@@ -813,7 +810,8 @@ public class TCS_MAllocationHdrValidator {
 		
 		//Case 1
 		if (C_Payment_ID>0 && C_Charge_ID>0) {
-			String sql="C_Payment_ID="+C_Payment_ID+" AND C_Charge_ID="+C_Charge_ID+" AND AD_Client_ID="+Env.getAD_Client_ID(match.getCtx());
+			String sql="C_Payment_ID="+C_Payment_ID+" AND C_Charge_ID="+C_Charge_ID+" AND AD_Client_ID="+Env.getAD_Client_ID(match.getCtx())
+			+ " AND Amount=" + match.getAllocationAmt();
 			int allocateCharge_ID = new Query(match.getCtx(), X_TCS_AllocateCharge.Table_Name, sql, match.get_TrxName()).firstId();
 			if (allocateCharge_ID>0) {
 				X_TCS_AllocateCharge allocateCharge = new X_TCS_AllocateCharge(match.getCtx(), allocateCharge_ID, match.get_TrxName());
