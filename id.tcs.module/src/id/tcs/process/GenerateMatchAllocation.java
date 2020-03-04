@@ -24,11 +24,18 @@ public class GenerateMatchAllocation extends SvrProcess {
 	@Override
 	protected String doIt() throws Exception {
 		
-		String deleteTable = "delete from tcs_match_allocation";
+		String deleteTable = "DELETE FROM tcs_match_allocation";
 		DB.executeUpdateEx(deleteTable, get_TrxName());
 		
 		//Scenario 1
-		String whereClause = "c_allocationhdr_Id in (select c_allocationhdr_Id from c_allocationline group by c_allocationhdr_Id having count(c_charge_id) = 0 and count(c_payment_id) = count(c_invoice_id))";
+		/*
+		String whereClause = "C_AllocationHdr_ID in (select c_allocationhdr_Id from c_allocationline "
+				+ "group by c_allocationhdr_Id having count(c_charge_id) = 0 and count(c_payment_id) = count(c_invoice_id))";
+		*/
+		
+		String whereClause = "C_AllocationHdr_ID IN (SELECT DISTINCT C_AllocationHdr_ID FROM C_AllocationLine "
+				+ "WHERE C_Charge_ID=0 AND C_Payment_ID>0 AND C_Invoice_ID>0)";
+		
 		int[] c_allocationhdr_list = new Query(getCtx(), "C_AllocationHdr", whereClause, get_TrxName()).setOrderBy("C_AllocationHDR_ID").getIDs();
 		
 		for (int i = 0; i < c_allocationhdr_list.length; i++) {
@@ -45,7 +52,9 @@ public class GenerateMatchAllocation extends SvrProcess {
 		}
 		
 		//Scenario 2
-		whereClause = "c_allocationhdr_Id in (select c_allocationhdr_id from c_allocationline group by c_allocationhdr_Id having count(c_allocationline_id) = 3 and count(c_charge_id) = 1 and ((count(c_invoice_id) = 2 and count(c_payment_id) = 1) or (count(c_payment_id) = 2 and count(c_invoice_id) = 1)))";
+		whereClause = "c_allocationhdr_Id in (select c_allocationhdr_id from c_allocationline "
+				+ "group by c_allocationhdr_Id having count(c_allocationline_id) = 3 and count(c_charge_id) = 1 "
+				+ "and ((count(c_invoice_id) = 2 and count(c_payment_id) = 1) or (count(c_payment_id) = 2 and count(c_invoice_id) = 1)))";
 		c_allocationhdr_list = new Query(getCtx(), "C_AllocationHdr", whereClause, get_TrxName()).setOrderBy("C_AllocationHDR_ID").getIDs();
 		for (int i = 0; i < c_allocationhdr_list.length; i++) {
 			MAllocationHdr allochdr = new MAllocationHdr(getCtx(), c_allocationhdr_list[i], get_TrxName());

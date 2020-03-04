@@ -92,6 +92,21 @@ public interface I_TCS_Match_Allocation
 
 	public org.compiere.model.I_C_AllocationHdr getC_AllocationHdr() throws RuntimeException;
 
+    /** Column name C_BPartner_ID */
+    public static final String COLUMNNAME_C_BPartner_ID = "C_BPartner_ID";
+
+	/** Set Business Partner .
+	  * Identifies a Business Partner
+	  */
+	public void setC_BPartner_ID (int C_BPartner_ID);
+
+	/** Get Business Partner .
+	  * Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID();
+
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException;
+
     /** Column name C_Charge_ID */
     public static final String COLUMNNAME_C_Charge_ID = "C_Charge_ID";
 
@@ -106,6 +121,21 @@ public interface I_TCS_Match_Allocation
 	public int getC_Charge_ID();
 
 	public org.compiere.model.I_C_Charge getC_Charge() throws RuntimeException;
+
+    /** Column name C_Currency_ID */
+    public static final String COLUMNNAME_C_Currency_ID = "C_Currency_ID";
+
+	/** Set Currency.
+	  * The Currency for this record
+	  */
+	public void setC_Currency_ID (int C_Currency_ID);
+
+	/** Get Currency.
+	  * The Currency for this record
+	  */
+	public int getC_Currency_ID();
+
+	public org.compiere.model.I_C_Currency getC_Currency() throws RuntimeException;
 
     /** Column name C_Invoice_ID */
     public static final String COLUMNNAME_C_Invoice_ID = "C_Invoice_ID";
@@ -166,6 +196,19 @@ public interface I_TCS_Match_Allocation
 	  */
 	public String getDescription();
 
+    /** Column name DiscountAmt */
+    public static final String COLUMNNAME_DiscountAmt = "DiscountAmt";
+
+	/** Set Discount Amount.
+	  * Calculated amount of discount
+	  */
+	public void setDiscountAmt (BigDecimal DiscountAmt);
+
+	/** Get Discount Amount.
+	  * Calculated amount of discount
+	  */
+	public BigDecimal getDiscountAmt();
+
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
 
@@ -197,6 +240,19 @@ public interface I_TCS_Match_Allocation
 	/** Get Match_Payment_ID	  */
 	public int getMatch_Payment_ID();
 
+    /** Column name OverUnderAmt */
+    public static final String COLUMNNAME_OverUnderAmt = "OverUnderAmt";
+
+	/** Set Over/Under Payment.
+	  * Over-Payment (unallocated) or Under-Payment (partial payment) Amount
+	  */
+	public void setOverUnderAmt (BigDecimal OverUnderAmt);
+
+	/** Get Over/Under Payment.
+	  * Over-Payment (unallocated) or Under-Payment (partial payment) Amount
+	  */
+	public BigDecimal getOverUnderAmt();
+
     /** Column name TCS_Match_Allocation_ID */
     public static final String COLUMNNAME_TCS_Match_Allocation_ID = "TCS_Match_Allocation_ID";
 
@@ -221,4 +277,17 @@ public interface I_TCS_Match_Allocation
 	  * User who updated this records
 	  */
 	public int getUpdatedBy();
+
+    /** Column name WriteOffAmt */
+    public static final String COLUMNNAME_WriteOffAmt = "WriteOffAmt";
+
+	/** Set Write-off Amount.
+	  * Amount to write-off
+	  */
+	public void setWriteOffAmt (BigDecimal WriteOffAmt);
+
+	/** Get Write-off Amount.
+	  * Amount to write-off
+	  */
+	public BigDecimal getWriteOffAmt();
 }
