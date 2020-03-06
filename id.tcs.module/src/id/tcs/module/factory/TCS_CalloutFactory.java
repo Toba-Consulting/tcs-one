@@ -24,6 +24,7 @@ import id.tcs.callout.TCS_CalloutInquiryLine;
 import id.tcs.callout.TCS_CalloutPayment;
 import id.tcs.callout.TCS_CalloutQuotation;
 import id.tcs.callout.TCS_CalloutQuotationLine;
+import id.tcs.callout.TCS_Callout_PP_Product_BOMLine;
 import id.tcs.model.MTCSAmortizationPlan;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.List;
 import org.adempiere.base.IColumnCallout;
 import org.adempiere.base.IColumnCalloutFactory;
 import org.eevolution.model.MDDOrderLine;
+import org.eevolution.model.MPPProductBOMLine;
 
 
 public class TCS_CalloutFactory implements IColumnCalloutFactory {
@@ -118,6 +120,9 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 		if(tableName.equals(MDDOrderLine.Table_Name))
 			list.add(new TCS_CalloutDDOrderLine());
 
+		if(tableName.equals(MPPProductBOMLine.Table_Name))
+			list.add(new TCS_Callout_PP_Product_BOMLine());
+		
 		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];
 	}
 
