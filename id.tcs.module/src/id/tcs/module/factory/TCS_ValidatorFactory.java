@@ -21,6 +21,7 @@ import org.compiere.model.X_AD_WF_Activity;
 import org.compiere.util.CLogger;
 import org.compiere.wf.MWFActivity;
 import org.eevolution.model.MDDOrder;
+import org.eevolution.model.MPPProductBOMLine;
 import org.osgi.service.event.Event;
 
 import id.tcs.model.MQuotation;
@@ -31,6 +32,7 @@ import id.tcs.validator.TCS_InOutValidator;
 import id.tcs.validator.TCS_InvoiceValidator;
 import id.tcs.validator.TCS_MovementValidator;
 import id.tcs.validator.TCS_OrderValidator;
+import id.tcs.validator.TCS_PPProductBomLineValidator;
 import id.tcs.validator.TCS_PaymentAllocateValidator;
 import id.tcs.validator.TCS_PaymentValidator;
 import id.tcs.validator.TCS_QuotationLineValidator;
@@ -92,6 +94,8 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, MOrder.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REACTIVATE, MOrder.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_VOID, MOrder.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, MPPProductBOMLine.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, MPPProductBOMLine.Table_Name);
 		log.info("PROJECT MANAGEMENT EVENT MANAGER // INITIALIZED");
 	}
 
@@ -157,6 +161,9 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		}
 		else if(getPO(event).get_TableName().equals(MRfQLine.Table_Name)) {
 			msg = TCS_RFQLineValidator.executeEvent(event, getPO(event));
+		}
+		else if(getPO(event).get_TableName().equals(MPPProductBOMLine.Table_Name)) {
+			msg = TCS_PPProductBomLineValidator.executeEvent(event, getPO(event));
 		}
 
 		if (msg.length() > 0)
