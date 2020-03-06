@@ -76,7 +76,7 @@ public class TCSGeneralLedgerView extends SvrProcess {
 			{
 				p_end_Account_id = para[i].getParameterAsInt();
 			}
-			else if(name.equals("AD_Org_ID"))
+			else if(name.equals("P_AD_Org_ID"))
 			{
 				p_AD_Org_ID = para[i].getParameterAsInt();
 			}
