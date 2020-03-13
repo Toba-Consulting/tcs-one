@@ -668,6 +668,7 @@ public class TCSAllocation
 	public MAllocationHdr saveData(int m_WindowNo, Object date, IMiniTable payment, IMiniTable invoice, String trxName,Object Description)
 	{
 		//Iqbal - Validation to only select 2 row
+		/*
 		if (m_noInvoices + m_noPayments > 2){
 			throw new AdempiereException("Cannot select more than 2");
 		}
@@ -708,7 +709,7 @@ public class TCSAllocation
 	
 		if (m_noInvoices + m_noPayments == 0)
 			return null;
-
+		*/
 		//  fixed fields
 		int AD_Client_ID = Env.getContextAsInt(Env.getCtx(), m_WindowNo, "AD_Client_ID");
 		int AD_Org_ID = Env.getContextAsInt(Env.getCtx(), m_WindowNo, "AD_Org_ID");

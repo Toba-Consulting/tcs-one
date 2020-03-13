@@ -359,7 +359,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 		matchAlloc.setMatch_Payment_ID(0);
 		matchAlloc.setMatch_Invoice_ID(0);
 		matchAlloc.setC_Charge_ID(C_Charge_ID);
-		matchAlloc.setAllocatedAmt(matchAmt);
+		matchAlloc.setAllocatedAmt(matchAmt.abs());
 		matchAlloc.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAlloc.setC_BPartner_ID(payLine.getC_BPartner_ID());
 		matchAlloc.setC_Currency_ID(allocHdr.getC_Currency_ID());
@@ -379,7 +379,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 		matchAlloc.setMatch_Payment_ID(0);
 		matchAlloc.setMatch_Invoice_ID(0);
 		matchAlloc.setC_Charge_ID(C_Charge_ID);
-		matchAlloc.setAllocatedAmt(matchAmt);
+		matchAlloc.setAllocatedAmt(matchAmt.abs());
 		matchAlloc.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAlloc.setC_BPartner_ID(invLine.getC_BPartner_ID());
 		matchAlloc.setC_Currency_ID(allocHdr.getC_Currency_ID());
@@ -399,7 +399,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 		matchAllocNegInvoice.setMatch_Payment_ID(0);
 		matchAllocNegInvoice.setMatch_Invoice_ID(posLine.getC_Invoice_ID());
 		matchAllocNegInvoice.setC_Charge_ID(0);
-		matchAllocNegInvoice.setAllocatedAmt(matchAmt);
+		matchAllocNegInvoice.setAllocatedAmt(matchAmt.abs());
 		matchAllocNegInvoice.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAllocNegInvoice.setC_BPartner_ID(negLine.getC_BPartner_ID());
 		matchAllocNegInvoice.setC_Currency_ID(allocHdr.getC_Currency_ID());
@@ -417,7 +417,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 		matchAllocPosInvoice.setMatch_Payment_ID(0);
 		matchAllocPosInvoice.setMatch_Invoice_ID(negLine.getC_Invoice_ID());
 		matchAllocPosInvoice.setC_Charge_ID(0);
-		matchAllocPosInvoice.setAllocatedAmt(matchAmt);
+		matchAllocPosInvoice.setAllocatedAmt(matchAmt.abs());
 		matchAllocPosInvoice.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAllocPosInvoice.setC_BPartner_ID(posLine.getC_BPartner_ID());
 		matchAllocPosInvoice.setC_Currency_ID(allocHdr.getC_Currency_ID());
@@ -438,7 +438,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 		matchAllocNegPayment.setMatch_Payment_ID(posLine.getC_Payment_ID());
 		matchAllocNegPayment.setMatch_Invoice_ID(0);
 		matchAllocNegPayment.setC_Charge_ID(0);
-		matchAllocNegPayment.setAllocatedAmt(matchAmt);
+		matchAllocNegPayment.setAllocatedAmt(matchAmt.abs());
 		matchAllocNegPayment.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAllocNegPayment.setC_BPartner_ID(negLine.getC_BPartner_ID());
 		matchAllocNegPayment.setC_Currency_ID(allocHdr.getC_Currency_ID());
@@ -456,7 +456,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 		matchAllocPosPayment.setMatch_Payment_ID(negLine.getC_Payment_ID());
 		matchAllocPosPayment.setMatch_Invoice_ID(0);
 		matchAllocPosPayment.setC_Charge_ID(0);
-		matchAllocPosPayment.setAllocatedAmt(matchAmt);
+		matchAllocPosPayment.setAllocatedAmt(matchAmt.abs());
 		matchAllocPosPayment.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAllocPosPayment.setC_BPartner_ID(posLine.getC_BPartner_ID());
 		matchAllocPosPayment.setC_Currency_ID(allocHdr.getC_Currency_ID());
@@ -478,7 +478,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 		matchAllocatePayment.setMatch_Payment_ID(0);
 		matchAllocatePayment.setMatch_Invoice_ID(line.getC_Invoice_ID());
 		matchAllocatePayment.setC_Charge_ID(0);
-		matchAllocatePayment.setAllocatedAmt(line.getAmount());
+		matchAllocatePayment.setAllocatedAmt(line.getAmount().abs());
 		matchAllocatePayment.setC_AllocationHdr_ID(line.getC_AllocationHdr_ID());
 		matchAllocatePayment.setC_BPartner_ID(line.getC_BPartner_ID());
 		matchAllocatePayment.setC_Currency_ID(line.getParent().getC_Currency_ID());
@@ -496,7 +496,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 		matchAllocationInvoice.setMatch_Payment_ID(line.getC_Payment_ID());
 		matchAllocationInvoice.setMatch_Invoice_ID(0);
 		matchAllocationInvoice.setC_Charge_ID(0);
-		matchAllocationInvoice.setAllocatedAmt(line.getAmount());
+		matchAllocationInvoice.setAllocatedAmt(line.getAmount().abs());
 		matchAllocationInvoice.setC_AllocationHdr_ID(line.getC_AllocationHdr_ID());
 		matchAllocationInvoice.setC_BPartner_ID(line.getC_BPartner_ID());
 		matchAllocationInvoice.setC_Currency_ID(line.getParent().getC_Currency_ID());

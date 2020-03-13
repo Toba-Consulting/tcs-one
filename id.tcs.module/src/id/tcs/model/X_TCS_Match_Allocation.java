@@ -32,7 +32,7 @@ public class X_TCS_Match_Allocation extends PO implements I_TCS_Match_Allocation
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20200219L;
+	private static final long serialVersionUID = 20200312L;
 
     /** Standard Constructor */
     public X_TCS_Match_Allocation (Properties ctx, int TCS_Match_Allocation_ID, String trxName)
