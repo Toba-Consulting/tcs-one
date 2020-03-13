@@ -133,6 +133,7 @@ public class TCS_AllocationReset extends SvrProcess
 			if(notValid)
 				throw new AdempiereException("Cannot reset allocation with charge..");
 			//@PhieAlbert
+			//deleteMatchAllocation(hdr);
 			
 			if (delete(hdr))
 				count++;
@@ -220,7 +221,7 @@ public class TCS_AllocationReset extends SvrProcess
 		boolean success = false;
 		//@David
 		//Delete Match Allocation Before AllocationHdr
-		String sql = "DELETE FROM T_MatchAllocation WHERE C_AllocationHdr_ID=?;";
+		String sql = "DELETE FROM TCS_Match_Allocation WHERE C_AllocationHdr_ID=?;";
 		DB.executeUpdate(sql, hdr.getC_AllocationHdr_ID(), m_trx.getTrxName());
 		//@David End
 		if (hdr.delete(true, m_trx.getTrxName()))
@@ -254,4 +255,17 @@ public class TCS_AllocationReset extends SvrProcess
 		COMMIT
 	}	//	setBPartner*/
 
+	private void deleteMatchAllocation (MAllocationHdr hdr) {
+		boolean success = false;
+		
+		String sqlDelete = "DELETE FROM TCS_Match_Allocation WHERE C_AllocationHdr_ID=?";
+		
+		int result = DB.executeUpdate(sqlDelete, hdr.get_ID(), get_TrxName());
+		
+		if (result >= 0)
+			success = true;
+		
+	}
+	
+	
 }	//	AllocationReset

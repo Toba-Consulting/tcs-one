@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import org.adempiere.base.IModelFactory;
-import org.compiere.model.I_C_AllocationHdr;
-import org.compiere.model.I_C_AllocationLine;
 import org.compiere.model.I_C_BankStatement;
 import org.compiere.model.I_C_Invoice;
 import org.compiere.model.I_C_Order;
@@ -34,13 +32,11 @@ import org.compiere.model.I_M_Inventory;
 import org.compiere.model.I_M_Movement;
 import org.compiere.model.I_M_RMA;
 import org.compiere.model.I_M_Requisition;
+import org.compiere.model.I_TCS_AllocateCharge;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 import id.tcs.model.I_M_MatchRequest;
-
-import org.compiere.model.I_TCS_AllocateCharge;
-
 import id.tcs.model.MBankTransfer;
 import id.tcs.model.MInquiry;
 import id.tcs.model.MInquiryLine;
