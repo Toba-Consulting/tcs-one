@@ -138,7 +138,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 			}
 		}
 		
-		boolean alreadyInbounded = new Query(getCtx(), MMovement.Table_Name, "M_OutBoundFrom_ID="+p_M_MovementOutBound_ID, get_TrxName())
+		boolean alreadyInbounded = new Query(getCtx(), MMovement.Table_Name, "M_OutBoundFrom_ID="+p_M_MovementOutBound_ID+" AND DocStatus NOT IN ('VO','RE')", get_TrxName())
 							.match();
 		
 		if (alreadyInbounded) 
