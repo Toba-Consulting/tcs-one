@@ -81,6 +81,17 @@ public class TCS_CalloutAssetAddition implements IColumnCallout{
 		
 		mTab.setValue("A_Asset_Group_ID", asset.getA_Asset_Group_ID());
 		
+		
+		//iqbal-to set use life years based on asset group acct
+		String sqlUseLifeYears =
+				"select aaga.UseLifeYears FROM A_Asset_Group_Acct aaga "
+				+ "JOIN A_Asset aa on aa.A_Asset_Group_ID = aaga.A_Asset_Group_ID "
+				+ "WHERE aa.A_Asset_ID = " + mTab.getValue("A_Asset_ID");
+								
+		int useLifeYears = DB.getSQLValue(null, sqlUseLifeYears);
+					
+		mTab.setValue("UseLifeYears", useLifeYears);	
+		
 		return "";
 	}
 }
