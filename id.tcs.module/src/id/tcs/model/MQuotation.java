@@ -392,6 +392,29 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 		return MCurrency.getStdPrecision(getCtx(), getC_Currency_ID());
 	}
 	
+	@Override
+	protected boolean afterSave(boolean newRecord, boolean success) {
+		if(!success){
+			return success;
+		}
+		//iqbal- tax in quotation line must be same when saving, to let user know the tax is correct
+		/*
+		 *	@stephan
+		 *	TAOWI-897 check tax in quotation line must be same with tax header
+		 */
+		if(getC_Tax_ID() > 0){
+			for (MQuotationLine quotationLine : getLines()) {
+				if(getC_Tax_ID() != quotationLine.getC_Tax_ID()){
+					quotationLine.setC_Tax_ID(getC_Tax_ID());
+					quotationLine.saveEx();
+				}
+			}
+		}
+		
+		
+		return success;
+	}
+	
 	protected boolean beforeSave (boolean newRecord)
 	{
 		//	Client/Org Check
