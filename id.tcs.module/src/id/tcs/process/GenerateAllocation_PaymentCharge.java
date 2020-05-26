@@ -9,8 +9,8 @@ import org.compiere.process.DocAction;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Msg;
 
-import id.tcs.model.TCS_MAllocationHdr;
-import id.tcs.model.TCS_MPayment;
+import org.compiere.model.MAllocationHdr;
+import org.compiere.model.TCS_MPayment;
 
 public class GenerateAllocation_PaymentCharge extends SvrProcess{
 
@@ -32,7 +32,7 @@ public class GenerateAllocation_PaymentCharge extends SvrProcess{
 		
 		for (int i = 0; i < id.length; i++) {
 			TCS_MPayment payment = new TCS_MPayment(getCtx(), id[i], get_TrxName());
-			TCS_MAllocationHdr alloc = new TCS_MAllocationHdr(getCtx(), false, 
+			MAllocationHdr alloc = new MAllocationHdr(getCtx(), false, 
 					payment.getDateTrx(), payment.getC_Currency_ID(), 
 					Msg.translate(getCtx(), "C_Payment_ID")	+ ": " + payment.getDocumentNo(), 
 					get_TrxName());

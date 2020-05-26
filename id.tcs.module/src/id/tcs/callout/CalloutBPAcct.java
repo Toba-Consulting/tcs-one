@@ -7,34 +7,28 @@ import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
 
-import id.tcs.model.IAccountGen;
-import id.tcs.model.MBPCustomerAcct;
-import id.tcs.model.MBPVendorAcct;
-import id.tcs.model.MValidCombination;
-
-public class CalloutBPAcct implements IColumnCallout, IAccountGen{
+public class CalloutBPAcct implements IColumnCallout{
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		// TODO Auto-generated method stub
-		if (mField.getColumnName().equals(MBPCustomerAcct.COLUMNNAME_C_ElementValue_CP_ID))
+		if (mField.getColumnName().equals("C_ElementValue_CP_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CP_ID");
-		if (mField.getColumnName().equals(MBPCustomerAcct.COLUMNNAME_C_ElementValue_CR_ID))
+		if (mField.getColumnName().equals("C_ElementValue_CR_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CR_ID");
-		if (mField.getColumnName().equals(MBPVendorAcct.COLUMNNAME_C_ElementValue_VL_ID))
+		if (mField.getColumnName().equals("C_ElementValue_VL_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VL_ID");
-		if (mField.getColumnName().equals(MBPVendorAcct.COLUMNNAME_C_ElementValue_VP_ID))
+		if (mField.getColumnName().equals("C_ElementValue_VP_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_VP_ID");
-		if (mField.getColumnName().equals(MBPCustomerAcct.COLUMNNAME_C_Receivable_Acct)
-				|| mField.getColumnName().equals(MBPCustomerAcct.COLUMNNAME_C_Prepayment_Acct)
-				|| mField.getColumnName().equals(MBPVendorAcct.COLUMNNAME_V_Liability_Acct)
-				|| mField.getColumnName().equals(MBPVendorAcct.COLUMNNAME_V_Prepayment_Acct)
+		if (mField.getColumnName().equals("C_Receivable_Acct")
+				|| mField.getColumnName().equals("C_Prepayment_Acct")
+				|| mField.getColumnName().equals("V_Liability_Acct")
+				|| mField.getColumnName().equals("V_Prepayment_Acct")
 				)
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;
 	}
 
-	@Override
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
 		// TODO Auto-generated method stub
@@ -60,16 +54,16 @@ public class CalloutBPAcct implements IColumnCallout, IAccountGen{
 			return "";
 		
 		int C_ValidCombination_ID = (int) value;
-		MValidCombination validCombination = new MValidCombination(ctx, C_ValidCombination_ID, null);
+		MAccount validCombination = new MAccount(ctx, C_ValidCombination_ID, null);
 		
-		if (mField.getColumnName().equals(MBPCustomerAcct.COLUMNNAME_C_Prepayment_Acct)) {
-			mTab.setValue(MBPCustomerAcct.COLUMNNAME_C_ElementValue_CP_ID, validCombination.getAccount_ID());
-		}else if (mField.getColumnName().equals(MBPCustomerAcct.COLUMNNAME_C_Receivable_Acct)) {
-			mTab.setValue(MBPCustomerAcct.COLUMNNAME_C_ElementValue_CR_ID, validCombination.getAccount_ID());
-		}else if (mField.getColumnName().equals(MBPVendorAcct.COLUMNNAME_V_Liability_Acct)) {
-			mTab.setValue(MBPVendorAcct.COLUMNNAME_C_ElementValue_VL_ID, validCombination.getAccount_ID());
-		}else if (mField.getColumnName().equals(MBPVendorAcct.COLUMNNAME_V_Prepayment_Acct)) {
-			mTab.setValue(MBPVendorAcct.COLUMNNAME_C_ElementValue_VP_ID, validCombination.getAccount_ID());
+		if (mField.getColumnName().equals("C_Prepayment_Acct")) {
+			mTab.setValue("C_ElementValue_CP_ID", validCombination.getAccount_ID());
+		}else if (mField.getColumnName().equals("C_Receivable_Acct")) {
+			mTab.setValue("C_ElementValue_CR_ID", validCombination.getAccount_ID());
+		}else if (mField.getColumnName().equals("V_Liability_Acct")) {
+			mTab.setValue("C_ElementValue_VL_ID", validCombination.getAccount_ID());
+		}else if (mField.getColumnName().equals("V_Prepayment_Acct")) {
+			mTab.setValue("C_ElementValue_VP_ID", validCombination.getAccount_ID());
 		}
 		
 		return "";

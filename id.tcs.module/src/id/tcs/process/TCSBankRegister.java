@@ -49,7 +49,7 @@ public class TCSBankRegister extends SvrProcess{
 		BigDecimal balance = Env.ZERO;										//Initial Balance
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append("(SELECT tcs_bankinitialbalance(date'"+p_DateSaldo+"',?))");					//Initial Balance @param p_DateSaldo
+		sb.append("(SELECT TCS_BankInitialBalance(date'"+p_DateSaldo+"',?))");					//Initial Balance @param p_DateSaldo
 		balance = DB.getSQLValueBD(get_TrxName(), sb.toString(), p_C_BankAccount_ID);
 		
 		cleanTable();							//Remove Table(View Requirement)[TEMPORARY] TODO Remove This Later!
@@ -61,7 +61,7 @@ public class TCSBankRegister extends SvrProcess{
 		sb = new StringBuilder();
 		//@PhieAlbert
 		//sb.append("SELECT BALANCE FROM T_TCSBankReport WHERE AD_PInstance_ID=? and c_bankstatementline_id>0 order by dateacct desc, c_bankstatementline_id desc");
-		sb.append("SELECT BALANCE FROM T_TCSBankReport WHERE AD_PInstance_ID=? AND Sequence IN (1,3) order by dateacct desc, voucher DESC, c_bankstatementline_id desc");
+		sb.append("SELECT BALANCE FROM T_TCSBankReport WHERE AD_PInstance_ID=? AND Sequence IN (1,3) order by DateAcct DESC, VoucherNo DESC, C_BankStatementLine_ID DESC");
 		balance = DB.getSQLValueBD(get_TrxName(), sb.toString(), getAD_PInstance_ID());
 		
 		if(balance == null)
@@ -80,11 +80,12 @@ public class TCSBankRegister extends SvrProcess{
 	 */
 	protected void createTitleLine(){
 
+		MBankAccount acc = new MBankAccount(getCtx(), p_C_BankAccount_ID, get_TrxName());
 		StringBuilder sb = new StringBuilder();
 		sb.append("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
-				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, BankAccountName, CurrencyName, Reference, Sequence, voucher, DocumentNo, BP_value, BP_name, DateFrom, DateTo) " 
-				+ "VALUES("+getAD_Client_ID()+","+Env.getAD_Org_ID(getCtx())+",null,null,null,null,null,"+p_C_BankAccount_ID+",null,'"+p_DateFrom+"','Reconciled Transactions',null,null,null,"+getAD_PInstance_ID()+",null,null,null,null,2, null, null, null, null, '"+p_DateFrom+"','"+p_DateTo+"')");
+				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo) " 
+				+ "VALUES("+getAD_Client_ID()+","+Env.getAD_Org_ID(getCtx())+",null,null,null,null,null,"+p_C_BankAccount_ID+",null,'"+p_DateFrom+"','Reconciled Transactions',null,null,null,"+getAD_PInstance_ID()+",null,'"+acc.getName()+"',null,null,2, null, null, null, null, '"+p_DateFrom+"','"+p_DateTo+"')");
 		
 		int no = DB.executeUpdate(sb.toString(), get_TrxName());
 		log.fine("#" + no);
@@ -96,13 +97,13 @@ public class TCSBankRegister extends SvrProcess{
 	 * Sequence 1
 	 */
 	protected void createInitialBalanceLine(BigDecimal balance){
-		String sqlGetLastDate = "(select max(dateacct) from c_bankstatement bs where bs.c_bankaccount_id = "+p_C_BankAccount_ID+" "
-				+ "AND bs.docStatus IN ('CO','CL') AND bs.AD_Client_ID = "+getAD_Client_ID()+" AND dateAcct < '"+p_DateFrom+"')";
+		String sqlGetLastDate = "(SELECT MAX(DateAcct) FROM C_BankStatement bs WHERE bs.C_BankAccount_ID = "+p_C_BankAccount_ID+" "
+				+ "AND bs.docStatus IN ('CO','CL') AND bs.AD_Client_ID = "+getAD_Client_ID()+" AND DateAcct < '"+p_DateFrom+"')";
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
-				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, BankAccountName, CurrencyName, Reference, Sequence, voucher, DocumentNo, BP_value, BP_name, DateFrom, DateTo) "
+				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo) " 
 				+ "VALUES("+getAD_Client_ID()+","+Env.getAD_Org_ID(getCtx())+",null,null,null,null,null,"+p_C_BankAccount_ID+",null,"+sqlGetLastDate+",'Beginning Balance',null,null,"+balance+","+getAD_PInstance_ID()+",null,null,null,null,1, null, null, null, null, '"+p_DateFrom+"','"+p_DateTo+"')");
 		
 		int no = DB.executeUpdate(sb.toString(), get_TrxName());
@@ -120,8 +121,8 @@ public class TCSBankRegister extends SvrProcess{
 		String bankAccountName = bankAcc.get_ValueAsString("name");
 		StringBuffer sb = new StringBuffer("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
-				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, BankAccountName, CurrencyName, Reference, Sequence, voucher, DocumentNo, BP_value, BP_name, DateFrom, DateTo) ");
-				
+				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo) " );
+		
 		sb.append("select bs.AD_Client_ID, bs.AD_Org_ID, bs.IsActive, bs.Created, bs.CreatedBy, bs.Updated, bs.UpdatedBy, bs.c_bankaccount_id, ")
 		.append("bsl.c_bankstatementline_id, bsl.dateacct, bsl.Description, ")
 		.append("CASE ")
@@ -133,23 +134,23 @@ public class TCSBankRegister extends SvrProcess{
 		.append("when bsl.stmtamt<0 ")
 		.append("then bsl.stmtamt*-1 ")
 		.append("else null ")
-		.append("end, ")
-		.append("(").append(balance).append("+(sum(bsl.stmtamt) OVER (ORDER BY bsl.dateacct, cp.noVoucher, bsl.c_bankstatementline_id))), ")
+		.append("end, ") //amtsourceCE
+		.append("(").append(balance).append("+(sum(bsl.stmtamt) OVER (ORDER BY bsl.dateacct, cp.VoucherNo, bsl.c_bankstatementline_id))), ")
 		.append(""+getAD_PInstance_ID()+", null, '")
 		.append(bankAccountName).append("', '").append(currencyName).append("', ")
 		.append("COALESCE((SELECT cp.documentno || ' - ' || bp.value || ' - ' || bp.name from C_Payment cp JOIN C_BPartner bp ON cp.C_BPartner_ID=bp.C_BPartner_ID ")
 		.append("WHERE cp.C_Payment_ID=bsl.C_Payment_ID), (SELECT name FROM C_Charge cc WHERE cc.C_Charge_ID=bsl.C_Charge_ID)), ")
-		.append("3, cp.noVoucher, cp.documentno, bp.value, bp.name ,?,?") // add column voucher @phie // HBC 2529 Reference -> documentNo, bp_value, bp_name
+		.append("3, cp.VoucherNo, cp.documentno, bp.value, bp.name ,?,?") // add column voucher @phie // HBC 2529 Reference -> documentNo, bp_value, bp_name
 		.append(" from c_bankstatement bs ") 
 		//.append("join c_bankaccount ba on ba.c_bankaccount_id=bs.c_bankaccount_id ") 
 		.append("join c_bankstatementline bsl on bs.c_bankstatement_id=bsl.c_bankstatement_id ")
-		.append("join c_payment cp on cp.c_payment_id=bsl.c_payment_id ") // add column voucher @phie
-		.append("join c_bpartner bp on cp.c_bpartner_id = bp.c_bpartner_id ")
+		.append("LEFT join c_payment cp on cp.c_payment_id=bsl.c_payment_id ") // add column voucher @phie
+		.append("LEFT join c_bpartner bp on cp.c_bpartner_id = bp.c_bpartner_id ")
 		.append("where bs.c_bankaccount_id="+p_C_BankAccount_ID) 
 		.append(" and bs.docstatus IN ('CO','CL') ") 
 		.append("and bsl.dateAcct between '"+p_DateFrom+"' and '"+p_DateTo+"'")
-		.append(" group by bs.ad_client_id, bs.ad_org_id, bs.isactive, bs.created, bs.createdby, bs.updated, bs.updatedby, bs.c_bankaccount_id,  bsl.c_bankstatementline_id, bsl.dateacct, bs.Description, cp.noVoucher, cp.documentno, bp.value, bp.name ")
-		.append("order by bsl.dateacct, cp.noVoucher, bsl.c_bankstatementline_id ");
+		.append(" group by bs.ad_client_id, bs.ad_org_id, bs.isactive, bs.created, bs.createdby, bs.updated, bs.updatedby, bs.c_bankaccount_id,  bsl.c_bankstatementline_id, bsl.dateacct, bs.Description, cp.VoucherNo, cp.documentno, bp.value, bp.name ")
+		.append("order by bsl.dateacct, cp.VoucherNo, bsl.c_bankstatementline_id ");
 		
 		int no = DB.executeUpdateEx(sb.toString(), new Object[]{p_DateFrom, p_DateTo}, get_TrxName());
 		log.fine("#" + no);
@@ -164,7 +165,7 @@ public class TCSBankRegister extends SvrProcess{
 		StringBuilder sb = new StringBuilder();
 		sb.append("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
-				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, BankAccountName, CurrencyName, Reference, Sequence, voucher, DocumentNo, BP_value, BP_name, DateFrom, DateTo) "
+				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo) "
 				+ "VALUES("+getAD_Client_ID()+","+Env.getAD_Org_ID(getCtx())+",null,null,null,null,null,"+p_C_BankAccount_ID+",null,'"+p_DateFrom+"','UnReconciled Transactions',null,null,null,"+getAD_PInstance_ID()+",null,null,null,null,4, null, null,null,null, '"+p_DateFrom+"','"+p_DateTo+"')");
 		
 		int no = DB.executeUpdate(sb.toString(), get_TrxName());
@@ -182,7 +183,7 @@ public class TCSBankRegister extends SvrProcess{
 		String bankAccountName = bankAcc.get_ValueAsString("name");
 		StringBuffer sb = new StringBuffer("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
-				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, BankAccountName, CurrencyName, Reference, Sequence, voucher, DocumentNo, BP_value, BP_name, DateFrom, DateTo) ");
+				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo) " );
 				
 		sb.append("select cp.AD_Client_ID, cp.AD_Org_ID, cp.IsActive, cp.Created, cp.CreatedBy, cp.Updated, cp.UpdatedBy, cp.c_bankaccount_id, ")
 		.append("null, cp.dateacct, cp.Description, ")
@@ -211,7 +212,7 @@ public class TCSBankRegister extends SvrProcess{
 		.append(", null, '")
 		.append(bankAccountName).append("', '").append(currencyName).append("', ")
 		.append("cp.documentno ||' - '|| bp.value || ' - ' || bp.name, ")
-		.append("5, cp.noVoucher, cp.documentno, bp.value, bp.name, ?,?") // add column voucher @phie
+		.append("5, cp.VoucherNo, cp.documentno, bp.value, bp.name, ?,?") // add column voucher @phie
 		.append(" from c_payment cp ") 
 		.append("join c_bpartner bp on bp.c_bpartner_id=cp.c_bpartner_id ")
 		//.append("join c_bankaccount ba on ba.c_bankaccount_id=cp.c_bankaccount_id ")

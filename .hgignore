@@ -6,3 +6,7 @@ id.tcs.module/bin/id/tcs/model/*.class
 id.tcs.module/bin/id/tcs/validator/*.class
 id.tcs.module/bin/id/tcs/webui/apps/form/*.class
 id.tcs.fragment/bin/id/tcs/webui/dashboard/*.class
+id.tcs.module/bin/id/tcs/callout/*.class
+id.tcs.module/bin/org/compiere/acct/*.class
+id.tcs.module/bin/org/compiere/model/*.class
+id.tcs.module/bin/id/taowi/process/*.class

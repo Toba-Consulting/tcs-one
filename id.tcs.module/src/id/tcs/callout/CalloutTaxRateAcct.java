@@ -7,30 +7,25 @@ import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
 
-import id.tcs.model.IAccountGen;
-import id.tcs.model.MTaxAcct;
-import id.tcs.model.MValidCombination;
-
-public class CalloutTaxRateAcct implements IColumnCallout, IAccountGen{
+public class CalloutTaxRateAcct implements IColumnCallout{
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		// TODO Auto-generated method stub
-		if (mField.getColumnName().equals(MTaxAcct.COLUMNNAME_C_ElementValue_TD_ID))
+		if (mField.getColumnName().equals("C_ElementValue_TD_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TD_ID");
-		if (mField.getColumnName().equals(MTaxAcct.COLUMNNAME_C_ElementValue_TE_ID))
+		if (mField.getColumnName().equals("C_ElementValue_TE_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TE_ID");
-		if (mField.getColumnName().equals(MTaxAcct.COLUMNNAME_C_ElementValue_TC_ID))
+		if (mField.getColumnName().equals("C_ElementValue_TC_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_TC_ID");
-		if (mField.getColumnName().equals(MTaxAcct.COLUMNNAME_T_Due_Acct)
-				|| mField.getColumnName().equals(MTaxAcct.COLUMNNAME_T_Expense_Acct)
-				|| mField.getColumnName().equals(MTaxAcct.COLUMNNAME_T_Credit_Acct)
+		if (mField.getColumnName().equals("T_Due_Acct")
+				|| mField.getColumnName().equals("T_Expense_Acct")
+				|| mField.getColumnName().equals("T_Credit_Acct")
 				)
 			setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;
 	}
 
-	@Override
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
 		// TODO Auto-generated method stub
@@ -54,14 +49,14 @@ public class CalloutTaxRateAcct implements IColumnCallout, IAccountGen{
 			return "";
 		
 		int C_ValidCombination_ID = (int)value;
-		MValidCombination validCombination = new MValidCombination(ctx, C_ValidCombination_ID, null);
+		MAccount validCombination = new MAccount(ctx, C_ValidCombination_ID, null);
 		
 		if (mField.getColumnName().equals("T_Due_Acct")) {
-			mTab.setValue(MTaxAcct.COLUMNNAME_C_ElementValue_TD_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_TD_ID", validCombination.getAccount_ID());
 		}else if (mField.getColumnName().equals("T_Expense_Acct")) {
-			mTab.setValue(MTaxAcct.COLUMNNAME_C_ElementValue_TE_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_TE_ID", validCombination.getAccount_ID());
 		}else if (mField.getColumnName().equals("T_Credit_Acct")) {
-			mTab.setValue(MTaxAcct.COLUMNNAME_C_ElementValue_TC_ID, validCombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_TC_ID", validCombination.getAccount_ID());
 		}
 		return "";
 	}

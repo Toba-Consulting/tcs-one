@@ -6,15 +6,23 @@ import java.util.logging.Level;
 
 import org.adempiere.base.IDocFactory;
 import org.compiere.acct.Doc;
-import org.compiere.acct.TCS_Doc_Invoice;
+//import org.compiere.acct.Doc_AssetAddition;
+import org.compiere.acct.Doc_BankTransfer;
+import org.compiere.acct.Doc_DDOrder;
+import org.compiere.acct.TCS_Doc_AmortizationRun;
+import org.compiere.acct.TCS_Doc_AssetAddition;
 import org.compiere.acct.TCS_Doc_Payment;
 import org.compiere.model.MAcctSchema;
-import org.compiere.model.MInvoice;
+import org.compiere.model.MAssetAddition;
 import org.compiere.model.MPayment;
 import org.compiere.model.MTable;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.eevolution.model.MDDOrder;
+
+import id.tcs.model.MBankTransfer;
+import id.tcs.model.MTCSAmortizationRun;
 
 public class TCS_DocFactory implements IDocFactory {
 	private final static CLogger s_log = CLogger.getCLogger(TCS_DocFactory.class);
@@ -67,12 +75,21 @@ public class TCS_DocFactory implements IDocFactory {
 			return new SLU_Doc_AllocationHdr(as, rs, trxName);
 		*/
 		
-		if(tableName.equals(MInvoice.Table_Name))
-			return new TCS_Doc_Invoice(as, rs, trxName);
-		
 		if(tableName.equals(MPayment.Table_Name))
 			return new TCS_Doc_Payment(as, rs, trxName);
 		
+		if(tableName.equals(MBankTransfer.Table_Name))
+			return new Doc_BankTransfer(as, rs, trxName);
+
+		if(tableName.equals(MAssetAddition.Table_Name))
+			return new TCS_Doc_AssetAddition(as, rs, trxName);
+
+		if(tableName.equals(MTCSAmortizationRun.Table_Name))
+			return new TCS_Doc_AmortizationRun(as, rs, trxName);
+
+		if(tableName.equals(MDDOrder.Table_Name))
+			return new Doc_DDOrder(as, rs, trxName);
+
 		return null;
 
 	}

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Custom
+Bundle-Name: TCS Custom Module
 Bundle-SymbolicName: id.tcs.module;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
@@ -16,5 +16,7 @@ Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
 Bundle-ActivationPolicy: lazy
 Import-Package: org.adempiere.webui.factory,
  org.adempiere.webui.panel
-Service-Component: OSGI-INF/tcscalloutfactory.xml,OSGI-INF/tcsvalidatorfactory.xml,OSGI-INF/tcsprocessfactory.xml,OSGI-INF/tcsmodelfactory.xml,OSGI-INF/tcsformfactory.xml,
- OSGI-INF/tcsdocfactory.xml
+Service-Component: OSGI-INF/tcscalloutfactory.xml,OSGI-INF/tcsvalidatorfactory.xml,OSGI-INF/tcsprocessfactory.xml,OSGI-INF/tcsmodelfactory.xml,OSGI-INF/tcsformfactory.xml,OSGI-INF/tcsdocfactory.xml,
+ OSGI-INF/tcscreatefromfactory.xml
+Export-Package: id.tcs.model
+Bundle-Vendor: Toba Technology

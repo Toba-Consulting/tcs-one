@@ -7,41 +7,34 @@ import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MAccount;
 
-import id.tcs.model.IAccountGen;
-import id.tcs.model.MBankAccountAcct;
-import id.tcs.model.MValidCombination;
-
-public class CalloutBankCash implements IColumnCallout, IAccountGen{
+public class CalloutBankCash implements IColumnCallout {
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		// TODO Auto-generated method stub
-		if (mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_C_ElementValue_BA_ID))
+		if (mField.getColumnName().equals("C_ElementValue_BA_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_BA_ID");
-		if (mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_C_ElementValue_BIT_ID))
+		if (mField.getColumnName().equals("C_ElementValue_BIT_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_BIT_ID");
-		if (mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_C_ElementValue_PS_ID))
+		if (mField.getColumnName().equals("C_ElementValue_PS_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_PS_ID");
-		if (mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_C_ElementValue_UC_ID))
+		if (mField.getColumnName().equals("C_ElementValue_UC_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_UC_ID");
-		if (mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_C_ElementValue_BIR_ID))
+		if (mField.getColumnName().equals("C_ElementValue_BIR_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_BIR_ID");
-		if (mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_C_ElementValue_BIE_ID))
+		if (mField.getColumnName().equals("C_ElementValue_BIE_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_BIE_ID");
-		if (mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_B_Asset_Acct) 
-				|| mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_B_InTransit_Acct) 
-				|| mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_B_PaymentSelect_Acct) 
-				|| mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_B_UnallocatedCash_Acct) 
-				|| mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_B_InterestRev_Acct) 
-				|| mField.getColumnName().equals(MBankAccountAcct.COLUMNNAME_B_InterestExp_Acct))
+		if (mField.getColumnName().equals("B_Asset_Acct") 
+				|| mField.getColumnName().equals("B_InTransit_Acct") 
+				|| mField.getColumnName().equals("B_PaymentSelect_Acct") 
+				|| mField.getColumnName().equals("B_UnallocatedCash_Acct") 
+				|| mField.getColumnName().equals("B_InterestRev_Acct") 
+				|| mField.getColumnName().equals("B_InterestExp_Acct"))
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;
 	}
 
-	@Override
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
-		// TODO Auto-generated method stub
 		if(value == null)
 			return "";
 			
@@ -71,20 +64,20 @@ public class CalloutBankCash implements IColumnCallout, IAccountGen{
 		}
 		
 		int C_ValidCombination_ID = (int) value;
-		MValidCombination validcombination = new MValidCombination(ctx, C_ValidCombination_ID, null);
+		MAccount validcombination = new MAccount(ctx, C_ValidCombination_ID, null);
 		
 		if(mField.getColumnName().equals("B_Asset_Acct"))
-			mTab.setValue(MBankAccountAcct.COLUMNNAME_C_ElementValue_BA_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_BA_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("B_InTransit_Acct"))
-			mTab.setValue(MBankAccountAcct.COLUMNNAME_C_ElementValue_BIT_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_BIT_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("B_PaymentSelect_Acct"))
-			mTab.setValue(MBankAccountAcct.COLUMNNAME_C_ElementValue_PS_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_PS_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("B_UnallocatedCash_Acct"))
-			mTab.setValue(MBankAccountAcct.COLUMNNAME_C_ElementValue_UC_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_UC_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("B_InterestRev_Acct"))
-			mTab.setValue(MBankAccountAcct.COLUMNNAME_C_ElementValue_BIR_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_BIR_ID", validcombination.getAccount_ID());
 		else if(mField.getColumnName().equals("B_InterestExp_Acct"))
-			mTab.setValue(MBankAccountAcct.COLUMNNAME_C_ElementValue_BIE_ID, validcombination.getAccount_ID());
+			mTab.setValue("C_ElementValue_BIE_ID", validcombination.getAccount_ID());
 		
 		return "";
 	}

@@ -23,38 +23,41 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import org.adempiere.base.IModelFactory;
-import org.compiere.model.I_C_AllocationHdr;
 import org.compiere.model.I_C_BankStatement;
+import org.compiere.model.I_C_Invoice;
+import org.compiere.model.I_C_Order;
 import org.compiere.model.I_C_Payment;
-import org.compiere.model.MWarehouse;
+import org.compiere.model.I_M_InOut;
+import org.compiere.model.I_M_Inventory;
+import org.compiere.model.I_M_Movement;
+import org.compiere.model.I_M_RMA;
+import org.compiere.model.I_M_Requisition;
+import org.compiere.model.I_TCS_AllocateCharge;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 
-import id.tcs.model.I_TCS_AllocateCharge;
-import id.tcs.model.MAcctSchemaDefault;
-import id.tcs.model.MAcctSchemaGL;
-import id.tcs.model.MBPCustomerAcct;
-import id.tcs.model.MBPGroupAcct;
-import id.tcs.model.MBPVendorAcct;
-import id.tcs.model.MBankAccountAcct;
-import id.tcs.model.MChargeAcct;
-import id.tcs.model.MFADefaultAccount;
-import id.tcs.model.MProductAcct;
-import id.tcs.model.MProductCategoryAcct;
-import id.tcs.model.MProjectAcct;
-import id.tcs.model.MTaxAcct;
-import id.tcs.model.MWarehouseAcct;
-import id.tcs.model.TCS_MAdvRequest;
-import id.tcs.model.TCS_MAdvRequestLine;
-import id.tcs.model.TCS_MAdvSettlement;
-import id.tcs.model.TCS_MAdvSettlementLine;
-import id.tcs.model.TCS_MDestRequest;
-import id.tcs.model.TCS_MDestSettlement;
-import id.tcs.model.TCS_MExpenseLine;
-import id.tcs.model.TCS_MTravelExpense;
-import id.tcs.model.TCS_MTripFacility;
-
-import org.compiere.model.TCS_MAllocationHdr;
+import id.tcs.model.I_M_MatchRequest;
+import id.tcs.model.MBankTransfer;
+import id.tcs.model.MInquiry;
+import id.tcs.model.MInquiryLine;
+import id.tcs.model.MQuotation;
+import id.tcs.model.MQuotationLine;
+import id.tcs.model.MQuotationTax;
+import id.tcs.model.MTCSAmortizationLine;
+import id.tcs.model.MTCSAmortizationPlan;
+import id.tcs.model.MTCSAmortizationRun;
+import id.tcs.model.TCS_MDDOrder;
+import id.tcs.model.TCS_MRequestLine;
+import id.tcs.model.TCS_MRfQ;
+import id.tcs.model.TCS_MRfQLine;
+import id.tcs.model.TCS_MRfQLineQty;
+import id.tcs.model.TCS_MRfQResponse;
+import id.tcs.model.TCS_MRfQResponseLine;
+import id.tcs.model.TCS_MRfQResponseLineQty;
+import id.tcs.model.TCS_MRfQTopic;
+import id.tcs.model.TCS_MRfQTopicSubscriber;
+import id.tcs.model.TCS_MRfQTopicSubscriberOnly;
+import id.tcs.model.X_M_MatchQuotation;
 
 
 
@@ -69,33 +72,44 @@ public class TCS_ModelFactory implements IModelFactory {
 	private static HashMap<String, String> mapTableModels = new HashMap<String, String>();
 	static
 	{
-		mapTableModels.put(I_C_Payment.Table_Name, "id.tcs.model.TCS_MPayment");
-		mapTableModels.put(I_TCS_AllocateCharge.Table_Name, "id.tcs.model.MTCS_AllocateCharge");
-		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
-		mapTableModels.put(I_C_BankStatement.Table_Name, "id.tcs.model.TCS_MBankStatement");
-		mapTableModels.put(TCS_MAllocationHdr.Table_Name, "org.compiere.model.TCS_MAllocationHdr");
-		mapTableModels.put(TCS_MAdvRequest.Table_Name, "id.tcs.model.TCS_MAdvRequest");
-		mapTableModels.put(TCS_MDestRequest.Table_Name, "id.tcs.model.TCS_MDestRequest");
-		mapTableModels.put(TCS_MAdvRequestLine.Table_Name, "id.tcs.model.TCS_MAdvRequestLine");
-		mapTableModels.put(TCS_MAdvSettlement.Table_Name, "id.tcs.model.TCS_MAdvSettlement");
-		mapTableModels.put(TCS_MDestSettlement.Table_Name, "id.tcs.model.TCS_MDestSettlement");
-		mapTableModels.put(TCS_MAdvSettlementLine.Table_Name, "id.tcs.model.TCS_MAdvSettlementLine");
-		mapTableModels.put(TCS_MTripFacility.Table_Name, "id.tcs.model.TCS_MTripFacility");
-		mapTableModels.put(TCS_MTravelExpense.Table_Name, "id.tcs.model.TCS_MTravelExpense");
-		mapTableModels.put(TCS_MExpenseLine.Table_Name, "id.tcs.model.TCS_MExpenseLine");
-		mapTableModels.put(MAcctSchemaDefault.Table_Name, "id.tcs.model.MAcctSchemaDefault");
-		mapTableModels.put(MAcctSchemaGL.Table_Name, "id.tcs.model.MAcctSchemaGL");
-		mapTableModels.put(MBankAccountAcct.Table_Name, "id.tcs.model.MBankAccountAcct");
-		mapTableModels.put(MBPCustomerAcct.Table_Name, "id.tcs.model.MBPCustomerAcct");
-		mapTableModels.put(MBPGroupAcct.Table_Name, "id.tcs.model.MBPGroupAcct");
-		mapTableModels.put(MBPVendorAcct.Table_Name, "id.tcs.model.MBPVendorAcct");
-		mapTableModels.put(MChargeAcct.Table_Name, "id.tcs.model.MChargeAcct");
-		mapTableModels.put(MFADefaultAccount.Table_Name, "id.tcs.model.MFADefaultAccount");
-		mapTableModels.put(MProductAcct.Table_Name, "id.tcs.model.MProductAcct");
-		mapTableModels.put(MProductCategoryAcct.Table_Name, "id.tcs.model.MProductCategoryAcct");
-		mapTableModels.put(MProjectAcct.Table_Name, "id.tcs.model.MProjectAcct");
-		mapTableModels.put(MTaxAcct.Table_Name, "id.tcs.model.MTaxAcct");
-		mapTableModels.put(MWarehouseAcct.Table_Name, "id.tcs.model.MWarehouseAcct");
+		mapTableModels.put(I_M_Requisition.Table_Name, "org.compiere.model.TCS_MRequisition");
+		mapTableModels.put(I_C_Order.Table_Name, "org.compiere.model.TCS_MOrder");
+		mapTableModels.put(I_M_RMA.Table_Name, "org.compiere.model.TCS_MRMA");
+		mapTableModels.put(I_M_InOut.Table_Name, "org.compiere.model.TCS_MInOut");
+		mapTableModels.put(I_C_Invoice.Table_Name, "org.compiere.model.TCS_MInvoice");
+		mapTableModels.put(I_C_Payment.Table_Name, "org.compiere.model.TCS_MPayment");
+		/*
+		mapTableModels.put(I_C_AllocationHdr.Table_Name, "org.compiere.model.TCS_MAllocationHdr");
+		mapTableModels.put(I_C_AllocationLine.Table_Name, "org.compiere.model.TCS_MAllocationLine");
+		*/
+		mapTableModels.put(I_C_BankStatement.Table_Name, "org.compiere.model.TCS_MBankStatement");
+		mapTableModels.put(I_M_Inventory.Table_Name, "org.compiere.model.TCS_MInventory");
+		mapTableModels.put(I_M_Movement.Table_Name, "org.compiere.model.TCS_MMovement");
+		
+		mapTableModels.put(I_TCS_AllocateCharge.Table_Name, "org.compiere.model.MTCS_AllocateCharge");
+		mapTableModels.put(MBankTransfer.Table_Name, "id.tcs.model.MBankTransfer");
+		mapTableModels.put(MQuotation.Table_Name, "id.tcs.model.MQuotation");
+		mapTableModels.put(MQuotationLine.Table_Name, "id.tcs.model.MQuotationLine");
+		mapTableModels.put(MQuotationTax.Table_Name, "id.tcs.model.MQuotationTax");
+		mapTableModels.put(MInquiry.Table_Name, "id.tcs.model.MInquiry");
+		mapTableModels.put(MInquiryLine.Table_Name, "id.tcs.model.MInquiryLine");
+		mapTableModels.put(MTCSAmortizationPlan.Table_Name, "id.tcs.model.MTCSAmortizationPlan");
+		mapTableModels.put(MTCSAmortizationLine.Table_Name, "id.tcs.model.MTCSAmortizationLine");
+		mapTableModels.put(MTCSAmortizationRun.Table_Name, "id.tcs.model.MTCSAmortizationRun");
+		mapTableModels.put(TCS_MRequestLine.Table_Name, "id.tcs.model.TCS_MRequestLine");
+		mapTableModels.put(TCS_MRfQResponse.Table_Name, "id.tcs.model.TCS_MRfQResponse");
+		mapTableModels.put(TCS_MRfQResponseLine.Table_Name, "id.tcs.model.TCS_MRfQResponseLine");
+		mapTableModels.put(TCS_MRfQResponseLineQty.Table_Name, "id.tcs.model.TCS_MRfQResponseLineQty");
+		mapTableModels.put(I_M_MatchRequest.Table_Name, "id.tcs.model.I_M_MatchRequest");
+		mapTableModels.put(TCS_MRfQ.Table_Name, "id.tcs.model.TCS_MRfQ");
+		mapTableModels.put(TCS_MRfQLine.Table_Name, "id.tcs.model.TCS_MRfQLine");
+		mapTableModels.put(TCS_MRfQLineQty.Table_Name, "id.tcs.model.TCS_MRfQLineQty");
+		mapTableModels.put(TCS_MRfQTopic.Table_Name, "id.tcs.model.TCS_MRfQTopic");
+		mapTableModels.put(TCS_MRfQTopicSubscriber.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriber");
+		mapTableModels.put(TCS_MRfQTopicSubscriberOnly.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriberOnly");
+		mapTableModels.put(TCS_MDDOrder.Table_Name, "id.tcs.model.TCS_MDDOrder");
+		mapTableModels.put(X_M_MatchQuotation.Table_Name, "id.tcs.model.X_M_MatchQuotation");
+		
 	}
 	
 	@Override

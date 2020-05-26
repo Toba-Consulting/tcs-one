@@ -1,14 +1,11 @@
 package id.tcs.validator;
 
-import id.tcs.model.TCS_MAdvRequest;
-import id.tcs.model.TCS_MAdvSettlement;
-
 import org.adempiere.base.event.IEventTopics;
-import org.compiere.model.MAllocationHdr;
+import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MAllocationLine;
 import org.compiere.model.MPayment;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
-import org.compiere.util.DB;
 import org.osgi.service.event.Event;
 
 public class TCS_PaymentValidator {
@@ -17,59 +14,27 @@ public class TCS_PaymentValidator {
 		String msg = "";
 		MPayment payment = (MPayment) po;
 
-		if(event.getTopic().equals(IEventTopics.DOC_AFTER_REVERSEACCRUAL))
-			msg = afterReverse(payment);
-		
-		if(event.getTopic().equals(IEventTopics.DOC_AFTER_REVERSECORRECT))
-			msg = afterReverse(payment);
-		
+		if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL)) ||
+				(event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT))) {
+			msg = checkAllocation(payment);
+		}
 		return msg;
 	}
 	
-	public  static String afterReverse(MPayment payment){
-		
-		//Set Tcs_AdvRequest.C_Payment_ID = NULL When Reverse when reverse C_Payment
-		String sqlRequest="C_Payment_ID="+payment.getC_Payment_ID();
-		int [] requestIDs = new Query(payment.getCtx(), TCS_MAdvRequest.Table_Name, sqlRequest, payment.get_TrxName()).getIDs();
-		if (requestIDs.length>0) {
-			
-			TCS_MAdvRequest request;
-			
-			for (int i : requestIDs) {
-				request= new TCS_MAdvRequest(payment.getCtx(), i, payment.get_TrxName());
-				request.setC_Payment_ID(0);
-				request.saveEx();
-			}
-	/*		
-			String sqlRequestUpdate="UPDATE TCS_AdvRequest SET C_Payment_ID = NULL WHERE TCS_AdvRequest_ID=?";
-			for (int i : requestIDs) {
-				DB.executeUpdate(sqlRequestUpdate, i, payment.get_TrxName());
-			}
-	*/	
-		}
-		
-		//Set Tcs_AdvSettlement.C_Payment_ID = NULL When Reverse when reverse C_Payment
-		String sqlSettlement="C_Payment_ID="+payment.getC_Payment_ID();
-		int [] settlementIDs = new Query(payment.getCtx(), TCS_MAdvSettlement.Table_Name, sqlSettlement, payment.get_TrxName()).getIDs();
-		if (settlementIDs.length>0) {
-		
-			TCS_MAdvSettlement settlement;
-			
-			for (int i : settlementIDs) {
-				settlement= new TCS_MAdvSettlement(payment.getCtx(), i, payment.get_TrxName());
-				settlement.setC_Payment_ID(0);
-				settlement.setisReimbursed(false);
-				settlement.setisReturned(false);
-				settlement.saveEx();
-			}
-			/*			
-			String sqlSettlementUpdate="UPDATE TCS_AdvSettlement SET C_Payment_ID = NULL WHERE TCS_AdvRequest_ID=?";
-			for (int i : settlementIDs) {
-				DB.executeUpdate(sqlSettlementUpdate, i, payment.get_TrxName());
-			}
-			 */			
-		}
-		
+	public static String checkAllocation(MPayment payment){
+		String whereClause =  " C_AllocationLine.C_Payment_ID = ? AND (cp.C_Charge_ID IS NULL OR cp.C_Charge_ID=0) AND cdr.docStatus='CO' AND"
+							+ " NOT EXISTS ("
+							+ " SELECT 1 FROM TCS_AllocateCharge tac WHERE tac.C_Payment_ID = C_AllocationLine.C_Payment_ID)"
+							+ " AND NOT EXISTS ("
+							+ " SELECT 1 FROM C_PaymentAllocate cpa WHERE C_AllocationLine.C_Payment_ID=cpa.C_Payment_ID)";
+		boolean match = new Query(payment.getCtx(), MAllocationLine.Table_Name, whereClause, payment.get_TrxName())
+				.addJoinClause("JOIN C_AllocationHdr cdr ON cdr.c_AllocationHdr_ID = C_AllocationLine.C_AllocationHdr_ID "
+							+  "JOIN C_Payment cp on cp.C_Payment_ID=C_AllocationLine.C_Payment_ID")
+				.setParameters(new Object[]{payment.getC_Payment_ID()})
+				.match();
+
+		if(match)
+			throw new AdempiereException("Cannot reverse payment.. Related allocation exists..");
 		return "";
 	}
 }
