@@ -33,7 +33,7 @@ public interface I_TCS_Match_Allocation
     public static final String Table_Name = "TCS_Match_Allocation";
 
     /** AD_Table_ID=300623 */
-    public static final int Table_ID = 300623;
+    public static final int Table_ID = 300725;
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 

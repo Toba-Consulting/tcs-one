@@ -350,7 +350,12 @@ public class TCS_MAllocationHdrValidator {
 		matchAlloc.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAlloc.setC_BPartner_ID(payLine.getC_BPartner_ID());
 		matchAlloc.setC_Currency_ID(allocHdr.getC_Currency_ID());
-		matchAlloc.setDescription(allocHdr.getDescription());
+		if(payLine.get_ValueAsString("Description").length() > 0){
+			matchAlloc.setDescription(payLine.get_ValueAsString("Description"));
+		}
+		else {
+			matchAlloc.setDescription(allocHdr.getDescription());
+		}
 		matchAlloc.setDiscountAmt(Env.ZERO);
 		matchAlloc.setWriteOffAmt(Env.ZERO);
 		matchAlloc.setOverUnderAmt(Env.ZERO);
@@ -370,7 +375,12 @@ public class TCS_MAllocationHdrValidator {
 		matchAlloc.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAlloc.setC_BPartner_ID(invLine.getC_BPartner_ID());
 		matchAlloc.setC_Currency_ID(allocHdr.getC_Currency_ID());
-		matchAlloc.setDescription(allocHdr.getDescription());
+		if(invLine.get_ValueAsString("Description").length() > 0){
+			matchAlloc.setDescription(invLine.get_ValueAsString("Description"));
+		}
+		else {
+			matchAlloc.setDescription(allocHdr.getDescription());
+		}
 		matchAlloc.setDiscountAmt(invLine.getDiscountAmt());
 		matchAlloc.setWriteOffAmt(invLine.getWriteOffAmt());
 		matchAlloc.setOverUnderAmt(invLine.getOverUnderAmt());
@@ -390,7 +400,12 @@ public class TCS_MAllocationHdrValidator {
 		matchAllocNegInvoice.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAllocNegInvoice.setC_BPartner_ID(negLine.getC_BPartner_ID());
 		matchAllocNegInvoice.setC_Currency_ID(allocHdr.getC_Currency_ID());
-		matchAllocNegInvoice.setDescription(allocHdr.getDescription());
+		if(negLine.get_ValueAsString("Description").length() > 0){
+			matchAllocNegInvoice.setDescription(negLine.get_ValueAsString("Description"));
+		}
+		else {
+			matchAllocNegInvoice.setDescription(allocHdr.getDescription());
+		}
 		matchAllocNegInvoice.setDiscountAmt(negLine.getDiscountAmt());
 		matchAllocNegInvoice.setWriteOffAmt(negLine.getWriteOffAmt());
 		matchAllocNegInvoice.setOverUnderAmt(negLine.getOverUnderAmt());
@@ -408,7 +423,12 @@ public class TCS_MAllocationHdrValidator {
 		matchAllocPosInvoice.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAllocPosInvoice.setC_BPartner_ID(posLine.getC_BPartner_ID());
 		matchAllocPosInvoice.setC_Currency_ID(allocHdr.getC_Currency_ID());
-		matchAllocPosInvoice.setDescription(allocHdr.getDescription());
+		if(posLine.get_ValueAsString("Description").length() > 0){
+			matchAllocPosInvoice.setDescription(posLine.get_ValueAsString("Description"));
+		}
+		else {
+			matchAllocPosInvoice.setDescription(allocHdr.getDescription());
+		}
 		matchAllocPosInvoice.setDiscountAmt(posLine.getDiscountAmt());
 		matchAllocPosInvoice.setWriteOffAmt(posLine.getWriteOffAmt());
 		matchAllocPosInvoice.setOverUnderAmt(posLine.getOverUnderAmt());
@@ -429,7 +449,12 @@ public class TCS_MAllocationHdrValidator {
 		matchAllocNegPayment.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAllocNegPayment.setC_BPartner_ID(negLine.getC_BPartner_ID());
 		matchAllocNegPayment.setC_Currency_ID(allocHdr.getC_Currency_ID());
-		matchAllocNegPayment.setDescription(allocHdr.getDescription());
+		if(negLine.get_ValueAsString("Description").length() > 0){
+			matchAllocNegPayment.setDescription(negLine.get_ValueAsString("Description"));
+		}
+		else {
+			matchAllocNegPayment.setDescription(allocHdr.getDescription());
+		}
 		matchAllocNegPayment.setDiscountAmt(Env.ZERO);
 		matchAllocNegPayment.setWriteOffAmt(Env.ZERO);
 		matchAllocNegPayment.setOverUnderAmt(Env.ZERO);
@@ -447,7 +472,12 @@ public class TCS_MAllocationHdrValidator {
 		matchAllocPosPayment.setC_AllocationHdr_ID(allocHdr.getC_AllocationHdr_ID());
 		matchAllocPosPayment.setC_BPartner_ID(posLine.getC_BPartner_ID());
 		matchAllocPosPayment.setC_Currency_ID(allocHdr.getC_Currency_ID());
-		matchAllocPosPayment.setDescription(allocHdr.getDescription());
+		if(posLine.get_ValueAsString("Description").length() > 0){
+			matchAllocPosPayment.setDescription(posLine.get_ValueAsString("Description"));
+		}
+		else {
+			matchAllocPosPayment.setDescription(allocHdr.getDescription());
+		}
 		matchAllocPosPayment.setDiscountAmt(Env.ZERO);
 		matchAllocPosPayment.setWriteOffAmt(Env.ZERO);
 		matchAllocPosPayment.setOverUnderAmt(Env.ZERO);
