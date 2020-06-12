@@ -5,6 +5,7 @@ import org.adempiere.base.event.IEventTopics;
 import org.adempiere.base.event.LoginEventData;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.I_C_Order;
+import org.compiere.model.MAllocationHdr;
 //import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MBankStatement;
 import org.compiere.model.MInOut;
@@ -30,7 +31,9 @@ import id.tcs.validator.TCS_BankStatementDocValidator;
 import id.tcs.validator.TCS_DDOrderValidator;
 import id.tcs.validator.TCS_InOutValidator;
 import id.tcs.validator.TCS_InvoiceValidator;
+import id.tcs.validator.TCS_MAllocationHdrValidator;
 import id.tcs.validator.TCS_MovementValidator;
+import id.tcs.validator.TCS_OrderLineValidator;
 import id.tcs.validator.TCS_OrderValidator;
 import id.tcs.validator.TCS_PPProductBomLineValidator;
 import id.tcs.validator.TCS_PaymentAllocateValidator;
@@ -41,8 +44,6 @@ import id.tcs.validator.TCS_RFQLineValidator;
 import id.tcs.validator.TCS_RequisitionValidator;
 import id.tcs.validator.TCS_RfQValidator;
 import id.tcs.validator.TCS_WFActivityValidator;
-import id.tcs.validator.TCS_MAllocationHdrValidator;
-import id.tcs.validator.TCS_OrderLineValidator;
 
 public class TCS_ValidatorFactory extends AbstractEventHandler {
 	private CLogger log = CLogger.getCLogger(TCS_ValidatorFactory.class);
@@ -58,9 +59,9 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, MInOut.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, MInOut.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, X_AD_WF_Activity.Table_Name);
-//		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MAllocationHdr.Table_Name);
-//		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MAllocationHdr.Table_Name);
-//		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MAllocationHdr.Table_Name);		
+		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MAllocationHdr.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MAllocationHdr.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MAllocationHdr.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, MPayment.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, MPayment.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, MPayment.Table_Name);		
@@ -116,9 +117,9 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		else if(getPO(event).get_TableName().equals(MWFActivity.Table_Name)){
 			msg = TCS_WFActivityValidator.executeEvent(event, getPO(event));
 		}
-//		else if(getPO(event).get_TableName().equals(MAllocationHdr.Table_Name)) {
-//			msg = TCS_MAllocationHdrValidator.executeEvent(event, getPO(event));
-//		}
+		else if(getPO(event).get_TableName().equals(MAllocationHdr.Table_Name)) {
+			msg = TCS_MAllocationHdrValidator.executeEvent(event, getPO(event));
+		}
 		else if(getPO(event).get_TableName().equals(MBankStatement.Table_Name)) {
 			msg = TCS_BankStatementDocValidator.executeEvent(event, getPO(event));
 		}
