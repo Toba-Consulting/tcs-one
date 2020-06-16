@@ -10,3 +10,4 @@ id.tcs.module/bin/id/tcs/callout/*.class
 id.tcs.module/bin/org/compiere/acct/*.class
 id.tcs.module/bin/org/compiere/model/*.class
 id.tcs.module/bin/id/taowi/process/*.class
+id.tcs.module/bin/org/compiere/process/*.class

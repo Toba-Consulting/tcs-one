@@ -34,6 +34,7 @@ import org.compiere.model.I_M_RMA;
 import org.compiere.model.I_M_Requisition;
 import org.compiere.model.I_TCS_AllocateCharge;
 import org.compiere.model.PO;
+import org.compiere.model.X_M_Periodic_Cost;
 import org.compiere.util.Env;
 
 import id.tcs.model.I_M_MatchRequest;
@@ -109,6 +110,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MRfQTopicSubscriberOnly.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriberOnly");
 		mapTableModels.put(TCS_MDDOrder.Table_Name, "id.tcs.model.TCS_MDDOrder");
 		mapTableModels.put(X_M_MatchQuotation.Table_Name, "id.tcs.model.X_M_MatchQuotation");
+		mapTableModels.put(X_M_Periodic_Cost.Table_Name, "org.compiere.model.X_M_Periodic_Cost");
 		
 	}
 	
