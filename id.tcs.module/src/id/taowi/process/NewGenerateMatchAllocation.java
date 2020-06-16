@@ -56,7 +56,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 			}
 		} else if (p_dateFrom != null && p_dateTo != null) {
 			String whereClause = "DocStatus IN ('CO','CL') AND DateAcct BETWEEN ? AND ? AND "
-					+ "not exists (select C_AllocationHDR_ID from TCS_Match_Allocation)";
+					+ "not exists (SELECT C_AllocationHDR_ID from TCS_Match_Allocation tma where C_AllocationHDR.C_AllocationHDR_ID = tma.C_AllocationHDR_ID)";
 			List<MAllocationHdr> allocHdrs = new Query(Env.getCtx(), MAllocationHdr.Table_Name, whereClause, get_TrxName())
 										.setParameters(new Object[] {p_dateFrom, p_dateTo})
 										.setOnlyActiveRecords(true)
@@ -88,6 +88,7 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 				List<MAllocationLine> coLines = new Query(alloc.getCtx(), MAllocationLine.Table_Name, 
 						whereChargeOnly , alloc.get_TrxName())
 						.setParameters(alloc.get_ID())
+						.setOrderBy(I_C_AllocationLine.COLUMNNAME_Amount + " DESC") 
 						.list();
 
 				ArrayList<BigDecimal> chargeAmountList = new ArrayList<BigDecimal>(coLines.size());

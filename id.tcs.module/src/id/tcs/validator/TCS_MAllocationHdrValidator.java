@@ -59,6 +59,7 @@ public class TCS_MAllocationHdrValidator {
 				List<MAllocationLine> coLines = new Query(alloc.getCtx(), MAllocationLine.Table_Name, 
 						whereChargeOnly , alloc.get_TrxName())
 						.setParameters(alloc.get_ID())
+						.setOrderBy(I_C_AllocationLine.COLUMNNAME_Amount + " DESC") 
 						.list();
 
 				ArrayList<BigDecimal> chargeAmountList = new ArrayList<BigDecimal>(coLines.size());
