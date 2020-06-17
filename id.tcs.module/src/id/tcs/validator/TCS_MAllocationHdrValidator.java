@@ -3,6 +3,7 @@ package id.tcs.validator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -59,7 +60,6 @@ public class TCS_MAllocationHdrValidator {
 				List<MAllocationLine> coLines = new Query(alloc.getCtx(), MAllocationLine.Table_Name, 
 						whereChargeOnly , alloc.get_TrxName())
 						.setParameters(alloc.get_ID())
-						.setOrderBy(I_C_AllocationLine.COLUMNNAME_Amount + " DESC") 
 						.list();
 
 				ArrayList<BigDecimal> chargeAmountList = new ArrayList<BigDecimal>(coLines.size());
@@ -67,7 +67,9 @@ public class TCS_MAllocationHdrValidator {
 				for (MAllocationLine coLine : coLines) {
 					chargeAmountList.add(coLine.getAmount().abs());
 				}
-
+				
+				Collections.sort(chargeAmountList,Collections.reverseOrder());
+				
 				//Match remaining payment to payment
 				String wherePaymentOnly = "C_AllocationHdr_ID=? AND C_Payment_ID > 0 AND C_Invoice_ID IS NULL";
 				List<MAllocationLine> poLines = new Query(alloc.getCtx(), I_C_AllocationLine.Table_Name, 
