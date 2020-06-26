@@ -19,7 +19,7 @@ import org.compiere.util.TimeUtil;
  * @author Phie Albert
  * Run process Calculate Costing Periodic before run this process
  */
-public class UpdateCostDetail extends SvrProcess{
+public class HBC_UpdateCostDetail extends SvrProcess{
 	
 	private int p_AD_Client_ID = 0;
 	private int p_C_Period_ID = 0;

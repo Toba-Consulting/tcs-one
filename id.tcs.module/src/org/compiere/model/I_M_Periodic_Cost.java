@@ -18,28 +18,26 @@ package org.compiere.model;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for M_Periodic_Cost
  *  @author iDempiere (generated) 
- *  @version Release 3.1
+ *  @version Release 5.1
  */
-@SuppressWarnings("all")
 public interface I_M_Periodic_Cost 
 {
 
     /** TableName=M_Periodic_Cost */
     public static final String Table_Name = "M_Periodic_Cost";
 
-    /** AD_Table_ID=1100441 */
-    public static final int Table_ID = MTable.getTable_ID(Table_Name);
+    /** AD_Table_ID=300726 */
+    public static final int Table_ID = 300726;
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 4 - System 
+    /** AccessLevel = 3 - Client - Org 
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(4);
+    BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
 
@@ -64,23 +62,23 @@ public interface I_M_Periodic_Cost
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name BeginningQty */
-    public static final String COLUMNNAME_BeginningQty = "BeginningQty";
+    /** Column name beginningamount */
+    public static final String COLUMNNAME_beginningamount = "beginningamount";
 
-	/** Set BeginningQty	  */
-	public void setBeginningQty (BigDecimal BeginningQty);
+	/** Set beginningamount	  */
+	public void setbeginningamount (BigDecimal beginningamount);
 
-	/** Get BeginningQty	  */
-	public BigDecimal getBeginningQty();
+	/** Get beginningamount	  */
+	public BigDecimal getbeginningamount();
 
-    /** Column name BeginnningAmount */
-    public static final String COLUMNNAME_BeginningAmount = "BeginningAmount";
+    /** Column name beginningqty */
+    public static final String COLUMNNAME_beginningqty = "beginningqty";
 
-	/** Set BeginnningAmount	  */
-	public void setBeginningAmount (BigDecimal BeginnningAmount);
+	/** Set beginningqty	  */
+	public void setbeginningqty (BigDecimal beginningqty);
 
-	/** Get BeginnningAmount	  */
-	public BigDecimal getBeginningAmount();
+	/** Get beginningqty	  */
+	public BigDecimal getbeginningqty();
 
     /** Column name C_Period_ID */
     public static final String COLUMNNAME_C_Period_ID = "C_Period_ID";
@@ -97,14 +95,14 @@ public interface I_M_Periodic_Cost
 
 	public org.compiere.model.I_C_Period getC_Period() throws RuntimeException;
 
-    /** Column name CostPrice */
-    public static final String COLUMNNAME_CostPrice = "CostPrice";
+    /** Column name costprice */
+    public static final String COLUMNNAME_costprice = "costprice";
 
-	/** Set Cost Price	  */
-	public void setCostPrice (BigDecimal CostPrice);
+	/** Set costprice	  */
+	public void setcostprice (BigDecimal costprice);
 
-	/** Get Cost Price	  */
-	public BigDecimal getCostPrice();
+	/** Get costprice	  */
+	public BigDecimal getcostprice();
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -122,32 +120,32 @@ public interface I_M_Periodic_Cost
 	  */
 	public int getCreatedBy();
 
-    /** Column name EndingAmount */
-    public static final String COLUMNNAME_EndingAmount = "EndingAmount";
+    /** Column name endingamount */
+    public static final String COLUMNNAME_endingamount = "endingamount";
 
-	/** Set EndingAmount	  */
-	public void setEndingAmount (BigDecimal EndingAmount);
+	/** Set endingamount	  */
+	public void setendingamount (BigDecimal endingamount);
 
-	/** Get EndingAmount	  */
-	public BigDecimal getEndingAmount();
+	/** Get endingamount	  */
+	public BigDecimal getendingamount();
 
-    /** Column name EndingQty */
-    public static final String COLUMNNAME_EndingQty = "EndingQty";
+    /** Column name endingqty */
+    public static final String COLUMNNAME_endingqty = "endingqty";
 
-	/** Set EndingQty	  */
-	public void setEndingQty (BigDecimal EndingQty);
+	/** Set endingqty	  */
+	public void setendingqty (BigDecimal endingqty);
 
-	/** Get EndingQty	  */
-	public BigDecimal getEndingQty();
+	/** Get endingqty	  */
+	public BigDecimal getendingqty();
 
-    /** Column name IPV_Amount */
-    public static final String COLUMNNAME_IPV_Amount = "IPV_Amount";
+    /** Column name ipv_amount */
+    public static final String COLUMNNAME_ipv_amount = "ipv_amount";
 
-	/** Set IPV_Amount	  */
-	public void setIPV_Amount (BigDecimal IPV_Amount);
+	/** Set ipv_amount	  */
+	public void setipv_amount (BigDecimal ipv_amount);
 
-	/** Get IPV_Amount	  */
-	public BigDecimal getIPV_Amount();
+	/** Get ipv_amount	  */
+	public BigDecimal getipv_amount();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
@@ -162,32 +160,32 @@ public interface I_M_Periodic_Cost
 	  */
 	public boolean isActive();
 
-    /** Column name IssueAmount */
-    public static final String COLUMNNAME_IssueAmount = "IssueAmount";
+    /** Column name issueamount */
+    public static final String COLUMNNAME_issueamount = "issueamount";
 
-	/** Set IssueAmount	  */
-	public void setIssueAmount (BigDecimal IssueAmount);
+	/** Set issueamount	  */
+	public void setissueamount (BigDecimal issueamount);
 
-	/** Get IssueAmount	  */
-	public BigDecimal getIssueAmount();
+	/** Get issueamount	  */
+	public BigDecimal getissueamount();
 
-    /** Column name IssueQty */
-    public static final String COLUMNNAME_IssueQty = "IssueQty";
+    /** Column name issueqty */
+    public static final String COLUMNNAME_issueqty = "issueqty";
 
-	/** Set IssueQty	  */
-	public void setIssueQty (BigDecimal IssueQty);
+	/** Set issueqty	  */
+	public void setissueqty (BigDecimal issueqty);
 
-	/** Get IssueQty	  */
-	public BigDecimal getIssueQty();
+	/** Get issueqty	  */
+	public BigDecimal getissueqty();
 
-    /** Column name LandedCostAmount */
-    public static final String COLUMNNAME_LandedCostAmount = "LandedCostAmount";
+    /** Column name landedcostamount */
+    public static final String COLUMNNAME_landedcostamount = "landedcostamount";
 
-	/** Set LandedCostAmount	  */
-	public void setLandedCostAmount (BigDecimal LandedCostAmount);
+	/** Set landedcostamount	  */
+	public void setlandedcostamount (BigDecimal landedcostamount);
 
-	/** Get LandedCostAmount	  */
-	public BigDecimal getLandedCostAmount();
+	/** Get landedcostamount	  */
+	public BigDecimal getlandedcostamount();
 
     /** Column name M_AttributeSetInstance_ID */
     public static final String COLUMNNAME_M_AttributeSetInstance_ID = "M_AttributeSetInstance_ID";
@@ -204,23 +202,23 @@ public interface I_M_Periodic_Cost
 
 	public I_M_AttributeSetInstance getM_AttributeSetInstance() throws RuntimeException;
 
-    /** Column name M_Periodic_Cost_ID */
-    public static final String COLUMNNAME_M_Periodic_Cost_ID = "M_Periodic_Cost_ID";
+    /** Column name m_periodic_cost_id */
+    public static final String COLUMNNAME_m_periodic_cost_id = "m_periodic_cost_id";
 
-	/** Set M_Periodic_Cost	  */
-	public void setM_Periodic_Cost_ID (int M_Periodic_Cost_ID);
+	/** Set m_periodic_cost_id	  */
+	public void setm_periodic_cost_id (int m_periodic_cost_id);
 
-	/** Get M_Periodic_Cost	  */
-	public int getM_Periodic_Cost_ID();
+	/** Get m_periodic_cost_id	  */
+	public int getm_periodic_cost_id();
 
-    /** Column name M_Periodic_Cost_UU */
-    public static final String COLUMNNAME_M_Periodic_Cost_UU = "M_Periodic_Cost_UU";
+    /** Column name m_periodic_cost_uu */
+    public static final String COLUMNNAME_m_periodic_cost_uu = "m_periodic_cost_uu";
 
-	/** Set M_Periodic_Cost_UU	  */
-	public void setM_Periodic_Cost_UU (String M_Periodic_Cost_UU);
+	/** Set m_periodic_cost_uu	  */
+	public void setm_periodic_cost_uu (String m_periodic_cost_uu);
 
-	/** Get M_Periodic_Cost_UU	  */
-	public String getM_Periodic_Cost_UU();
+	/** Get m_periodic_cost_uu	  */
+	public String getm_periodic_cost_uu();
 
     /** Column name M_Product_Category_ID */
     public static final String COLUMNNAME_M_Product_Category_ID = "M_Product_Category_ID";
@@ -235,8 +233,6 @@ public interface I_M_Periodic_Cost
 	  */
 	public int getM_Product_Category_ID();
 
-	public org.compiere.model.I_M_Product_Category getM_Product_Category() throws RuntimeException;
-
     /** Column name M_Product_ID */
     public static final String COLUMNNAME_M_Product_ID = "M_Product_ID";
 
@@ -250,25 +246,59 @@ public interface I_M_Periodic_Cost
 	  */
 	public int getM_Product_ID();
 
-	public org.compiere.model.I_M_Product getM_Product() throws RuntimeException;
+    /** Column name manufacturedamt */
+    public static final String COLUMNNAME_manufacturedamt = "manufacturedamt";
 
-    /** Column name ReceiptAmount */
-    public static final String COLUMNNAME_ReceiptAmount = "ReceiptAmount";
+	/** Set manufacturedamt	  */
+	public void setmanufacturedamt (BigDecimal manufacturedamt);
 
-	/** Set ReceiptAmount	  */
-	public void setReceiptAmount (BigDecimal ReceiptAmount);
+	/** Get manufacturedamt	  */
+	public BigDecimal getmanufacturedamt();
 
-	/** Get ReceiptAmount	  */
-	public BigDecimal getReceiptAmount();
+    /** Column name manufacturedqty */
+    public static final String COLUMNNAME_manufacturedqty = "manufacturedqty";
 
-    /** Column name ReceiptQty */
-    public static final String COLUMNNAME_ReceiptQty = "ReceiptQty";
+	/** Set manufacturedqty	  */
+	public void setmanufacturedqty (BigDecimal manufacturedqty);
 
-	/** Set ReceiptQty	  */
-	public void setReceiptQty (BigDecimal ReceiptQty);
+	/** Get manufacturedqty	  */
+	public BigDecimal getmanufacturedqty();
 
-	/** Get ReceiptQty	  */
-	public BigDecimal getReceiptQty();
+    /** Column name receiptamount */
+    public static final String COLUMNNAME_receiptamount = "receiptamount";
+
+	/** Set receiptamount	  */
+	public void setreceiptamount (BigDecimal receiptamount);
+
+	/** Get receiptamount	  */
+	public BigDecimal getreceiptamount();
+
+    /** Column name receiptqty */
+    public static final String COLUMNNAME_receiptqty = "receiptqty";
+
+	/** Set receiptqty	  */
+	public void setreceiptqty (BigDecimal receiptqty);
+
+	/** Get receiptqty	  */
+	public BigDecimal getreceiptqty();
+
+    /** Column name shippedamt */
+    public static final String COLUMNNAME_shippedamt = "shippedamt";
+
+	/** Set shippedamt	  */
+	public void setshippedamt (BigDecimal shippedamt);
+
+	/** Get shippedamt	  */
+	public BigDecimal getshippedamt();
+
+    /** Column name shippedqty */
+    public static final String COLUMNNAME_shippedqty = "shippedqty";
+
+	/** Set shippedqty	  */
+	public void setshippedqty (BigDecimal shippedqty);
+
+	/** Get shippedqty	  */
+	public BigDecimal getshippedqty();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";

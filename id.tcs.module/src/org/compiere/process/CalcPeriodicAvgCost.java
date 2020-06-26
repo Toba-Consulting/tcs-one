@@ -10,12 +10,9 @@ import org.compiere.model.MAccount;
 import org.compiere.model.MPeriod;
 import org.compiere.model.MProduct;
 import org.compiere.model.Query;
-import org.compiere.process.ProcessInfoParameter;
-import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.TimeUtil;
-import org.compiere.model.X_M_Periodic_Cost;
 
 /**
  * @author Phie Albert

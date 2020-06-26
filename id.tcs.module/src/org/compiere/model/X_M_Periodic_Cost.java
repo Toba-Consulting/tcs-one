@@ -20,20 +20,18 @@ package org.compiere.model;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
-import org.compiere.model.*;
 import org.compiere.util.Env;
-import org.compiere.util.KeyNamePair;
 
 /** Generated Model for M_Periodic_Cost
  *  @author iDempiere (generated) 
- *  @version Release 3.1 - $Id$ */
+ *  @version Release 5.1 - $Id$ */
 public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20180612L;
+	private static final long serialVersionUID = 20200620L;
 
     /** Standard Constructor */
     public X_M_Periodic_Cost (Properties ctx, int M_Periodic_Cost_ID, String trxName)
@@ -41,7 +39,7 @@ public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persis
       super (ctx, M_Periodic_Cost_ID, trxName);
       /** if (M_Periodic_Cost_ID == 0)
         {
-			setM_Periodic_Cost_ID (0);
+			setm_periodic_cost_id (0);
         } */
     }
 
@@ -52,7 +50,7 @@ public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persis
     }
 
     /** AccessLevel
-      * @return 4 - System 
+      * @return 3 - Client - Org 
       */
     protected int get_AccessLevel()
     {
@@ -73,35 +71,35 @@ public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persis
       return sb.toString();
     }
 
-	/** Set BeginningQty.
-		@param BeginningQty BeginningQty	  */
-	public void setBeginningQty (BigDecimal BeginningQty)
+	/** Set beginningamount.
+		@param beginningamount beginningamount	  */
+	public void setbeginningamount (BigDecimal beginningamount)
 	{
-		set_Value (COLUMNNAME_BeginningQty, BeginningQty);
+		set_Value (COLUMNNAME_beginningamount, beginningamount);
 	}
 
-	/** Get BeginningQty.
-		@return BeginningQty	  */
-	public BigDecimal getBeginningQty () 
+	/** Get beginningamount.
+		@return beginningamount	  */
+	public BigDecimal getbeginningamount () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_BeginningQty);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_beginningamount);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
 	}
 
-	/** Set BeginnningAmount.
-		@param BeginnningAmount BeginnningAmount	  */
-	public void setBeginningAmount (BigDecimal BeginnningAmount)
+	/** Set beginningqty.
+		@param beginningqty beginningqty	  */
+	public void setbeginningqty (BigDecimal beginningqty)
 	{
-		set_Value (COLUMNNAME_BeginningAmount, BeginnningAmount);
+		set_Value (COLUMNNAME_beginningqty, beginningqty);
 	}
 
-	/** Get BeginnningAmount.
-		@return BeginnningAmount	  */
-	public BigDecimal getBeginningAmount () 
+	/** Get beginningqty.
+		@return beginningqty	  */
+	public BigDecimal getbeginningqty () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_BeginningAmount);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_beginningqty);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
@@ -135,120 +133,120 @@ public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persis
 		return ii.intValue();
 	}
 
-	/** Set Cost Price.
-		@param CostPrice Cost Price	  */
-	public void setCostPrice (BigDecimal CostPrice)
+	/** Set costprice.
+		@param costprice costprice	  */
+	public void setcostprice (BigDecimal costprice)
 	{
-		set_Value (COLUMNNAME_CostPrice, CostPrice);
+		set_Value (COLUMNNAME_costprice, costprice);
 	}
 
-	/** Get Cost Price.
-		@return Cost Price	  */
-	public BigDecimal getCostPrice () 
+	/** Get costprice.
+		@return costprice	  */
+	public BigDecimal getcostprice () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_CostPrice);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_costprice);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
 	}
 
-	/** Set EndingAmount.
-		@param EndingAmount EndingAmount	  */
-	public void setEndingAmount (BigDecimal EndingAmount)
+	/** Set endingamount.
+		@param endingamount endingamount	  */
+	public void setendingamount (BigDecimal endingamount)
 	{
-		set_Value (COLUMNNAME_EndingAmount, EndingAmount);
+		set_Value (COLUMNNAME_endingamount, endingamount);
 	}
 
-	/** Get EndingAmount.
-		@return EndingAmount	  */
-	public BigDecimal getEndingAmount () 
+	/** Get endingamount.
+		@return endingamount	  */
+	public BigDecimal getendingamount () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_EndingAmount);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_endingamount);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
 	}
 
-	/** Set EndingQty.
-		@param EndingQty EndingQty	  */
-	public void setEndingQty (BigDecimal EndingQty)
+	/** Set endingqty.
+		@param endingqty endingqty	  */
+	public void setendingqty (BigDecimal endingqty)
 	{
-		set_Value (COLUMNNAME_EndingQty, EndingQty);
+		set_Value (COLUMNNAME_endingqty, endingqty);
 	}
 
-	/** Get EndingQty.
-		@return EndingQty	  */
-	public BigDecimal getEndingQty () 
+	/** Get endingqty.
+		@return endingqty	  */
+	public BigDecimal getendingqty () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_EndingQty);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_endingqty);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
 	}
 
-	/** Set IPV_Amount.
-		@param IPV_Amount IPV_Amount	  */
-	public void setIPV_Amount (BigDecimal IPV_Amount)
+	/** Set ipv_amount.
+		@param ipv_amount ipv_amount	  */
+	public void setipv_amount (BigDecimal ipv_amount)
 	{
-		set_Value (COLUMNNAME_IPV_Amount, IPV_Amount);
+		set_Value (COLUMNNAME_ipv_amount, ipv_amount);
 	}
 
-	/** Get IPV_Amount.
-		@return IPV_Amount	  */
-	public BigDecimal getIPV_Amount () 
+	/** Get ipv_amount.
+		@return ipv_amount	  */
+	public BigDecimal getipv_amount () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_IPV_Amount);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ipv_amount);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
 	}
 
-	/** Set IssueAmount.
-		@param IssueAmount IssueAmount	  */
-	public void setIssueAmount (BigDecimal IssueAmount)
+	/** Set issueamount.
+		@param issueamount issueamount	  */
+	public void setissueamount (BigDecimal issueamount)
 	{
-		set_Value (COLUMNNAME_IssueAmount, IssueAmount);
+		set_Value (COLUMNNAME_issueamount, issueamount);
 	}
 
-	/** Get IssueAmount.
-		@return IssueAmount	  */
-	public BigDecimal getIssueAmount () 
+	/** Get issueamount.
+		@return issueamount	  */
+	public BigDecimal getissueamount () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_IssueAmount);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_issueamount);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
 	}
 
-	/** Set IssueQty.
-		@param IssueQty IssueQty	  */
-	public void setIssueQty (BigDecimal IssueQty)
+	/** Set issueqty.
+		@param issueqty issueqty	  */
+	public void setissueqty (BigDecimal issueqty)
 	{
-		set_Value (COLUMNNAME_IssueQty, IssueQty);
+		set_Value (COLUMNNAME_issueqty, issueqty);
 	}
 
-	/** Get IssueQty.
-		@return IssueQty	  */
-	public BigDecimal getIssueQty () 
+	/** Get issueqty.
+		@return issueqty	  */
+	public BigDecimal getissueqty () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_IssueQty);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_issueqty);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
 	}
 
-	/** Set LandedCostAmount.
-		@param LandedCostAmount LandedCostAmount	  */
-	public void setLandedCostAmount (BigDecimal LandedCostAmount)
+	/** Set landedcostamount.
+		@param landedcostamount landedcostamount	  */
+	public void setlandedcostamount (BigDecimal landedcostamount)
 	{
-		set_Value (COLUMNNAME_LandedCostAmount, LandedCostAmount);
+		set_Value (COLUMNNAME_landedcostamount, landedcostamount);
 	}
 
-	/** Get LandedCostAmount.
-		@return LandedCostAmount	  */
-	public BigDecimal getLandedCostAmount () 
+	/** Get landedcostamount.
+		@return landedcostamount	  */
+	public BigDecimal getlandedcostamount () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LandedCostAmount);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_landedcostamount);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
@@ -282,52 +280,36 @@ public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persis
 		return ii.intValue();
 	}
 
-	/** Set M_Periodic_Cost.
-		@param M_Periodic_Cost_ID M_Periodic_Cost	  */
-	public void setM_Periodic_Cost_ID (int M_Periodic_Cost_ID)
+	/** Set m_periodic_cost_id.
+		@param m_periodic_cost_id m_periodic_cost_id	  */
+	public void setm_periodic_cost_id (int m_periodic_cost_id)
 	{
-		if (M_Periodic_Cost_ID < 1) 
-			set_ValueNoCheck (COLUMNNAME_M_Periodic_Cost_ID, null);
-		else 
-			set_ValueNoCheck (COLUMNNAME_M_Periodic_Cost_ID, Integer.valueOf(M_Periodic_Cost_ID));
+		set_ValueNoCheck (COLUMNNAME_m_periodic_cost_id, Integer.valueOf(m_periodic_cost_id));
 	}
 
-	/** Get M_Periodic_Cost.
-		@return M_Periodic_Cost	  */
-	public int getM_Periodic_Cost_ID () 
+	/** Get m_periodic_cost_id.
+		@return m_periodic_cost_id	  */
+	public int getm_periodic_cost_id () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_M_Periodic_Cost_ID);
+		Integer ii = (Integer)get_Value(COLUMNNAME_m_periodic_cost_id);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
 	}
 
-    /** Get Record ID/ColumnName
-        @return ID/ColumnName pair
-      */
-    public KeyNamePair getKeyNamePair() 
-    {
-        return new KeyNamePair(get_ID(), String.valueOf(getM_Periodic_Cost_ID()));
-    }
-
-	/** Set M_Periodic_Cost_UU.
-		@param M_Periodic_Cost_UU M_Periodic_Cost_UU	  */
-	public void setM_Periodic_Cost_UU (String M_Periodic_Cost_UU)
+	/** Set m_periodic_cost_uu.
+		@param m_periodic_cost_uu m_periodic_cost_uu	  */
+	public void setm_periodic_cost_uu (String m_periodic_cost_uu)
 	{
-		set_Value (COLUMNNAME_M_Periodic_Cost_UU, M_Periodic_Cost_UU);
+		set_ValueNoCheck (COLUMNNAME_m_periodic_cost_uu, m_periodic_cost_uu);
 	}
 
-	/** Get M_Periodic_Cost_UU.
-		@return M_Periodic_Cost_UU	  */
-	public String getM_Periodic_Cost_UU () 
+	/** Get m_periodic_cost_uu.
+		@return m_periodic_cost_uu	  */
+	public String getm_periodic_cost_uu () 
 	{
-		return (String)get_Value(COLUMNNAME_M_Periodic_Cost_UU);
+		return (String)get_Value(COLUMNNAME_m_periodic_cost_uu);
 	}
-
-	public org.compiere.model.I_M_Product_Category getM_Product_Category() throws RuntimeException
-    {
-		return (org.compiere.model.I_M_Product_Category)MTable.get(getCtx(), org.compiere.model.I_M_Product_Category.Table_Name)
-			.getPO(getM_Product_Category_ID(), get_TrxName());	}
 
 	/** Set Product Category.
 		@param M_Product_Category_ID 
@@ -352,11 +334,6 @@ public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persis
 		return ii.intValue();
 	}
 
-	public org.compiere.model.I_M_Product getM_Product() throws RuntimeException
-    {
-		return (org.compiere.model.I_M_Product)MTable.get(getCtx(), org.compiere.model.I_M_Product.Table_Name)
-			.getPO(getM_Product_ID(), get_TrxName());	}
-
 	/** Set Product.
 		@param M_Product_ID 
 		Product, Service, Item
@@ -380,35 +357,103 @@ public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persis
 		return ii.intValue();
 	}
 
-	/** Set ReceiptAmount.
-		@param ReceiptAmount ReceiptAmount	  */
-	public void setReceiptAmount (BigDecimal ReceiptAmount)
+	/** Set manufacturedamt.
+		@param manufacturedamt manufacturedamt	  */
+	public void setmanufacturedamt (BigDecimal manufacturedamt)
 	{
-		set_Value (COLUMNNAME_ReceiptAmount, ReceiptAmount);
+		set_Value (COLUMNNAME_manufacturedamt, manufacturedamt);
 	}
 
-	/** Get ReceiptAmount.
-		@return ReceiptAmount	  */
-	public BigDecimal getReceiptAmount () 
+	/** Get manufacturedamt.
+		@return manufacturedamt	  */
+	public BigDecimal getmanufacturedamt () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ReceiptAmount);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_manufacturedamt);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
 	}
 
-	/** Set ReceiptQty.
-		@param ReceiptQty ReceiptQty	  */
-	public void setReceiptQty (BigDecimal ReceiptQty)
+	/** Set manufacturedqty.
+		@param manufacturedqty manufacturedqty	  */
+	public void setmanufacturedqty (BigDecimal manufacturedqty)
 	{
-		set_Value (COLUMNNAME_ReceiptQty, ReceiptQty);
+		set_Value (COLUMNNAME_manufacturedqty, manufacturedqty);
 	}
 
-	/** Get ReceiptQty.
-		@return ReceiptQty	  */
-	public BigDecimal getReceiptQty () 
+	/** Get manufacturedqty.
+		@return manufacturedqty	  */
+	public BigDecimal getmanufacturedqty () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ReceiptQty);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_manufacturedqty);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set receiptamount.
+		@param receiptamount receiptamount	  */
+	public void setreceiptamount (BigDecimal receiptamount)
+	{
+		set_Value (COLUMNNAME_receiptamount, receiptamount);
+	}
+
+	/** Get receiptamount.
+		@return receiptamount	  */
+	public BigDecimal getreceiptamount () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_receiptamount);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set receiptqty.
+		@param receiptqty receiptqty	  */
+	public void setreceiptqty (BigDecimal receiptqty)
+	{
+		set_Value (COLUMNNAME_receiptqty, receiptqty);
+	}
+
+	/** Get receiptqty.
+		@return receiptqty	  */
+	public BigDecimal getreceiptqty () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_receiptqty);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set shippedamt.
+		@param shippedamt shippedamt	  */
+	public void setshippedamt (BigDecimal shippedamt)
+	{
+		set_Value (COLUMNNAME_shippedamt, shippedamt);
+	}
+
+	/** Get shippedamt.
+		@return shippedamt	  */
+	public BigDecimal getshippedamt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_shippedamt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set shippedqty.
+		@param shippedqty shippedqty	  */
+	public void setshippedqty (BigDecimal shippedqty)
+	{
+		set_Value (COLUMNNAME_shippedqty, shippedqty);
+	}
+
+	/** Get shippedqty.
+		@return shippedqty	  */
+	public BigDecimal getshippedqty () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_shippedqty);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;

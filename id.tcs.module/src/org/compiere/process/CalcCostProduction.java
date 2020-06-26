@@ -17,7 +17,7 @@ import org.compiere.util.Env;
 import org.compiere.util.TimeUtil;
 import org.compiere.model.X_M_Periodic_Cost;
 
-public class CalcInitialPeriodicCost extends SvrProcess{
+public class CalcCostProduction extends SvrProcess{
 	
 	private int p_AD_Client_ID = 0;
 	private int p_C_Period_ID = 0;
@@ -86,13 +86,13 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 		BigDecimal beginningAmount = Env.ZERO;
 		BigDecimal beginningQty = Env.ZERO;
 		
-		BigDecimal totalAmountReceipt = Env.ZERO;
-		BigDecimal totalQtyReceipt = Env.ZERO;
+//		BigDecimal totalAmountReceipt = Env.ZERO;
+//		BigDecimal totalQtyReceipt = Env.ZERO;
+//		
+//		BigDecimal invoiceVarianAmount = Env.ZERO;
+//		BigDecimal averageCostVarianceAmount = Env.ZERO;
 		
-		BigDecimal invoiceVarianAmount = Env.ZERO;
-		BigDecimal averageCostVarianceAmount = Env.ZERO;
-		
-		BigDecimal invoiceLandedCostAmount = Env.ZERO;
+//		BigDecimal invoiceLandedCostAmount = Env.ZERO;
 		
 		BigDecimal totalIssueQty = Env.ZERO;
 		BigDecimal totalIssueAmount = Env.ZERO;
@@ -120,16 +120,16 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 		if(beginningQty==null)
 			beginningQty = Env.ZERO;
 		
-		//Receipt
-		totalAmountReceipt = getAmountReceipt(M_Product_ID, period);
-		totalQtyReceipt = getQtyReceipt(M_Product_ID, period);
-		
-		//Invoice Varian
-		invoiceVarianAmount = getInvoiceVarianAmount(M_Product_ID, period);
-		averageCostVarianceAmount = getAverageCostVarian(M_Product_ID, period);
-		
-		//Invoice Landed Cost
-		invoiceLandedCostAmount = getInvoiceLandedCost(M_Product_ID, period);
+//		//Receipt
+//		totalAmountReceipt = getAmountReceipt(M_Product_ID, period);
+//		totalQtyReceipt = getQtyReceipt(M_Product_ID, period);
+//		
+//		//Invoice Varian
+//		invoiceVarianAmount = getInvoiceVarianAmount(M_Product_ID, period);
+//		averageCostVarianceAmount = getAverageCostVarian(M_Product_ID, period);
+//		
+//		//Invoice Landed Cost
+//		invoiceLandedCostAmount = getInvoiceLandedCost(M_Product_ID, period);
 		
 		//Total Amount
 		if(getAccountAverageCostVarian(M_Product_ID) != getAccountInvoiceVarian(M_Product_ID))
@@ -149,11 +149,11 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 		
 		if(beginningQty.compareTo(Env.ZERO) != 0 ||
 				beginningAmount.compareTo(Env.ZERO) != 0 ||
-				totalAmountReceipt.compareTo(Env.ZERO) != 0 ||
-				totalQtyReceipt.compareTo(Env.ZERO) != 0 ||
-				invoiceVarianAmount.compareTo(Env.ZERO) != 0 ||
-				averageCostVarianceAmount.compareTo(Env.ZERO) != 0 ||
-				invoiceLandedCostAmount.compareTo(Env.ZERO) != 0 ||
+//				totalAmountReceipt.compareTo(Env.ZERO) != 0 ||
+//				totalQtyReceipt.compareTo(Env.ZERO) != 0 ||
+//				invoiceVarianAmount.compareTo(Env.ZERO) != 0 ||
+//				averageCostVarianceAmount.compareTo(Env.ZERO) != 0 ||
+//				invoiceLandedCostAmount.compareTo(Env.ZERO) != 0 ||
 				totalIssueQty.compareTo(Env.ZERO) != 0 ||
 				totalIssueAmount.compareTo(Env.ZERO) != 0)
 		{
@@ -168,11 +168,11 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 			periodCost.setbeginningamount(beginningAmount);
 			periodCost.setreceiptqty(totalQtyReceipt);
 			periodCost.setreceiptamount(totalAmountReceipt);
-			if(getAccountAverageCostVarian(M_Product_ID) != getAccountInvoiceVarian(M_Product_ID))
-				periodCost.setipv_amount(invoiceVarianAmount.add(averageCostVarianceAmount));
-			else
-				periodCost.setipv_amount(invoiceVarianAmount);
-			periodCost.setlandedcostamount(invoiceLandedCostAmount);
+//			if(getAccountAverageCostVarian(M_Product_ID) != getAccountInvoiceVarian(M_Product_ID))
+//				periodCost.setipv_amount(invoiceVarianAmount.add(averageCostVarianceAmount));
+//			else
+//				periodCost.setipv_amount(invoiceVarianAmount);
+//			periodCost.setlandedcostamount(invoiceLandedCostAmount);
 			
 			periodCost.setissueqty(totalIssueQty);
 			periodCost.setendingqty(endingQty);
@@ -357,100 +357,7 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 		return shipmentQty;
 		
 	}
-	
-	
-	
-	private int getAccountInvoiceVarian(int M_Product_ID)
-	{
-		MProduct product = new MProduct(getCtx(), M_Product_ID, get_TrxName());
-		//get account
-		String sql = "SELECT P_Asset_Acct FROM M_Product_Acct WHERE M_Product_ID=? AND C_AcctSchema_ID=?";
-		int C_ValidCombination_ID = DB.getSQLValue(get_TrxName(), sql, new Object[]{M_Product_ID, p_C_AcctSchema_ID});
-		if(C_ValidCombination_ID == -1)
-			throw new AdempiereException("There's no accounting setup for product "+product.getValue());
-		
-		MAccount account = new MAccount(getCtx(), C_ValidCombination_ID, get_TrxName());
-		
-		return account.getAccount_ID();
-	}
-	
-	private int getAccountAverageCostVarian(int M_Product_ID)
-	{
-		MProduct product = new MProduct(getCtx(), M_Product_ID, get_TrxName());
-		//get account
-		String sql = "SELECT P_AverageCostVariance_Acct FROM M_Product_Acct WHERE M_Product_ID=? AND C_AcctSchema_ID=?";
-		int C_ValidCombination_ID = DB.getSQLValue(get_TrxName(), sql, new Object[]{M_Product_ID, p_C_AcctSchema_ID});
-		if(C_ValidCombination_ID == -1)
-			throw new AdempiereException("There's no accounting setup for product "+product.getValue());
-		
-		MAccount account = new MAccount(getCtx(), C_ValidCombination_ID, get_TrxName());
-		
-		return account.getAccount_ID();
-	}
-	
-	//Setup product asset
-	private BigDecimal getInvoiceVarianAmount(int M_Product_ID, MPeriod period){
-		MProduct product = new MProduct(getCtx(), M_Product_ID, get_TrxName());
-		//get account
-		String sql = "SELECT P_Asset_Acct FROM M_Product_Acct WHERE M_Product_ID=? AND C_AcctSchema_ID=?";
-		int C_ValidCombination_ID = DB.getSQLValue(get_TrxName(), sql, new Object[]{M_Product_ID, p_C_AcctSchema_ID});
-		if(C_ValidCombination_ID == -1)
-			throw new AdempiereException("There's no accounting setup for product "+product.getValue());
-		
-		MAccount account = new MAccount(getCtx(), C_ValidCombination_ID, get_TrxName());
-		
-		StringBuilder ivpSql = new StringBuilder();
-		ivpSql.append("SELECT COALESCE(Sum(Amtacctdr-Amtacctcr),0) FROM Fact_Acct "
-				+ "WHERE AD_Client_ID = ? AND AD_Table_ID = 472 AND Account_ID = ? AND M_Product_ID = ?"
-				+ " AND Record_ID IN (Select M_MatchInv_ID FROM M_MatchInv WHERE DateAcct BETWEEN ? AND ?)");
-		BigDecimal IVP_Amount = DB.getSQLValueBD(get_TrxName(), ivpSql.toString(), 
-										new Object[]{p_AD_Client_ID, account.getAccount_ID(), M_Product_ID, period.getStartDate(), period.getEndDate()});
-		
-		return IVP_Amount;
-	}
-	
-	//Setup average cost varian
-	private BigDecimal getAverageCostVarian(int M_Product_ID, MPeriod period){
-		MProduct product = new MProduct(getCtx(), M_Product_ID, get_TrxName());
-		//get account
-		String sql = "SELECT P_AverageCostVariance_Acct FROM M_Product_Acct WHERE M_Product_ID=? AND C_AcctSchema_ID=?";
-		int C_ValidCombination_ID = DB.getSQLValue(get_TrxName(), sql, new Object[]{M_Product_ID, p_C_AcctSchema_ID});
-		if(C_ValidCombination_ID == -1)
-			throw new AdempiereException("There's no accounting setup for product "+product.getValue());
-		
-		MAccount account = new MAccount(getCtx(), C_ValidCombination_ID, get_TrxName());
-		
-		StringBuilder ivpSql = new StringBuilder();
-		ivpSql.append("SELECT COALESCE(Sum(Amtacctdr-Amtacctcr),0) FROM Fact_Acct "
-				+ "WHERE AD_Client_ID = ? AND AD_Table_ID = 472 AND Account_ID = ? AND M_Product_ID = ?"
-				+ " AND Record_ID IN (Select M_MatchInv_ID FROM M_MatchInv WHERE DateAcct BETWEEN ? AND ?)");
-		BigDecimal IVP_Amount = DB.getSQLValueBD(get_TrxName(), ivpSql.toString(), 
-										new Object[]{p_AD_Client_ID, account.getAccount_ID(), M_Product_ID, period.getStartDate(), period.getEndDate()});
-		
-		return IVP_Amount;
-	}
-	
-	private BigDecimal getInvoiceLandedCost(int M_Product_ID, MPeriod period){
-		
-		MProduct product = new MProduct(getCtx(), M_Product_ID, get_TrxName());
-		//get account
-		String sql = "SELECT P_Asset_Acct FROM M_Product_Acct WHERE M_Product_ID=? AND C_AcctSchema_ID=?";
-		int C_ValidCombination_ID = DB.getSQLValue(get_TrxName(), sql, new Object[]{M_Product_ID, p_C_AcctSchema_ID});
-		if(C_ValidCombination_ID == -1)
-			throw new AdempiereException("There's no accounting setup for product "+product.getValue());
-		
-		MAccount account = new MAccount(getCtx(), C_ValidCombination_ID, get_TrxName());
-		
-		StringBuilder landedCost = new StringBuilder();
-		landedCost.append("SELECT COALESCE(Sum(Amtacctdr-Amtacctcr),0) FROM Fact_Acct "
-				+ "WHERE AD_Client_ID = ? AND AD_Table_ID = 318 AND Account_ID = ? AND M_Product_ID = ?"
-				+ " AND Record_ID IN (Select C_Invoice_ID FROM C_Invoice WHERE DateAcct BETWEEN ? AND ?)");
-		BigDecimal landedCostAmount = DB.getSQLValueBD(get_TrxName(), landedCost.toString(), 
-										new Object[]{p_AD_Client_ID, account.getAccount_ID(), M_Product_ID, period.getStartDate(), period.getEndDate()});
-		
-		return landedCostAmount;
-	}
-	
+			
 	private String getListProduct_ID()
 	{
 		StringBuilder tmp = new StringBuilder();
