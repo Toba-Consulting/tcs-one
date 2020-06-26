@@ -1,6 +1,5 @@
 package org.compiere.process;
 
-import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,7 +30,8 @@ public class HWH_BOMExplosion extends SvrProcess{
 
 	protected String doIt() throws Exception {
 
-		String whereClause = "isbom='Y' and exists (select 1 from m_product_bom where m_product_id=m_product.m_product_id) " + 
+		String whereClause = "isbom='Y' and exists (select 1 from m_product_bom where m_product_id=m_product.m_product_id) " + //product as FG 
+				"and not exists (select 1 from m_product_bom where m_productbom_id=m_product_id) " + //product as component
 				"and ad_client_id=1000000 and isactive='Y'";
 
 		List<MProduct> finishedGoods = new Query(getCtx(), MProduct.Table_Name, whereClause, get_TrxName())
