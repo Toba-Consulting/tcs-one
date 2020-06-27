@@ -25,6 +25,7 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 	private int p_M_Product_Category_ID = 0;
 	private int p_C_AcctSchema_ID = 0;
 	private boolean p_isRecalculate = false;
+	private int p_Line = 1;
 	
 	protected void prepare() {
 		ProcessInfoParameter[] para = getParameter();
@@ -45,6 +46,8 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 				p_isRecalculate = para[i].getParameterAsBoolean();
 			else if (name.equals("C_AcctSchema_ID"))
 				p_C_AcctSchema_ID = para[i].getParameterAsInt();
+			else if (name.equals("Line"))
+				p_Line = para[i].getParameterAsInt();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
@@ -89,6 +92,9 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 		BigDecimal totalAmountReceipt = Env.ZERO;
 		BigDecimal totalQtyReceipt = Env.ZERO;
 		
+		BigDecimal totalProductionAmt = Env.ZERO;
+		BigDecimal totalProductionQty = Env.ZERO;
+		
 		BigDecimal invoiceVarianAmount = Env.ZERO;
 		BigDecimal averageCostVarianceAmount = Env.ZERO;
 		
@@ -96,6 +102,9 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 		
 		BigDecimal totalIssueQty = Env.ZERO;
 		BigDecimal totalIssueAmount = Env.ZERO;
+		
+		BigDecimal totalShipmentQty = Env.ZERO;
+		BigDecimal totalShipmentAmount = Env.ZERO;
 		
 		BigDecimal totalAmount = Env.ZERO;
 		BigDecimal totalQty = Env.ZERO;
@@ -124,6 +133,10 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 		totalAmountReceipt = getAmountReceipt(M_Product_ID, period);
 		totalQtyReceipt = getQtyReceipt(M_Product_ID, period);
 		
+		//Simple Production
+		totalProductionAmt = getAmountProduction(M_Product_ID, period);
+		totalProductionQty = getQtyProduction(M_Product_ID, period);
+		
 		//Invoice Varian
 		invoiceVarianAmount = getInvoiceVarianAmount(M_Product_ID, period);
 		averageCostVarianceAmount = getAverageCostVarian(M_Product_ID, period);
@@ -133,19 +146,26 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 		
 		//Total Amount
 		if(getAccountAverageCostVarian(M_Product_ID) != getAccountInvoiceVarian(M_Product_ID))
-			totalAmount = beginningAmount.add(totalAmountReceipt).add(invoiceVarianAmount).add(averageCostVarianceAmount).add(invoiceLandedCostAmount);
+			totalAmount = beginningAmount.add(totalAmountReceipt).add(totalProductionAmt)
+			.add(invoiceVarianAmount).add(averageCostVarianceAmount).add(invoiceLandedCostAmount);
 		else
-			totalAmount = beginningAmount.add(totalAmountReceipt).add(invoiceVarianAmount).add(invoiceLandedCostAmount);
-		totalQty = beginningQty.add(totalQtyReceipt);
+			totalAmount = beginningAmount.add(totalAmountReceipt).add(totalProductionQty)
+			.add(invoiceVarianAmount).add(invoiceLandedCostAmount);
+		
+		totalQty = beginningQty.add(totalQtyReceipt).add(totalProductionQty);
 		costPrice = (totalQty.compareTo(Env.ZERO)!= 0) ? (totalAmount.divide(totalQty, 9, RoundingMode.HALF_UP)) : Env.ZERO;
 
 		//Issue
-		totalIssueQty = getIssueQty(M_Product_ID, period).add(getShipmentQty(M_Product_ID, period));
+		totalIssueQty = getIssueQty(M_Product_ID, period);
 		totalIssueAmount = totalIssueQty.multiply(costPrice);
 		
+		//Shipment
+		totalShipmentQty = getShipmentQty(M_Product_ID, period);
+		totalShipmentAmount = totalShipmentQty.multiply(costPrice);
+		
 		//Ending
-		endingQty = totalQty.add(totalIssueQty);
-		endingAmount = totalAmount.add(totalIssueAmount);
+		endingQty = totalQty.add(totalIssueQty).subtract(totalShipmentQty);
+		endingAmount = totalAmount.add(totalIssueAmount).add(totalShipmentAmount);
 		
 		if(beginningQty.compareTo(Env.ZERO) != 0 ||
 				beginningAmount.compareTo(Env.ZERO) != 0 ||
@@ -176,6 +196,10 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 			
 			periodCost.setissueqty(totalIssueQty);
 			periodCost.setendingqty(endingQty);
+			periodCost.setshippedqty(totalShipmentQty);
+			periodCost.setshippedamt(totalShipmentAmount);
+			periodCost.setmanufacturedamt(totalProductionAmt);
+			periodCost.setmanufacturedqty(totalProductionQty);
 			periodCost.setissueamount(totalIssueAmount.setScale(9, RoundingMode.HALF_UP));
 			periodCost.setendingamount(endingAmount.setScale(9, RoundingMode.HALF_UP));
 			
@@ -219,10 +243,28 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 	
 	private int[] getInventoryProduct()
 	{
-		String whereClause = "AD_Client_ID = ? AND ProductType='I'";
-		return new Query(getCtx(), MProduct.Table_Name, whereClause, get_TrxName())
-								.setParameters(new Object[]{p_AD_Client_ID})						
-								.getIDs();
+		String whereClause = "";
+		if (p_Line==1) {
+			whereClause = "m_product_id in (1010002,1010337,1010340,1010346,1010504,1010511)";
+			return new Query(getCtx(), MProduct.Table_Name, whereClause, get_TrxName())
+					.setOnlyActiveRecords(true)
+					.getIDs();
+			
+		} else if (p_Line==2) {
+			whereClause = "m_product_id in (1007069,1007073,1007095,1007105,1010089,1010091,1010092,1010398,1010512,1010603)";
+			return new Query(getCtx(), MProduct.Table_Name, whereClause, get_TrxName())
+					.setOnlyActiveRecords(true)
+					.getIDs();
+			
+		} else {
+			whereClause = "AD_Client_ID = ? AND ProductType='I' AND IsBOM='N'";
+			return new Query(getCtx(), MProduct.Table_Name, whereClause, get_TrxName())
+					.setParameters(new Object[]{p_AD_Client_ID})
+					.setOnlyActiveRecords(true)
+					.getIDs();
+		}
+		
+		
 	}
 	
 	private int[] getInventoryProductForProductCategory(int M_Product_Category_ID)
@@ -241,7 +283,7 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 				+ "FROM M_InOutLine mil "
 				+ "JOIN M_InOut mi ON mi.M_InOut_ID = mil.M_InOut_ID "
 				+ "JOIN C_OrderLine cil ON cil.C_OrderLine_ID = mil.C_OrderLine_ID "
-				+ "WHERE mil.M_Product_ID = ? AND mil.AD_Client_ID = ? AND mi.docStatus in ('CO','CL') "
+				+ "WHERE mil.M_Product_ID = ? AND mil.AD_Client_ID = ? AND mi.docStatus in ('CO','CL','RE') "
 				+ "AND (mi.DateAcct >= ? AND mi.DateAcct < ?)");
 				//+ "AND (mi.DateAcct >= ? AND mi.DateAcct < ?) AND mi.C_DocType_ID IN (1000205, 1000251)");
 		
@@ -264,6 +306,42 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 		*/
 	}
 	
+	private BigDecimal getAmountProduction(int M_Product_ID, MPeriod period){
+		Timestamp endDate = TimeUtil.addDays(period.getEndDate(), 1);
+		
+		StringBuilder productionAmountSql = new StringBuilder();
+		productionAmountSql.append("select coalesce(sum(mcd.amt),0) " + 
+				"from m_production mp " + 
+				"join m_productionline mpl on mpl.m_production_id=mp.m_production_id " + 
+				"join m_costdetail mcd on mcd.m_productionline_id =mpl.m_productionline_id " + 
+				"where mpl.m_product_id =mp.m_product_id " + 
+				"and mpl.m_product_id=? and mp.docstatus in ('CO','CL','RE') " + 
+				"and mp.movementdate >= ? AND mp.movementdate < ?");
+		
+		BigDecimal materialReceiptAmount = DB.getSQLValueBD(get_TrxName(), productionAmountSql.toString(), 
+										new Object[]{M_Product_ID, period.getStartDate(), endDate});
+		
+		return materialReceiptAmount;
+	}
+	
+	private BigDecimal getQtyProduction(int M_Product_ID, MPeriod period) {
+		Timestamp endDate = TimeUtil.addDays(period.getEndDate(), 1);
+		
+		StringBuilder productionQtySql = new StringBuilder();
+		productionQtySql.append("select coalesce(sum(mpl.movementqty),0) " + 
+				"from m_production mp " + 
+				"join m_productionline mpl on mpl.m_production_id=mp.m_production_id " + 
+				"join m_costdetail mcd on mcd.m_productionline_id =mpl.m_productionline_id " + 
+				"where mpl.m_product_id =mp.m_product_id " + 
+				"and mpl.m_product_id=? and mp.docstatus in ('CO','CL','RE') " + 
+				"and mp.movementdate >= ? AND mp.movementdate < ?");
+		
+		BigDecimal materialReceiptQty = DB.getSQLValueBD(get_TrxName(), productionQtySql.toString(), 
+										new Object[]{M_Product_ID, period.getStartDate(), endDate});																												//MR AND MR FUEL;
+		
+		return materialReceiptQty;
+	}
+	
 	private BigDecimal getQtyReceipt(int M_Product_ID, MPeriod period){
 		Timestamp endDate = TimeUtil.addDays(period.getEndDate(), 1);
 		
@@ -272,7 +350,7 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 				+ "FROM M_InOutLine mil "
 				+ "JOIN M_InOut mi ON mi.M_InOut_ID = mil.M_InOut_ID "
 				+ "JOIN C_OrderLine cil ON cil.C_OrderLine_ID = mil.C_OrderLine_ID "
-				+ "WHERE mil.M_Product_ID = ? AND mil.AD_Client_ID = ? AND mi.docStatus in ('CO','CL') "
+				+ "WHERE mil.M_Product_ID = ? AND mil.AD_Client_ID = ? AND mi.docStatus in ('CO','CL','RE') "
 				+ "AND (mi.DateAcct >= ? AND mi.DateAcct < ?)");
 				//+ "AND (mi.DateAcct >= ? AND mi.DateAcct < ?) AND mi.C_DocType_ID IN (1000205, 1000251)");
 		
@@ -308,30 +386,32 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 				+ "WHERE docSubTypeInv IN ('IU') AND mi.movementDate >= ? AND mi.movementdate < ? AND "
 				//+ "WHERE docSubTypeInv IN ('IU','MR') AND mi.movementDate >= ? AND mi.movementdate < ? AND "
 				
-				+ "mi.AD_Client_ID = ? AND mi.docStatus in ('CO','CL') AND mil.M_Product_ID=?");
+				+ "mi.AD_Client_ID = ? AND mi.docStatus in ('CO','CL','RE') AND mil.M_Product_ID=?");
 				//+ "mi.AD_Client_ID = ? AND mi.docStatus in ('CO','CL') AND mil.M_Product_ID=? AND mil.isUnitCost = 'N'");
 		
 		BigDecimal miscIssueQty = DB.getSQLValueBDEx(get_TrxName(), issueQtySql.toString(), 
 				new Object[]{period.getStartDate(), endDate, p_AD_Client_ID, M_Product_ID});
 		
-		issueQtySql = new StringBuilder();
-		issueQtySql.append("SELECT COALESCE(SUM(qtyCount-qtyBook),0) FROM M_InventoryLine mil "
+		//Physical Inventory
+		StringBuilder physicalInvSql = new StringBuilder();
+		physicalInvSql.append("SELECT COALESCE(SUM(qtyBook-qtyCount)*-1,0) FROM M_InventoryLine mil "
 				+ "JOIN M_Inventory mi ON mil.M_Inventory_ID = mi.M_Inventory_ID "
 				+ "JOIN C_DocType cdt ON cdt.C_DocType_ID = mi.C_DocType_ID "
 				+ "WHERE docSubTypeInv = 'PI' AND mi.movementDate >= ? AND mi.movementdate < ? AND "
-				+ "mi.AD_Client_ID = ? AND mi.docStatus in ('CO','CL') AND mil.M_Product_ID=?");
-		BigDecimal physicalInventoryQty = DB.getSQLValueBDEx(get_TrxName(), issueQtySql.toString(), 
+				+ "mi.AD_Client_ID = ? AND mi.docStatus in ('CO','CL','RE') AND mil.M_Product_ID=?");
+		BigDecimal physicalInventoryQty = DB.getSQLValueBDEx(get_TrxName(), physicalInvSql.toString(), 
 				new Object[]{period.getStartDate(), endDate, p_AD_Client_ID, M_Product_ID});
 		
-		issueQtySql = new StringBuilder();
-		issueQtySql.append("SELECT COALESCE(SUM(movementQty*-1),0) FROM M_InOutLine mil "
+		//Vendor Return
+		StringBuilder vendorReturnSql = new StringBuilder();
+		vendorReturnSql.append("SELECT COALESCE(SUM(movementQty*-1),0) FROM M_InOutLine mil "
 				+ "JOIN M_InOut mi ON mil.M_InOut_ID = mi.M_InOut_ID "
 				+ "JOIN C_DocType cdt ON cdt.C_DocType_ID = mi.C_DocType_ID "
 				+ "WHERE docBaseType = 'MMS' AND cdt.IsSOTrx='N' AND mi.DateAcct >= ? AND mi.DateAcct < ? AND "
 				//+ "WHERE docBaseType = 'MMS' AND mi.DateAcct >= ? AND mi.DateAcct < ? AND "
 				
-				+ "mi.AD_Client_ID = ? AND mi.docStatus in ('CO','CL') AND mil.M_Product_ID=?");
-		BigDecimal vendorReturn = DB.getSQLValueBDEx(get_TrxName(), issueQtySql.toString(), 
+				+ "mi.AD_Client_ID = ? AND mi.docStatus in ('CO','CL','RE') AND mil.M_Product_ID=?");
+		BigDecimal vendorReturn = DB.getSQLValueBDEx(get_TrxName(), vendorReturnSql.toString(), 
 				new Object[]{period.getStartDate(), endDate, p_AD_Client_ID, M_Product_ID});
 		
 		return miscIssueQty.add(physicalInventoryQty).add(vendorReturn);
@@ -342,7 +422,6 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 	{
 		Timestamp endDate = TimeUtil.addDays(period.getEndDate(), 1);
 		
-			
 		StringBuilder shipmentQtySql = new StringBuilder();
 		shipmentQtySql.append("SELECT COALESCE(SUM(movementQty),0) FROM M_InOutLine mil "
 				+ "JOIN M_InOut mi ON mil.M_InOut_ID = mi.M_InOut_ID "
@@ -350,15 +429,13 @@ public class CalcInitialPeriodicCost extends SvrProcess{
 				+ "WHERE docBaseType = 'MMS' AND cdt.IsSOTrx='Y' AND mi.DateAcct >= ? AND mi.DateAcct < ? AND "
 				//+ "WHERE docBaseType = 'MMS' AND mi.DateAcct >= ? AND mi.DateAcct < ? AND "
 				
-				+ "mi.AD_Client_ID = ? AND mi.docStatus in ('CO','CL') AND mil.M_Product_ID=?");
+				+ "mi.AD_Client_ID = ? AND mi.docStatus in ('CO','CL','RE') AND mil.M_Product_ID=?");
 		BigDecimal shipmentQty = DB.getSQLValueBDEx(get_TrxName(), shipmentQtySql.toString(), 
 				new Object[]{period.getStartDate(), endDate, p_AD_Client_ID, M_Product_ID});
 		
 		return shipmentQty;
 		
 	}
-	
-	
 	
 	private int getAccountInvoiceVarian(int M_Product_ID)
 	{

@@ -282,16 +282,16 @@ public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persis
 
 	/** Set m_periodic_cost_id.
 		@param m_periodic_cost_id m_periodic_cost_id	  */
-	public void setm_periodic_cost_id (int m_periodic_cost_id)
+	public void setM_Periodic_Cost_ID (int M_Periodic_Cost_ID)
 	{
-		set_ValueNoCheck (COLUMNNAME_m_periodic_cost_id, Integer.valueOf(m_periodic_cost_id));
+		set_ValueNoCheck (COLUMNNAME_M_Periodic_Cost_ID, Integer.valueOf(M_Periodic_Cost_ID));
 	}
 
 	/** Get m_periodic_cost_id.
 		@return m_periodic_cost_id	  */
-	public int getm_periodic_cost_id () 
+	public int getM_Periodic_Cost_ID () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_m_periodic_cost_id);
+		Integer ii = (Integer)get_Value(COLUMNNAME_M_Periodic_Cost_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

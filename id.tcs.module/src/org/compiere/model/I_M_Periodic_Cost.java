@@ -203,13 +203,13 @@ public interface I_M_Periodic_Cost
 	public I_M_AttributeSetInstance getM_AttributeSetInstance() throws RuntimeException;
 
     /** Column name m_periodic_cost_id */
-    public static final String COLUMNNAME_m_periodic_cost_id = "m_periodic_cost_id";
+    public static final String COLUMNNAME_M_Periodic_Cost_ID = "M_Periodic_Cost_ID";
 
 	/** Set m_periodic_cost_id	  */
-	public void setm_periodic_cost_id (int m_periodic_cost_id);
+	public void setM_Periodic_Cost_ID (int M_Periodic_Cost_ID);
 
 	/** Get m_periodic_cost_id	  */
-	public int getm_periodic_cost_id();
+	public int getM_Periodic_Cost_ID();
 
     /** Column name m_periodic_cost_uu */
     public static final String COLUMNNAME_m_periodic_cost_uu = "m_periodic_cost_uu";
