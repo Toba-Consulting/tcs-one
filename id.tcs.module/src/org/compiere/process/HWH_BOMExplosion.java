@@ -1,5 +1,9 @@
 package org.compiere.process;
 
+import id.tcs.model.I_TCS_BOM_Explosion_List;
+import id.tcs.model.X_BOM_Explosion_List;
+import id.tcs.model.X_TCS_BOM_Explosion_List;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -42,13 +46,21 @@ public class HWH_BOMExplosion extends SvrProcess{
 		for (MProduct product:finishedGoods) {
 			if (!productExplosionLevel.containsKey(product)) {
 				productExplosionLevel.put(product, 0);
-			} else 
-				continue;
+			} 
+//			else 
+//				continue;
 
 			List<MProduct> subAssy1 = getSubAssy(product.get_ID());
 
 			if (subAssy1.isEmpty())
 				continue;
+			
+			X_TCS_BOM_Explosion_List head = new X_TCS_BOM_Explosion_List(getCtx(), 0, get_TrxName());
+			head.setM_Product_ID(product.getM_Product_ID());
+			head.setM_Product_Parent_ID(product.getM_Product_ID());
+			head.setM_Product_Child_ID(0);
+			head.setbomdistance(0);
+			head.saveEx();
 
 			for (MProduct assy1:subAssy1) {
 				if (!productExplosionLevel.containsKey(assy1)) {
@@ -62,12 +74,22 @@ public class HWH_BOMExplosion extends SvrProcess{
 
 				List<MProduct> subAssy2 = getSubAssy(assy1.get_ID());
 
-				if (!subAssy2.isEmpty())
+				if (subAssy2.isEmpty())
 					continue;
+				
+				X_TCS_BOM_Explosion_List headtolevel1 = new X_TCS_BOM_Explosion_List(getCtx(), 0, get_TrxName());
+				headtolevel1.setM_Product_ID(product.getM_Product_ID());
+				headtolevel1.setM_Product_Parent_ID(product.getM_Product_ID());
+				headtolevel1.setM_Product_Child_ID(assy1.getM_Product_ID());
+				headtolevel1.setbomdistance(1);
+				headtolevel1.saveEx();
 
 				for (MProduct assy2:subAssy2) {
+					
+					
 					if (!productExplosionLevel.containsKey(assy2)) {
 						productExplosionLevel.put(assy2, 0);
+						
 					}
 
 					Integer productLevel2 = productExplosionLevel.get(product);
@@ -81,8 +103,24 @@ public class HWH_BOMExplosion extends SvrProcess{
 
 					List<MProduct> subAssy3 = getSubAssy(assy2.get_ID());
 
-					if (!subAssy3.isEmpty())
+					if (subAssy3.isEmpty())
 						continue;
+					
+					//create record because assy2 have child
+					X_TCS_BOM_Explosion_List L1toL2 = new X_TCS_BOM_Explosion_List(getCtx(), 0, get_TrxName());
+					L1toL2.setM_Product_ID(product.getM_Product_ID());
+					L1toL2.setM_Product_Parent_ID(assy1.getM_Product_ID());
+					L1toL2.setM_Product_Child_ID(assy2.getM_Product_ID());
+					L1toL2.setbomdistance(1);
+					L1toL2.saveEx();
+					
+					//create record because assy2 have child
+					X_TCS_BOM_Explosion_List headtolevel2 = new X_TCS_BOM_Explosion_List(getCtx(), 0, get_TrxName());
+					headtolevel2.setM_Product_ID(product.getM_Product_ID());
+					headtolevel2.setM_Product_Parent_ID(product.getM_Product_ID());
+					headtolevel2.setM_Product_Child_ID(assy2.getM_Product_ID());
+					headtolevel2.setbomdistance(2);
+					headtolevel2.saveEx();
 
 					for (MProduct assy3:subAssy3) {
 						if (!productExplosionLevel.containsKey(assy3)) {
@@ -101,6 +139,27 @@ public class HWH_BOMExplosion extends SvrProcess{
 						Integer assy2Level3 = productExplosionLevel.get(assy2);
 						if (assy2Level3 < 1)
 							productExplosionLevel.put(assy2, 1);
+						
+						List<MProduct> subAssy4 = getSubAssy(assy3.get_ID());
+
+						if (subAssy4.isEmpty())
+							continue;
+						
+						//create record because assy3 have child
+						X_TCS_BOM_Explosion_List L2toL3 = new X_TCS_BOM_Explosion_List(getCtx(), 0, get_TrxName());
+						L2toL3.setM_Product_ID(product.getM_Product_ID());
+						L2toL3.setM_Product_Parent_ID(assy2.getM_Product_ID());
+						L2toL3.setM_Product_Child_ID(assy3.getM_Product_ID());
+						L2toL3.setbomdistance(1);
+						L2toL3.saveEx();
+						
+						//create record because assy3 have child
+						X_TCS_BOM_Explosion_List level3 = new X_TCS_BOM_Explosion_List(getCtx(), 0, get_TrxName());
+						level3.setM_Product_ID(product.getM_Product_ID());
+						level3.setM_Product_Parent_ID(product.getM_Product_ID());
+						level3.setM_Product_Child_ID(assy3.getM_Product_ID());
+						level3.setbomdistance(3);
+						level3.saveEx();
 
 					}
 
@@ -120,7 +179,7 @@ public class HWH_BOMExplosion extends SvrProcess{
 
 
 	private List<MProduct> getSubAssy(int product_ID) {
-		String assyWhereClause = " AD_Client_ID=1000000 AND IsBOM='Y' AND M_Product_BOM.M_Product_ID=? ";
+		String assyWhereClause = " M_Product.AD_Client_ID=1000000 AND IsBOM='Y' AND M_Product_BOM.M_Product_ID=? ";
 		List<MProduct> subAssy = new Query(getCtx(), MProduct.Table_Name, assyWhereClause, get_TrxName())
 				.addJoinClause("JOIN M_Product_BOM ON M_Product.M_Product_ID=M_Product_BOM.M_ProductBOM_ID ")
 				.setParameters(product_ID)
