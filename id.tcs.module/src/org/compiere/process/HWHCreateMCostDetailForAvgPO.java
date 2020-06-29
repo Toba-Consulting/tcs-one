@@ -14,6 +14,8 @@ import org.compiere.util.Env;
 
 public class HWHCreateMCostDetailForAvgPO extends SvrProcess {
 
+	int p_C_Period_ID = 0;
+	
 	@Override
 	protected void prepare() {
 
@@ -36,7 +38,7 @@ public class HWHCreateMCostDetailForAvgPO extends SvrProcess {
 
 		String sqlShipment = "select m_inoutline_id from m_inoutline where m_inout_id IN (" + 
 				"select m_inout_id from m_inout " + 
-				"where issotrx='Y' and docstatus IN ('CO','CL') " + 
+				"where issotrx='Y' and docstatus IN ('CO','CL') AND movementdate > ? " + 
 				"and posted!='Y') and m_inoutline_id NOT IN (select m_inoutline_id from m_costdetail "
 				+ "where m_inoutline_id is not null and ad_client_id=1000000)"; 
 
@@ -52,7 +54,7 @@ public class HWHCreateMCostDetailForAvgPO extends SvrProcess {
 			while (rs.next()) {
 				MInOutLine ioLine = new MInOutLine(getCtx(), rs.getInt(1), get_TrxName());
 				MCostDetail.createShipment(acctSchema, ioLine.getAD_Org_ID(), ioLine.getM_Product_ID(), 
-						ioLine.getM_AttributeSetInstance_ID(), ioLine.get_ID(), 1000001, Env.ONE, ioLine.getMovementQty(), 
+						ioLine.getM_AttributeSetInstance_ID(), ioLine.get_ID(), 1000001, Env.ONE, ioLine.getMovementQty().negate(), 
 						ioLine.getDescription(), ioLine.getParent().isSOTrx(), get_TrxName());
 				countShipment++;
 
@@ -74,7 +76,7 @@ public class HWHCreateMCostDetailForAvgPO extends SvrProcess {
 		String sqlInventory = "select m_inventoryline_id from m_inventoryline where m_inventory_id IN (" + 
 				"select m_inventory_id from m_inventory " + 
 				"where docstatus IN ('CO','CL') " + 
-				"and posted!='Y') and m_inventoryline_id NOT IN (select m_inventoryline_id from m_costdetail "
+				") and m_inventoryline_id NOT IN (select m_inventoryline_id from m_costdetail "
 				+ "where m_inventoryline_id is not null and ad_client_id=1000000)"; 
 
 		pstmt = null;

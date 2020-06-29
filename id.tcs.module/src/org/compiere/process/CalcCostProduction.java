@@ -85,7 +85,6 @@ public class CalcCostProduction extends SvrProcess{
 
 		Timestamp endDate = TimeUtil.addDays(period.getEndDate(), 1);
 
-		
 		List<MProduction> productions = new Query(getCtx(), MProduction.Table_Name, whereClause, get_TrxName())
 				.setParameters(new Object[] {productID, period.getStartDate(), endDate})
 				.setOnlyActiveRecords(true)
@@ -98,7 +97,7 @@ public class CalcCostProduction extends SvrProcess{
 			MProductionLine fgLine = null;
 
 			for (MProductionLine line : prodLines) {
-				BigDecimal lineCost  = Env.ZERO;
+				BigDecimal lineAmt  = Env.ZERO;
 				BigDecimal lineQty = Env.ZERO;
 				if (line.getM_Product_ID() == production.getM_Product_ID()) {
 					fgQty = line.getMovementQty();
@@ -108,20 +107,21 @@ public class CalcCostProduction extends SvrProcess{
 					X_M_Periodic_Cost linePeriodicCost = new Query(getCtx(), I_M_Periodic_Cost.Table_Name, "M_Product_ID=?", get_TrxName())
 							.setParameters(new Object[] {line.getM_Product_ID()})
 							.first();
-					
-					if (linePeriodicCost == null) {
-						lineCost = Env.ONE;
-						int M_Product_ID = line.getM_Product_ID();
-						int M_ProductionLine_ID = line.get_ID();
-					}
 
 					lineQty = line.getMovementQty();
-					lineCost = lineQty.multiply(linePeriodicCost.getcostprice());
 
-					fgAmt = fgAmt.add(lineCost);
+					if (linePeriodicCost == null) {
+						lineAmt = Env.ONE;
+						int M_Product_ID = line.getM_Product_ID();
+						int M_ProductionLine_ID = line.get_ID();
+					} else {
+						lineAmt = lineQty.multiply(linePeriodicCost.getcostprice()).abs();
+					}
+
+					fgAmt = fgAmt.add(lineAmt);
 
 					//Update Component Cost Detail
-					updateProductionLineCostDetail(line, lineCost, lineQty);
+					updateProductionLineCostDetail(line, lineAmt.divide(lineQty.abs(), 9, BigDecimal.ROUND_HALF_DOWN), lineQty);
 				}
 
 			}
@@ -167,9 +167,9 @@ public class CalcCostProduction extends SvrProcess{
 		String whereClause = "";
 		if (p_Line==1) {
 			whereClause = "m_product_id in (1010002,1010337,1010340,1010346,1010504,1010511)";
-
 		} else {
-			whereClause = "m_product_id in (1007069,1007073,1007095,1007105,1010089,1010091,1010092,1010398,1010512,1010603)";
+			//whereClause = "m_product_id in (1007069,1007073,1007095,1007105,1010089,1010091,1010092,1010398,1010512,1010603)";
+			whereClause = "m_product_id in (1010512)";
 		}
 
 		return new Query(getCtx(), MProduct.Table_Name, whereClause, get_TrxName())

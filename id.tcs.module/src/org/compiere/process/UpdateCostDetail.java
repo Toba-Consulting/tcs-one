@@ -58,30 +58,29 @@ public class UpdateCostDetail extends SvrProcess{
 		MPeriod period = new MPeriod(getCtx(), p_C_Period_ID, get_TrxName());
 		Timestamp endDate = TimeUtil.addDays(period.getEndDate(), 1);
 
-		if (p_Line < 4) {
-			StringBuilder sb;
-			for(int productID : getInventoryProduct()) {
-				sb = new StringBuilder();
-				BigDecimal costPrice = Env.ZERO;
+		//if (p_Line < 4) {
+		StringBuilder sb;
+		for(int productID : getInventoryProduct()) {
+			sb = new StringBuilder();
+			BigDecimal costPrice = Env.ZERO;
 
-				sb.append("SELECT COALESCE(CostPrice,0) FROM M_Periodic_Cost "
-						+ "WHERE AD_Client_ID = ? AND M_Product_ID = ? AND C_Period_ID = ?");
-				costPrice = DB.getSQLValueBDEx(get_TrxName(), sb.toString(), 
-						new Object[]{p_AD_Client_ID, productID, p_C_Period_ID});
+			sb.append("SELECT COALESCE(CostPrice,0) FROM M_Periodic_Cost "
+					+ "WHERE AD_Client_ID = ? AND M_Product_ID = ? AND C_Period_ID = ?");
+			costPrice = DB.getSQLValueBDEx(get_TrxName(), sb.toString(), 
+					new Object[]{p_AD_Client_ID, productID, p_C_Period_ID});
 
-				if(costPrice == null)
-					continue;
+			if(costPrice == null)
+				continue;
 
-				updateCurrentPriceCostDetail(costPrice, productID, period, endDate);
-				updateAmtCostDetail(costPrice, productID, period, endDate);
-
-			}
-		} else {	
-			deleteInventoryFacts(period, endDate);
-			deleteShipmentFacts(period, endDate);
-			deleteProductionFacts(period, endDate);
-			deleteReturnFacts(period, endDate);
+			updateCurrentPriceCostDetail(costPrice, productID, period, endDate);
+			updateAmtCostDetail(costPrice, productID, period, endDate);
 		}
+
+		deleteInventoryFacts(period, endDate);
+		deleteShipmentFacts(period, endDate);
+		deleteProductionFacts(period, endDate);
+		deleteReturnFacts(period, endDate);
+
 		return "The process is done";
 	}
 
@@ -195,7 +194,7 @@ public class UpdateCostDetail extends SvrProcess{
 				p_AD_Client_ID, period.getStartDate(), endDate}, get_TrxName());
 
 		//Update Shipment
-		StringBuilder sb3 = new StringBuilder("UPDATE M_CostDetail Set Amt = CurrentCostPrice*Qty WHERE M_Product_ID = ? "
+		StringBuilder sb3 = new StringBuilder("UPDATE M_CostDetail Set Amt = CurrentCostPrice*Qty*-1 WHERE M_Product_ID = ? "
 				+ "AND M_ProductionLine_ID IN ( "
 				+ "SELECT M_ProductionLine_ID "
 				+ "FROM M_ProductionLine mpl "
@@ -227,16 +226,19 @@ public class UpdateCostDetail extends SvrProcess{
 					.getIDs();
 
 		} else if (p_Line==2) {
-			whereClause = "m_product_id in (1007069,1007073,1007095,1007105,1010089,1010091,1010092,1010398,1010512,1010603)";
+			//whereClause = "m_product_id in (1007069,1007073,1007095,1007105,1010089,1010091,1010092,1010398,1010512,1010603)";
+			whereClause = "m_product_id in (1010512)";
+			
 			return new Query(getCtx(), MProduct.Table_Name, whereClause, get_TrxName())
 					.setOnlyActiveRecords(true)
 					.getIDs();
 
-			
+
 		} else {
-			whereClause = "AD_Client_ID = ? AND ProductType='I' AND IsBOM='N'";
+			whereClause = "AD_Client_ID = ? AND ProductType='I'";
 		}
 
+		//whereClause = "AD_Client_ID = ? AND ProductType='I'";
 		return new Query(getCtx(), MProduct.Table_Name, whereClause, get_TrxName())
 				.setParameters(new Object[]{p_AD_Client_ID})
 				.setOnlyActiveRecords(true)
