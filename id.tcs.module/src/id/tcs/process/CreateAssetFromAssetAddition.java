@@ -42,15 +42,15 @@ public class CreateAssetFromAssetAddition extends SvrProcess{
 		MAsset asset = new MAsset(getCtx(), 0, get_TrxName());
 		
 		asset.setAD_Org_ID(assetAdditiion.getAD_Org_ID());
-		asset.setName(assetAdditiion.getA_NewAsset_Name());
-		asset.setValue(assetAdditiion.getA_NewAsset_Value());
-		asset.setA_Asset_Group_ID(assetAdditiion.getA_Asset_Group_ID());
+		asset.setName(assetAdditiion.get_Value("A_NewAsset_Name").toString());
+		asset.setValue(assetAdditiion.get_Value("A_NewAsset_Value").toString());
+		asset.setA_Asset_Group_ID(assetAdditiion.get_ValueAsInt("A_Asset_Group_ID"));
 		asset.setA_Asset_CreateDate(assetAdditiion.getCreated());
 		asset.setM_Product_ID(p_M_Product_ID);
 //		asset.setA_Asset_Status(MAsset.A_ASSET_STATUS_Activated);
 		System.out.println(p_ManufacturedYear);
 		asset.setManufacturedYear(p_ManufacturedYear);
-		asset.setLocationComment(assetAdditiion.getLocationComment());
+		asset.setLocationComment(assetAdditiion.get_Value("LocationComment").toString());
 		asset.saveEx();
 		
 		

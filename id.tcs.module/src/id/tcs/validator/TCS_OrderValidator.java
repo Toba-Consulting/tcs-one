@@ -1,17 +1,23 @@
 package id.tcs.validator;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MMatchPO;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MPayment;
+import org.compiere.model.MRequisition;
+import org.compiere.model.MRequisitionLine;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
 
+import id.tcs.model.X_M_MatchPR;
 import id.tcs.model.X_M_MatchQuotation;
 
 public class TCS_OrderValidator {
@@ -33,10 +39,93 @@ public class TCS_OrderValidator {
 			msg += checkLinkedPayment(order);
 			msg += checkActiveLinkedInOut(order);
 			msg += removeMatchQuotation(order);
-		} 
+//		} else  if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)){
+//			msg += generateRequisition(order);
+		} else  if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL) || 
+				event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT)){
+			msg += removeRequisition(order);
+		}
 		return msg;
 	}
 	
+	private static String generateRequisition(MOrder order) {
+		if(!order.isSOTrx())
+			updateRequisition(order);
+		
+		return "";
+	}
+
+	private static String updateRequisition(MOrder order){
+		String whereClause = "DocStatus!='CO' AND M_Requisition_ID IN (SELECT DISTINCT M_Requisition_ID "
+				+ "FROM M_RequisitionLine mrl "
+				+ "JOIN C_OrderLine col ON col.M_RequisitionLine_ID=mrl.M_RequisitionLine_ID "
+				+ "WHERE col.C_Order_ID=?)";
+		
+		List<MRequisition> requisitions = new Query(Env.getCtx(), MRequisition.Table_Name, whereClause, null)
+								.setParameters(order.getC_Order_ID())
+								.setOnlyActiveRecords(true)
+								.list();
+		
+		if (!requisitions.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			for (MRequisition req : requisitions) {
+				sb.append(req.getDocumentNo()).append(",");
+			}
+			sb.deleteCharAt(sb.length()-1);
+			return "Abort.. Please check document status for Requisition: ";
+			
+		}
+		
+		for (MOrderLine orderLine : order.getLines()) {
+			int M_RequisitionLine_ID = orderLine.get_ValueAsInt("M_RequisitionLine_ID");
+			if(M_RequisitionLine_ID <= 0)
+				continue;
+			MRequisitionLine requisitionLine = new MRequisitionLine(Env.getCtx(), M_RequisitionLine_ID, null);	
+			System.out.println(M_RequisitionLine_ID);
+			System.out.println(requisitionLine.get_Value("QtyRequired"));
+			System.out.println(orderLine.getQtyOrdered());
+			requisitionLine.set_ValueOfColumn("QtyRequired", ((BigDecimal) requisitionLine.get_Value("QtyRequired")).subtract(orderLine.getQtyOrdered()));
+			requisitionLine.set_ValueOfColumn("QtyOrdered", requisitionLine.getQtyOrdered().add(orderLine.getQtyOrdered()));
+			requisitionLine.saveEx();
+			
+			X_M_MatchPR matchPR = new X_M_MatchPR(Env.getCtx(),0,null);
+	        matchPR.setC_OrderLine_ID(orderLine.getC_OrderLine_ID());
+	        matchPR.setM_Requisition_ID(requisitionLine.getM_Requisition_ID());
+	        matchPR.setM_RequisitionLine_ID(requisitionLine.get_ID());
+	        matchPR.setC_Order_ID(orderLine.getC_Order_ID());
+	        matchPR.setDateTrx(orderLine.getC_Order().getDateOrdered());
+	        matchPR.setQtyOrdered(orderLine.getQtyOrdered());
+	        matchPR.saveEx();
+		}
+		
+		return "";
+	}
+	
+	private static String removeRequisition(MOrder order){
+		if (order.getDocStatus().equals("CO")) {
+			for (MOrderLine orderLine : order.getLines()) {
+				int M_RequisitionLine_ID = orderLine.get_ValueAsInt("M_RequisitionLine_ID");
+				if(M_RequisitionLine_ID <= 0)
+					continue;
+				MRequisitionLine requisitionLine = new MRequisitionLine(Env.getCtx(), M_RequisitionLine_ID, null);
+				requisitionLine.set_ValueOfColumn("QtyRequired", ((BigDecimal) requisitionLine.get_Value("QtyRequired")).add(orderLine.getQtyOrdered()));
+				requisitionLine.set_ValueOfColumn("QtyOrdered",requisitionLine.getQtyOrdered().subtract(orderLine.getQtyOrdered()));
+				requisitionLine.saveEx();	
+			}
+			String sqlDelete = "DELETE FROM M_MatchPR WHERE C_Order_ID=?";
+			DB.executeUpdate(sqlDelete, order.get_ID(), null);
+			
+		}
+		return "";
+		/*//@win: for now we prefer not removing the reference to Requisition Line to preserve audit reference
+		if (DocAction.equalsIgnoreCase(DOCACTION_Void)) {
+	        String sql = "UPDATE C_OrderLine SET M_RequisitionLine_ID = NULL WHERE C_Order_ID=?";
+	        int no = DB.executeUpdate(sql, get_ID(), get_TrxName());
+	        log.info("UPDATED Order Line "+no);
+		}
+		*/	
+	}
+
 	public static String unreserveQty(MOrder order){
 		MOrderLine [] lines = order.getLines();
 		for (MOrderLine line : lines) {

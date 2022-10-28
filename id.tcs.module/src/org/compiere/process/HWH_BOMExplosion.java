@@ -1,7 +1,7 @@
 package org.compiere.process;
 
 import id.tcs.model.I_TCS_BOM_Explosion_List;
-import id.tcs.model.X_BOM_Explosion_List;
+//import id.tcs.model.X_BOM_Explosion_List;
 import id.tcs.model.X_TCS_BOM_Explosion_List;
 
 import java.util.HashMap;

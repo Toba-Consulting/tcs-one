@@ -67,9 +67,9 @@ public class TCS_Doc_AssetAddition extends Doc
 		//
 		fact.createLine(null, getA_Asset_Acct(), as.getC_Currency_ID(), assetValueAmt, Env.ZERO);
 
-		if (assetAdd.isAdjustAccmDepr()) {
-			BigDecimal remainingAmt = assetValueAmt.subtract(assetAdd.getA_Accumulated_Depr());
-			fact.createLine(null, getA_AccmDepr_Acct(), as.getC_Currency_ID(), Env.ZERO, assetAdd.getA_Accumulated_Depr());
+		if (assetAdd.get_ValueAsBoolean("isAdjustAccmDepr")) {
+			BigDecimal remainingAmt = assetValueAmt.subtract((BigDecimal) assetAdd.get_Value("getA_Accumulated_Depr"));
+			fact.createLine(null, getA_AccmDepr_Acct(), as.getC_Currency_ID(), Env.ZERO, (BigDecimal) assetAdd.get_Value("getA_Accumulated_Depr"));
 			fact.createLine(null, getP_Asset_Acct(as), as.getC_Currency_ID(), Env.ZERO, remainingAmt);
 
 		}
@@ -154,19 +154,23 @@ public class TCS_Doc_AssetAddition extends Doc
 	private MAccount getA_Asset_Acct()
 	{
 		MAssetAddition assetAdd = getAssetAddition();
-		int acct_id = MAssetAcct
-				.forA_Asset_ID(getCtx(), assetAdd.getA_Asset_ID(), assetAdd.getPostingType(), assetAdd.getDateAcct(), null)
-				.getA_Asset_Acct();
-		return MAccount.get(getCtx(), acct_id);
+		// Temporary Commented Out - because core is out of sync
+//		int acct_id = MAssetAcct
+//				.forA_Asset_ID(getCtx(), assetAdd.getA_Asset_ID(), assetAdd.getPostingType(), assetAdd.getDateAcct(), null)
+//				.getA_Asset_Acct();
+//		return MAccount.get(getCtx(), acct_id);
+		return null;
 	}
 
 	private MAccount getA_AccmDepr_Acct()
 	{
 		MAssetAddition assetAdd = getAssetAddition();
-		int acct_id = MAssetAcct
-				.forA_Asset_ID(getCtx(), assetAdd.getA_Asset_ID(), assetAdd.getPostingType(), assetAdd.getDateAcct(), null)
-				.getA_Accumdepreciation_Acct();
-		return MAccount.get(getCtx(), acct_id);
+		// Temporary Commented Out - because core is out of sync
+//		int acct_id = MAssetAcct
+//				.forA_Asset_ID(getCtx(), assetAdd.getA_Asset_ID(), assetAdd.getPostingType(), assetAdd.getDateAcct(), null)
+//				.getA_Accumdepreciation_Acct();
+//		return MAccount.get(getCtx(), acct_id);
+		return null;
 	}
 
 

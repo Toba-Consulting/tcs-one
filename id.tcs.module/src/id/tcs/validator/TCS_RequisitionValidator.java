@@ -1,6 +1,7 @@
 package id.tcs.validator;
 
 import org.adempiere.base.event.IEventTopics;
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MRequisition;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
@@ -36,7 +37,9 @@ public class TCS_RequisitionValidator {
 				.addJoinClause("JOIN C_Order co on co.C_Order_ID=col.C_Order_ID AND co.IsSOTrx='N' ")
 				.match();
 		
-		if (match)return "Active Purchase Order Referencing This Requisition Exist";
+		if (match) 
+			return "Active Purchase Order Referencing This Requisition Exist";
+		
 		return "";
 	}
 }

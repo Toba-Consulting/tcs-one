@@ -4,4 +4,5 @@
       <provide interface="org.adempiere.base.IProcessFactory"/>
    </service>
    <implementation class="id.tcs.module.factory.TCS_ProcessFactory"/>
+   <property name="service.ranking" type="Integer" value="1000"/>
 </scr:component>

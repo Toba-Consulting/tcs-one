@@ -73,11 +73,13 @@ public class TCS_MovementValidator {
 					sqlSumUsedQty += " AND IsInbound='Y'";
 				}
 				
+				
 				BigDecimal UsedQty = new Query(move.getCtx(), MMovementLine.Table_Name, sqlSumUsedQty, move.get_TrxName())
 										.addJoinClause("JOIN M_Movement mm on mm.M_Movement_ID=M_MovementLine.M_Movement_ID ")
 										.sum("MovementQty");
 
 				BigDecimal remainingQty = ddLine.getQtyEntered().subtract(UsedQty);
+
 				if (remainingQty.compareTo(lineQty)<0) {
 					return "Line "+moveLine.getLine()+" : Qty after complete is more than order qty, reamining qty = "+remainingQty+". ";
 				}
@@ -103,7 +105,7 @@ public class TCS_MovementValidator {
 			}
 			lineIDs = lineIDs.substring(0, lineIDs.length()-2);
 
-			String sqlWhereMatch = "M_OutBoundLineFrom_ID IN ("+lineIDs+") AND IsInBound='Y' AND DocStatus IN ('CO','CL')";
+			String sqlWhereMatch = "M_OutBoundLine_ID IN ("+lineIDs+") AND IsInBound='Y' AND DocStatus IN ('CO','CL')";
 			boolean match = new Query(move.getCtx(), MMovementLine.Table_Name, sqlWhereMatch, move.get_TrxName())
 			.addJoinClause("JOIN M_Movement ON M_Movement.M_Movement_ID = M_MovementLine.M_Movement_ID")
 			.match();
