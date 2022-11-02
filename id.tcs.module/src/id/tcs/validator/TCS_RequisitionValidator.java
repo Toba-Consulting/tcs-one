@@ -17,12 +17,12 @@ public class TCS_RequisitionValidator {
 				(event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT))) {
 			msg = checkPO(req);
 		}
-		else if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE))){
-			msg = checkPO(req);
-		}
-		else if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID))){
-			msg = checkPO(req);
-		}
+//		else if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE))){
+//			msg = checkPO(req);
+//		}
+//		else if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID))){
+//			msg = checkPO(req);
+//		}
 
 		return msg;
 	}

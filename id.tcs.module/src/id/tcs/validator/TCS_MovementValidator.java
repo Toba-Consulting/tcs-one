@@ -76,11 +76,11 @@ public class TCS_MovementValidator {
 				
 				BigDecimal UsedQty = new Query(move.getCtx(), MMovementLine.Table_Name, sqlSumUsedQty, move.get_TrxName())
 										.addJoinClause("JOIN M_Movement mm on mm.M_Movement_ID=M_MovementLine.M_Movement_ID ")
-										.sum("MovementQty");
+										.sum("QtyDelivered");
 
 				BigDecimal remainingQty = ddLine.getQtyEntered().subtract(UsedQty);
 
-				if (remainingQty.compareTo(lineQty)<0) {
+				if (remainingQty.compareTo(ddLine.getQtyEntered())<0) {
 					return "Line "+moveLine.getLine()+" : Qty after complete is more than order qty, reamining qty = "+remainingQty+". ";
 				}
 			}
