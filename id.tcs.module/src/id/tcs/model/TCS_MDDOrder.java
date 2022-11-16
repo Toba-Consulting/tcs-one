@@ -11,6 +11,11 @@ import org.eevolution.model.MDDOrderLine;
 
 public class TCS_MDDOrder extends MDDOrder implements DocOptions{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public TCS_MDDOrder(Properties ctx, int DD_Order_ID, String trxName) {
 		super(ctx, DD_Order_ID, trxName);
 		// TODO Auto-generated constructor stub

@@ -63,7 +63,7 @@ public class TCS_DDOrderValidator {
 		boolean match = new Query(ddOrder.getCtx(), MMovement.Table_Name, sqlWhere, ddOrder.get_TrxName())
 						.match();
 		if (match)
-			return "Active OutBound Or InBound Exist";
+			return "Active Movement Exist";
 		
 		return "";
 	}
