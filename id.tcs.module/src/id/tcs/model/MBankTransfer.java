@@ -247,7 +247,11 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			}
 			paymentFrom.setDateAcct(getDateAcct());
 			paymentFrom.setDateTrx(getDateAcct()); 
-			paymentFrom.setPayAmt(getPayAmtFrom());
+			
+			if(getTransferFeeType().equals("F"))
+				paymentFrom.setPayAmt(getPayAmtFrom().add(getChargeAmt()));
+			else
+				paymentFrom.setPayAmt(getPayAmtFrom());
 			
 			if (funcCurrencyID!=getC_Currency_From_ID()) {
 				paymentFrom.setC_ConversionType_ID(getC_ConversionType_ID());
@@ -276,7 +280,11 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			}
 			paymentTo.setDateAcct(getDateAcct());
 			paymentTo.setDateTrx(getDateAcct());
-			paymentTo.setPayAmt(getPayAmtTo());
+			if(getTransferFeeType().equals("T"))
+				paymentTo.setPayAmt(getPayAmtTo().add(getChargeAmt()));
+			else
+				paymentTo.setPayAmt(getPayAmtTo());
+			
 			if (funcCurrencyID!=getC_Currency_From_ID()) {
 				paymentTo.setC_ConversionType_ID(getC_ConversionType_ID());
 			}
@@ -393,6 +401,8 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				alloclineAP.setAmount(paymentFrom.getPayAmt().multiply(multiplyRate).negate());
 			else if(getC_Currency_From_ID() != getC_Currency_ID() && getC_Currency_To_ID() != getC_Currency_ID())
 				alloclineAP.setAmount(paymentFrom.getPayAmt().multiply(multiplyRateCurrencynotIDRFrom).negate());
+			else if(getTransferFeeType().equals("F"))
+				alloclineAP.setAmount(getPayAmtFrom().negate());
 			else
 				alloclineAP.setAmount(getAmountFrom().negate());
 			alloclineAP.saveEx();
@@ -408,24 +418,55 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				alloclineAR.setAmount(paymentTo.getPayAmt().multiply(divideRate));
 			else if(getC_Currency_From_ID() != getC_Currency_ID() && getC_Currency_To_ID() != getC_Currency_ID())
 				alloclineAR.setAmount(paymentTo.getPayAmt().multiply(multiplyRateCurrencynotIDRTo));
+			else if(getTransferFeeType().equals("T"))
+				alloclineAR.setAmount(getPayAmtTo());
 			else
 				alloclineAR.setAmount(getAmountTo());
 			alloclineAR.saveEx();
+			
+			if(isHasTransferFee()){
+				MAllocationLine alloclineCharge= new MAllocationLine(allocHdr);
+				
+				alloclineCharge.setAD_Org_ID(allocHdr.getAD_Org_ID());
+				alloclineCharge.setC_BPartner_ID(getC_BPartner_ID());
+				if(getTransferFeeType().equals("F"))
+					alloclineCharge.setAmount(getChargeAmt());
+				else if(getTransferFeeType().equals("T"))
+					alloclineCharge.setAmount(getChargeAmt().negate());
+				alloclineCharge.setC_Charge_ID(getC_Charge_ID());
+				
+				alloclineCharge.saveEx();
+				
+				
+				MAllocationLine alloclineChargePay= new MAllocationLine(allocHdr);
+				alloclineChargePay.setAD_Org_ID(allocHdr.getAD_Org_ID());
+				alloclineChargePay.setC_BPartner_ID(getC_BPartner_ID());
+				if(getTransferFeeType().equals("F")) {
+					alloclineChargePay.setAmount(getChargeAmt().negate());
+					alloclineChargePay.setC_Payment_ID(paymentFrom.getC_Payment_ID());
+				}
+				else if(getTransferFeeType().equals("T")) {
+					alloclineChargePay.setAmount(getChargeAmt());
+					alloclineChargePay.setC_Payment_ID(paymentTo.getC_Payment_ID());
+				}
+				alloclineChargePay.saveEx();
+			}				
 		
 			if(getC_Currency_From_ID() != getC_Currency_To_ID()) {
 				
 				MAllocationLine alloclineLossvsGain = new MAllocationLine(allocHdr);
 				
 				alloclineLossvsGain.setAD_Org_ID(allocHdr.getAD_Org_ID());
-				alloclineLossvsGain.setC_BPartner_ID(getC_BPartner_ID());	
+				alloclineLossvsGain.setC_BPartner_ID(getC_BPartner_ID());
 				alloclineLossvsGain.setAmount(alloclineAP.getAmount().negate().subtract(alloclineAR.getAmount()));
+				
 				if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1) {
 					alloclineLossvsGain.setC_Charge_ID(MSysConfig.getIntValue("currency_loss_charge", 0, paymentFrom.getAD_Client_ID()));
 				}
 				else if(alloclineAR.getAmount().compareTo(alloclineAP.getAmount().negate())==1)
 				{
 					alloclineLossvsGain.setC_Charge_ID(MSysConfig.getIntValue("currency_gain_charge", 0, paymentFrom.getAD_Client_ID()));
-				}					
+				}
 				alloclineLossvsGain.saveEx();
 			}				
 			

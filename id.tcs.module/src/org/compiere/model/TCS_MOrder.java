@@ -45,6 +45,8 @@ public class TCS_MOrder extends MOrder implements DocOptions {
 		} else if (docStatus.equals(DocAction.STATUS_Invalid)) {
 			options[index++] = DocAction.ACTION_Complete;
 			options[index++] = DocAction.ACTION_Void;
+		} else if (docStatus.equals(DocAction.STATUS_WaitingPayment)) {
+			options[index++] = DocAction.ACTION_ReActivate;
 		}
 
 		return index;
