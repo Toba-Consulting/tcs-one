@@ -11,6 +11,7 @@ import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAssetAcct;
 import org.compiere.model.MAssetAddition;
 import org.compiere.model.MCharge;
+import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
 import org.compiere.model.MProject;
 import org.compiere.model.ProductCost;
@@ -67,6 +68,8 @@ public class TCS_Doc_AssetAddition extends Doc
 		//
 		fact.createLine(null, getA_Asset_Acct(), as.getC_Currency_ID(), assetValueAmt, Env.ZERO);
 
+		//@win temporary solution, comment out code 
+		/*
 		if (assetAdd.isAdjustAccmDepr()) {
 			BigDecimal remainingAmt = assetValueAmt.subtract(assetAdd.getA_Accumulated_Depr());
 			fact.createLine(null, getA_AccmDepr_Acct(), as.getC_Currency_ID(), Env.ZERO, assetAdd.getA_Accumulated_Depr());
@@ -76,6 +79,9 @@ public class TCS_Doc_AssetAddition extends Doc
 		else{
 			fact.createLine(null, getP_Asset_Acct(as), as.getC_Currency_ID(), Env.ZERO, assetValueAmt);
 		}
+		*/
+		fact.createLine(null, getP_Asset_Acct(as), as.getC_Currency_ID(), Env.ZERO, assetValueAmt);
+		//end @win temporary solution
 
 		/* Set BPartner and C_Project dimension for "Imobilizari in curs / Property Being"
 		final int invoiceBP_ID = getInvoicePartner_ID();
@@ -154,8 +160,11 @@ public class TCS_Doc_AssetAddition extends Doc
 	private MAccount getA_Asset_Acct()
 	{
 		MAssetAddition assetAdd = getAssetAddition();
+		MClient client = new MClient(getCtx(), assetAdd.getAD_Client_ID(), assetAdd.get_TrxName());
+		MAcctSchema schema = client.getAcctSchema();
+		
 		int acct_id = MAssetAcct
-				.forA_Asset_ID(getCtx(), assetAdd.getA_Asset_ID(), assetAdd.getPostingType(), assetAdd.getDateAcct(), null)
+				.forA_Asset_ID(getCtx(), schema.get_ID(), assetAdd.getA_Asset_ID(), assetAdd.getPostingType(), assetAdd.getDateAcct(), assetAdd.get_TrxName())
 				.getA_Asset_Acct();
 		return MAccount.get(getCtx(), acct_id);
 	}
@@ -163,8 +172,11 @@ public class TCS_Doc_AssetAddition extends Doc
 	private MAccount getA_AccmDepr_Acct()
 	{
 		MAssetAddition assetAdd = getAssetAddition();
+		MClient client = new MClient(getCtx(), assetAdd.getAD_Client_ID(), assetAdd.get_TrxName());
+		MAcctSchema schema = client.getAcctSchema();
+		
 		int acct_id = MAssetAcct
-				.forA_Asset_ID(getCtx(), assetAdd.getA_Asset_ID(), assetAdd.getPostingType(), assetAdd.getDateAcct(), null)
+				.forA_Asset_ID(getCtx(), schema.get_ID(), assetAdd.getA_Asset_ID(), assetAdd.getPostingType(), assetAdd.getDateAcct(), assetAdd.get_TrxName())
 				.getA_Accumdepreciation_Acct();
 		return MAccount.get(getCtx(), acct_id);
 	}

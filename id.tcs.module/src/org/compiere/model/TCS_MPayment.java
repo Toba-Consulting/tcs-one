@@ -249,7 +249,7 @@ public class TCS_MPayment extends MPayment {
 	 * 	Allocate single AP/AR Invoice
 	 * 	@return true if allocated
 	 */
-	private boolean allocateInvoice()
+	protected boolean allocateInvoice()
 	{
 		//	calculate actual allocation
 		BigDecimal allocationAmt = getPayAmt();			//	underpayment
@@ -295,7 +295,7 @@ public class TCS_MPayment extends MPayment {
 	 * 	Allocate Payment Selection
 	 * 	@return true if allocated
 	 */
-	private boolean allocatePaySelection()
+	protected boolean allocatePaySelection()
 	{
 		MAllocationHdr alloc = new MAllocationHdr(getCtx(), false, 
 			getDateTrx(), getC_Currency_ID(),
@@ -525,7 +525,7 @@ public class TCS_MPayment extends MPayment {
 	/**
 	 * 	Set the definite document number after completed
 	 */
-	private void setDefiniteDocumentNo() {
+	protected void setDefiniteDocumentNo() {
 		MDocType dt = MDocType.get(getCtx(), getC_DocType_ID());
 		if (dt.isOverwriteDateOnComplete()) {
 			setDateTrx(TimeUtil.getDay(0));
@@ -545,7 +545,7 @@ public class TCS_MPayment extends MPayment {
 	 * 	Create Counter Document
 	 * 	@return payment
 	 */
-	private MPayment createCounterDoc()
+	protected MPayment createCounterDoc()
 	{
 		//	Is this a counter doc ?
 		if (getRef_Payment_ID() != 0)
@@ -749,7 +749,7 @@ public class TCS_MPayment extends MPayment {
 			setDocAction(DOCACTION_Complete);
 		return DocAction.STATUS_InProgress;
 	}
-	private boolean verifyPaymentAllocateSum(MPaymentAllocate[] pAllocs) {
+	protected boolean verifyPaymentAllocateSum(MPaymentAllocate[] pAllocs) {
 		BigDecimal sumPaymentAllocates = Env.ZERO;
 		//TCS calculation include TCS_AllocateCharge
 		String sqlCount = "SELECT COUNT(1) FROM TCS_AllocateCharge WHERE C_Payment_ID="+getC_Payment_ID();
@@ -773,7 +773,7 @@ public class TCS_MPayment extends MPayment {
 		return true;
 	}
 	
-	private boolean verifyDocType(MPaymentAllocate[] pAllocs)
+	protected boolean verifyDocType(MPaymentAllocate[] pAllocs)
 	{
 		if (getC_DocType_ID() == 0)
 			return false;
@@ -920,7 +920,7 @@ public class TCS_MPayment extends MPayment {
 	 * @param pAllocs 
 	 *	@return true if ok
 	 */
-	private boolean verifyPaymentAllocateVsHeader(MPaymentAllocate[] pAllocs) {
+	protected boolean verifyPaymentAllocateVsHeader(MPaymentAllocate[] pAllocs) {
 		if (pAllocs.length > 0) {
 			if (getC_Charge_ID() > 0 || getC_Invoice_ID() > 0 || getC_Order_ID() > 0)
 				return false;
@@ -1089,7 +1089,7 @@ public class TCS_MPayment extends MPayment {
 			return true;
 		}
 	
-	private void setC_DocType_ID ()
+	protected void setC_DocType_ID ()
 	{
 		setC_DocType_ID(isReceipt());
 	}	//	setC_DocType_ID
@@ -1126,7 +1126,7 @@ public class TCS_MPayment extends MPayment {
 		}
 	}	//	setC_DocType_ID
 	
-	private void setDocumentNo()
+	protected void setDocumentNo()
 	{
 		//	Cash Transfer
 		if ("X".equals(getTenderType()))
