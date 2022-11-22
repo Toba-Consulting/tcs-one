@@ -16,7 +16,6 @@ public class GenerateAllocation_PaymentCharge extends SvrProcess{
 
 	@Override
 	protected void prepare() {
-		// TODO Auto-generated method stub
 		
 	}
 

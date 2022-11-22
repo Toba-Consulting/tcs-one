@@ -1,25 +1,15 @@
 package id.taowi.process;
 
-import id.tcs.model.MInquiry;
-import id.tcs.model.MInquiryLine;
-import id.tcs.model.MQuotation;
-import id.tcs.model.MQuotationLine;
-import id.tcs.model.X_M_MatchInquiry;
-import id.tcs.model.X_M_MatchQuotation;
-
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MProductPrice;
 import org.compiere.model.MProductPricing;
-import org.compiere.model.MRfQ;
 import org.compiere.model.MRfQResponse;
 import org.compiere.model.MRfQResponseLine;
 import org.compiere.model.Query;
@@ -30,6 +20,12 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
+import id.tcs.model.MInquiry;
+import id.tcs.model.MInquiryLine;
+import id.tcs.model.MQuotation;
+import id.tcs.model.MQuotationLine;
+import id.tcs.model.X_M_MatchQuotation;
+
 public class TaoInquiryToQuotation extends SvrProcess{
 
 	int C_Inquiry_ID = 0;
@@ -38,7 +34,7 @@ public class TaoInquiryToQuotation extends SvrProcess{
 	int C_PaymentTerm_ID = 0;
 	int C_Tax_ID = 0;
 	int p_M_PriceList_ID = 0;
-	
+
 	@Override
 	protected void prepare() {
 		ProcessInfoParameter[] para = getParameter();
@@ -56,9 +52,9 @@ public class TaoInquiryToQuotation extends SvrProcess{
 				C_Tax_ID = para[i].getParameterAsInt();
 			} /*else if (para[i].getParameterName().equalsIgnoreCase("M_PriceList_ID")) {
 				p_M_PriceList_ID = para[i].getParameterAsInt();
-			
+
 			}*/
-			
+
 			else {
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 			}
@@ -67,37 +63,38 @@ public class TaoInquiryToQuotation extends SvrProcess{
 
 	@Override
 	protected String doIt() throws Exception {
-		
+
 		C_Inquiry_ID = getRecord_ID();
-		
+
 		if(C_Inquiry_ID == 0){
 			return "Fill the Inquiry";
 		}
-		
-//		if (p_M_PriceList_ID <= 0) {
-//			return "Price List is Mandatory";
-//		}
-		
+
+		//		if (p_M_PriceList_ID <= 0) {
+		//			return "Price List is Mandatory";
+		//		}
+
 		MPriceList priceList = new MPriceList(getCtx(), p_M_PriceList_ID, get_TrxName());
-		
+
 		String sql = "SELECT plv.M_PriceList_Version_ID "
 				+ "FROM M_PriceList_Version plv "
 				+ "WHERE plv.M_PriceList_ID=? "						//	1
 				+ " AND plv.ValidFrom <= ? "
 				+ "ORDER BY plv.ValidFrom DESC";
-			//	Use newest price list - may not be future
+		//	Use newest price list - may not be future
 
 		Timestamp today = new Timestamp(System.currentTimeMillis());
 		int	M_PriceList_Version_ID = DB.getSQLValueEx(null, sql, p_M_PriceList_ID, today);
-					
+
 		MInquiry inquiry = new MInquiry(getCtx(), C_Inquiry_ID, get_TrxName());
 		MInquiryLine inqLines[] = inquiry.getLines();
-		List<String> listDoc = new ArrayList<String>();
-		
+		//		List<String> listDoc = new ArrayList<String>();
+
 		if (inqLines.length == 0) 
 			return "Inquiry has no lines";
-		
+
 		//FBI-2274 add validation create quotation must have rfq with responses @Febrian
+		/*
 		int[] matchInquiry_IDs = new Query(getCtx(), X_M_MatchInquiry.Table_Name, " C_Inquiry_ID = ? ", get_TrxName())
 			.setParameters(C_Inquiry_ID).getIDs();
 		for (int matchInquiry_ID : matchInquiry_IDs) {
@@ -106,18 +103,19 @@ public class TaoInquiryToQuotation extends SvrProcess{
 			if(RfQ_ID>0)
 			{
 				MRfQ rfq = new MRfQ(getCtx(), RfQ_ID, get_TrxName());
-				
+
 //				if(rfq.getResponses(true, true).length <= 0)
 //					throw new AdempiereException("Cannot create quotation due to RfQ have no responses.");
 			}
 		}
+		 */
 		//FBI-2274
-		
+
 		boolean isNewProduct = false;
-		MRfQ rfq = null;
-		MRfQResponse rfqResponse = null;
+		//		MRfQ rfq = null;
+		//		MRfQResponse rfqResponse = null;
 		Map<Integer, MRfQResponseLine> rfqResponseMap = new HashMap<Integer, MRfQResponseLine>();
-		
+
 		for (MInquiryLine line : inqLines) {
 			if (line.isIncludeRfQ()) {
 				isNewProduct = true;
@@ -128,31 +126,31 @@ public class TaoInquiryToQuotation extends SvrProcess{
 			/*
 			if (inquiry.getC_RfQ_ID() <= 0)
 				return "Inquiry has no related RfQ";
-			
+
 			rfq = MRfQ.get(getCtx(), inquiry.getC_RfQ_ID(), get_TrxName());
-			
+
 			if (!rfq.getDocStatus().equals(DocAction.STATUS_Completed))
 				return "Error: RfQ status is not Completed";
-			*/
+			 */
 			//@KevinY FBI - 2530
 			String whereClause = "IsInternal='Y' AND isSelectedWinner='Y' AND C_RfQ_ID IN (SELECT DISTINCT C_RfQ_ID FROM M_MatchInquiry WHERE C_Inquiry_ID=?)";
 			//@KevinY end
 			List<MRfQResponse> rfqResponses = new Query(getCtx(), MRfQResponse.Table_Name, whereClause, get_TrxName())
-							.setParameters(C_Inquiry_ID)
-							.list();
-			
-//			if (rfqResponses.isEmpty())
-//				return "Related RfQ has no selected internal response";
-//			
+					.setParameters(C_Inquiry_ID)
+					.list();
+
+			//			if (rfqResponses.isEmpty())
+			//				return "Related RfQ has no selected internal response";
+			//			
 			for(MRfQResponse response : rfqResponses) {
 				MRfQResponseLine[] respLines = response.getLines();
-				
+
 				for (MRfQResponseLine respLine : respLines) {
 					rfqResponseMap.put(respLine.getC_RfQLine_ID(), respLine);
-					
+
 				}
 			}
-			
+
 		}
 		MQuotation quotation = new MQuotation(getCtx(), 0, get_TrxName());
 
@@ -176,9 +174,9 @@ public class TaoInquiryToQuotation extends SvrProcess{
 			quotation.setAD_OrgTrx_ID(inquiry.get_ValueAsInt("AD_OrgTrx_ID"));
 		}
 		if (inquiry.getC_Project_ID() > 0) {
-		quotation.setC_Project_ID(inquiry.getC_Project_ID());
+			quotation.setC_Project_ID(inquiry.getC_Project_ID());
 		}
-		
+
 		//@KevinY FBI - 2530
 		if(( inquiry.getC_BPartner_ID() > 0 && inquiry.getC_BPartner_Location_ID() > 0 ) 
 				&& inquiry.get_ValueAsInt("TCS_Lead_ID") <= 0){
@@ -199,30 +197,30 @@ public class TaoInquiryToQuotation extends SvrProcess{
 		quotation.setM_PriceList_ID(inquiry.getC_BPartner().getM_PriceList_ID());
 		quotation.setC_Tax_ID(C_Tax_ID);
 		if (inquiry.getSalesRep_ID() > 0) {
-		quotation.setSalesRep_ID(inquiry.getSalesRep_ID());
+			quotation.setSalesRep_ID(inquiry.getSalesRep_ID());
 		}
 		quotation.setGrandTotal(Env.ZERO);
 		quotation.setTotalLines(Env.ZERO);
 		quotation.saveEx();
-		
+
 		for (MInquiryLine inqLine : inqLines) {
 			MQuotationLine quoLine = new MQuotationLine(quotation);
-			
+
 			//if inquiry line not new item
 			if(!inqLine.isNewProduct()){
 				quoLine.setDateOrdered(today);
 				quoLine.setIsActive(true);
 				quoLine.setAD_Org_ID(inqLine.getAD_Org_ID());
-				
+
 				MProductPricing pp = new MProductPricing (inqLine.getM_Product_ID(), 
-						inquiry.getC_BPartner_ID(), inqLine.getQty(), true);
+						inquiry.getC_BPartner_ID(), inqLine.getQty(), true, null);
 				//Get Price List From BPartner on Inquiry
 				pp.setM_PriceList_ID(inquiry.getC_BPartner().getM_PriceList_ID());
 				pp.setM_PriceList_Version_ID(M_PriceList_Version_ID);
 				pp.setPriceDate(today);
 
 				//get currency_id
-				
+
 				quoLine.setC_Currency_ID(pp.getC_Currency_ID());
 				quoLine.setC_Tax_ID(C_Tax_ID);
 				//@KevinY FBI - 2530
@@ -231,18 +229,18 @@ public class TaoInquiryToQuotation extends SvrProcess{
 				}
 				//@KevinY end
 				quoLine.setC_UOM_ID(inqLine.getC_UOM_ID());
-				
+
 				//@leo HWH-3009 set price on quotation line from price list
 				BigDecimal priceStd = Env.ZERO;
 				BigDecimal priceLst = Env.ZERO;
-				
+
 				if (pp.getPriceStd()!= null) {
 					priceStd = pp.getPriceStd();
 				}
 				if (pp.getPriceList()!= null) {
 					priceLst = pp.getPriceList();
 				}
-				
+
 				quoLine.setPriceEntered(priceStd);
 				quoLine.setPriceActual(priceStd);
 				quoLine.set_CustomColumn("BasePrice", priceStd);
@@ -253,55 +251,56 @@ public class TaoInquiryToQuotation extends SvrProcess{
 				quoLine.setQtyOrdered(inqLine.getQty());
 				//@end
 			}
-			
+
 			//if inquiry line is new item
 			else if(inqLine.isNewProduct()){
 				//get price
-				String sqlGet = "SELECT C_RfQLine_ID FROM M_MatchInquiry WHERE C_InquiryLine_ID=? AND C_RfQLine_ID IS NOT NULL";
-				int rfqLineID = DB.getSQLValue(get_TrxName(), sqlGet, inqLine.getC_InquiryLine_ID());
+				//				String sqlGet = "SELECT C_RfQLine_ID FROM M_MatchInquiry WHERE C_InquiryLine_ID=? AND C_RfQLine_ID IS NOT NULL";
+				//				int rfqLineID = DB.getSQLValue(get_TrxName(), sqlGet, inqLine.getC_InquiryLine_ID());
 				//@albert add try catch
 				try{
-				MRfQResponseLine respLine = rfqResponseMap.get(rfqLineID);
- 
-				quoLine.setAD_Org_ID(inqLine.getAD_Org_ID());
-				quoLine.setDateOrdered(today);
 
-				//get currency_id
-				quoLine.setC_Currency_ID(priceList.getC_Currency_ID());
-				quoLine.setC_Tax_ID(C_Tax_ID);
-				//@KevinY FBI - 2530
-				if(inquiry.getC_BPartner_Location_ID() > 0)
-					quoLine.setC_BPartner_Location_ID(inquiry.getC_BPartner_Location_ID());
-				//@KevinY end
-				quoLine.setC_UOM_ID(inqLine.getC_UOM_ID());
-//				quoLine.setPriceEntered((BigDecimal)respLine.get_Value("Price"));
-//				quoLine.set_ValueOfColumn("BasePrice", (BigDecimal)respLine.get_Value("Price"));
-				
-				
-				StringBuilder sqls = new StringBuilder();	
-				sqls.append("select M_ProductPrice_ID From M_ProductPrice where M_PriceList_Version_ID="+M_PriceList_Version_ID+" AND M_Product_ID="+quoLine.getM_Product_ID());
-				Integer M_ProductPrice_ID = DB.getSQLValue(null, sql.toString());
-				if(M_ProductPrice_ID!=-1){
-					MProductPrice productprice= new MProductPrice(Env.getCtx(),M_ProductPrice_ID,get_TrxName());
-					quoLine.set_ValueOfColumn("PriceKondisi", productprice.getPriceList());
-				}else{
-//					quoLine.set_ValueOfColumn("PriceKondisi",(BigDecimal)respLine.get_Value("PriceKondisi"));
-				}
-//				quoLine.setPriceActual((BigDecimal)respLine.get_Value("Price"));
-//				quoLine.setPriceList((BigDecimal)respLine.get_Value("Price"));
-//				quoLine.setDeliveryDays(respLine.getDeliveryDays());
-//				MRfQResponse resp = new MRfQResponse(getCtx(), respLine.getC_RfQResponse_ID(), get_TrxName());
-//				quotation.set_ValueOfColumn("DeliveryDays", resp.getDeliveryDays());
-				quotation.saveEx();
-				quoLine.setDescription(inqLine.getDescription());
-				quoLine.setQtyEntered(inqLine.getQty());
-				quoLine.setQtyOrdered(inqLine.getQty());
+					//				MRfQResponseLine respLine = rfqResponseMap.get(rfqLineID);
+
+					quoLine.setAD_Org_ID(inqLine.getAD_Org_ID());
+					quoLine.setDateOrdered(today);
+
+					//get currency_id
+					quoLine.setC_Currency_ID(priceList.getC_Currency_ID());
+					quoLine.setC_Tax_ID(C_Tax_ID);
+					//@KevinY FBI - 2530
+					if(inquiry.getC_BPartner_Location_ID() > 0)
+						quoLine.setC_BPartner_Location_ID(inquiry.getC_BPartner_Location_ID());
+					//@KevinY end
+					quoLine.setC_UOM_ID(inqLine.getC_UOM_ID());
+					//				quoLine.setPriceEntered((BigDecimal)respLine.get_Value("Price"));
+					//				quoLine.set_ValueOfColumn("BasePrice", (BigDecimal)respLine.get_Value("Price"));
+
+
+					StringBuilder sqls = new StringBuilder();	
+					sqls.append("select M_ProductPrice_ID From M_ProductPrice where M_PriceList_Version_ID="+M_PriceList_Version_ID+" AND M_Product_ID="+quoLine.getM_Product_ID());
+					Integer M_ProductPrice_ID = DB.getSQLValue(null, sql.toString());
+					if(M_ProductPrice_ID!=-1){
+						MProductPrice productprice= new MProductPrice(Env.getCtx(),M_ProductPrice_ID,get_TrxName());
+						quoLine.set_ValueOfColumn("PriceKondisi", productprice.getPriceList());
+					}else{
+						//					quoLine.set_ValueOfColumn("PriceKondisi",(BigDecimal)respLine.get_Value("PriceKondisi"));
+					}
+					//				quoLine.setPriceActual((BigDecimal)respLine.get_Value("Price"));
+					//				quoLine.setPriceList((BigDecimal)respLine.get_Value("Price"));
+					//				quoLine.setDeliveryDays(respLine.getDeliveryDays());
+					//				MRfQResponse resp = new MRfQResponse(getCtx(), respLine.getC_RfQResponse_ID(), get_TrxName());
+					//				quotation.set_ValueOfColumn("DeliveryDays", resp.getDeliveryDays());
+					quotation.saveEx();
+					quoLine.setDescription(inqLine.getDescription());
+					quoLine.setQtyEntered(inqLine.getQty());
+					quoLine.setQtyOrdered(inqLine.getQty());
 				}catch(Exception e){
 					e.printStackTrace();
 				}
 				//
 			}
-			
+
 			if (inquiry.get_ValueAsInt("AD_OrgTrx_ID") > 0) {
 				quoLine.setAD_OrgTrx_ID(inquiry.get_ValueAsInt("AD_OrgTrx_ID"));
 			}
@@ -319,12 +318,12 @@ public class TaoInquiryToQuotation extends SvrProcess{
 			quoLine.setLine(inqLine.getLineNo());
 			quoLine.set_ValueOfColumn("FaktorKondisi", Env.ONE);
 			quoLine.saveEx();
-			
+
 			if(quoLine.get_Value("BasePrice")==null){
 				quoLine.set_ValueOfColumn("BasePrice", quoLine.getPrice());
 				quoLine.saveEx();
 			}
-			
+
 			X_M_MatchQuotation match = new X_M_MatchQuotation(getCtx(), 0, get_TrxName());
 			match.setAD_Org_ID(quoLine.getAD_Org_ID());
 			match.setC_Quotation_ID(quoLine.getC_Quotation_ID());
@@ -335,10 +334,10 @@ public class TaoInquiryToQuotation extends SvrProcess{
 			match.setQtyOrdered(quoLine.getQtyOrdered());
 			match.saveEx();
 		}
-		
+
 		String message = Msg.parseTranslation(getCtx(), "@GeneratedQuotation@ " + quotation.getDocumentNo());
 		addBufferLog(0, null, null, message, quotation.get_Table_ID(), quotation.getC_Quotation_ID());
-		
+
 		return "";
 	}
 

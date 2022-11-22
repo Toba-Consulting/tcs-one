@@ -1,20 +1,17 @@
 package id.tcs.process;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.logging.Level;
 
-import org.compiere.model.MAsset;
-import org.compiere.model.MAssetAddition;
-import org.compiere.model.MProduct;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 
 public class CreateAssetFromAssetAddition extends SvrProcess{
+	
 	private int p_A_Asset_Addition;
 	private int p_M_Product_ID;
 	private int p_ManufacturedYear;
+	
 	@Override
 	protected void prepare() {
 		p_A_Asset_Addition = getRecord_ID();

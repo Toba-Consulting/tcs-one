@@ -17,7 +17,6 @@ public class GenerateMatchAllocation extends SvrProcess {
 
 	@Override
 	protected void prepare() {
-		// TODO Auto-generated method stub
 		
 	}
 

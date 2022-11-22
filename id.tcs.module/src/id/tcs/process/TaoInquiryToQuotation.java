@@ -1,15 +1,7 @@
 package id.tcs.process;
 
-import id.tcs.model.MInquiry;
-import id.tcs.model.MInquiryLine;
-import id.tcs.model.MQuotation;
-import id.tcs.model.MQuotationLine;
-import id.tcs.model.X_M_MatchInquiry;
-import id.tcs.model.X_M_MatchQuotation;
-
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +21,13 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+
+import id.tcs.model.MInquiry;
+import id.tcs.model.MInquiryLine;
+import id.tcs.model.MQuotation;
+import id.tcs.model.MQuotationLine;
+import id.tcs.model.X_M_MatchInquiry;
+import id.tcs.model.X_M_MatchQuotation;
 
 public class TaoInquiryToQuotation extends SvrProcess{
 
@@ -92,7 +91,7 @@ public class TaoInquiryToQuotation extends SvrProcess{
 					
 		MInquiry inquiry = new MInquiry(getCtx(), C_Inquiry_ID, get_TrxName());
 		MInquiryLine inqLines[] = inquiry.getLines();
-		List<String> listDoc = new ArrayList<String>();
+//		List<String> listDoc = new ArrayList<String>();
 		
 		if (inqLines.length == 0) 
 			return "Inquiry has no lines";
@@ -214,7 +213,7 @@ public class TaoInquiryToQuotation extends SvrProcess{
 				quoLine.setAD_Org_ID(inqLine.getAD_Org_ID());
 				
 				MProductPricing pp = new MProductPricing (inqLine.getM_Product_ID(), 
-						inquiry.getC_BPartner_ID(), inqLine.getQty(), true);
+						inquiry.getC_BPartner_ID(), inqLine.getQty(), true, null);
 				pp.setM_PriceList_ID(p_M_PriceList_ID);
 				pp.setM_PriceList_Version_ID(M_PriceList_Version_ID);
 				pp.setPriceDate(today);

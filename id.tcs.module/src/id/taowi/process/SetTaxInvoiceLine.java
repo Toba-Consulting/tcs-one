@@ -18,7 +18,7 @@ public class SetTaxInvoiceLine extends SvrProcess{
 	
 	@Override
 	protected void prepare() {
-		// TODO Auto-generated method stub
+
 		ProcessInfoParameter[] para = getParameter();
 		for (int i = 0; i < para.length; i++) {
 			String name = para[i].getParameterName();

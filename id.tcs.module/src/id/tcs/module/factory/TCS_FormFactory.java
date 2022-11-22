@@ -20,14 +20,14 @@ public class TCS_FormFactory implements IFormFactory{
 			try {
 				clazz = loader.loadClass(formName);
 			} catch (Exception e) {
-				log.log(Level.FINE,"Load Form Class Failed in id.slu.custom.webui.apps.form.formcontroller",e);
+				log.log(Level.FINE,"Load Form Class Failed in id.tcs.module.factory.TCS_FormFactory",e);
 			}
 			//
 			if(clazz != null){
 				try {
 					form = clazz.newInstance();
 				} catch (Exception e) {
-					log.log(Level.FINE,"Form Class Initiate Failed in id.slu.custom.webui.apps.form.formcontroller",e);
+					log.log(Level.FINE,"Form Class Initiate Failed in id.tcs.module.factory.TCS_FormFactory",e);
 				}
 			}
 			//

@@ -3,7 +3,6 @@ package id.taowi.process;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -101,11 +100,11 @@ public class NewGenerateMatchAllocation extends SvrProcess {
 
 				//Match remaining payment to payment
 				String wherePaymentOnly = "C_AllocationHdr_ID=? AND C_Payment_ID > 0 AND C_Invoice_ID IS NULL";
-				List<MAllocationLine> poLines = new Query(alloc.getCtx(), I_C_AllocationLine.Table_Name, 
-						wherePaymentOnly , alloc.get_TrxName())
-						.setParameters(alloc.get_ID())
-						.setOrderBy(I_C_AllocationLine.COLUMNNAME_Amount)
-						.list();
+//				List<MAllocationLine> poLines = new Query(alloc.getCtx(), I_C_AllocationLine.Table_Name, 
+//						wherePaymentOnly , alloc.get_TrxName())
+//						.setParameters(alloc.get_ID())
+//						.setOrderBy(I_C_AllocationLine.COLUMNNAME_Amount)
+//						.list();
 
 				String wherePaymentNegOnly = "C_AllocationHdr_ID=? AND C_Payment_ID > 0 AND C_Invoice_ID IS NULL AND Amount < 0";
 				List<MAllocationLine> ioNegLines = new Query(alloc.getCtx(), MAllocationLine.Table_Name, 

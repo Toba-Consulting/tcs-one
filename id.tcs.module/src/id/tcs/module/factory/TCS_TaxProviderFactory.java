@@ -1,10 +1,9 @@
 package id.tcs.module.factory;
 
-import id.tcs.model.TCS_TaxProvider;
-
 import org.adempiere.base.ITaxProviderFactory;
 import org.adempiere.model.ITaxProvider;
-import org.compiere.model.StandardTaxProvider;
+
+import id.tcs.model.TCS_TaxProvider;
 
 public class TCS_TaxProviderFactory implements ITaxProviderFactory{
 	
