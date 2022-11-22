@@ -45,9 +45,10 @@ public class TCS_CalloutQuotationLine extends CalloutEngine implements IColumnCa
 
 	public String total(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value){
 
-		BigDecimal baseprice = (BigDecimal)mTab.getValue("BasePrice");
-		BigDecimal discount = (BigDecimal)mTab.getValue("Discount");
-		BigDecimal qtyEntered = (BigDecimal)mTab.getValue("QtyEntered");
+		BigDecimal baseprice = mTab.getValue("BasePrice") != null ? (BigDecimal)mTab.getValue("BasePrice") : BigDecimal.ZERO;
+		BigDecimal discount = mTab.getValue("Discount") != null ? (BigDecimal)mTab.getValue("Discount") : BigDecimal.ZERO;
+		BigDecimal qtyEntered = mTab.getValue("QtyEntered") != null ? (BigDecimal)mTab.getValue("QtyEntered") : BigDecimal.ZERO;
+		
 		BigDecimal beforeDisc = baseprice.multiply(discount).divide(Env.ONEHUNDRED);
 		BigDecimal afterDisc = baseprice.subtract(beforeDisc).setScale(0, RoundingMode.UP);
 
@@ -602,32 +603,6 @@ public class TCS_CalloutQuotationLine extends CalloutEngine implements IColumnCa
 		return "";
 	}	//	bPartnerBill
 
-
-	public String PriceKondisi (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
-	{
-		BigDecimal FaktorKondisi= (BigDecimal)value;
-		Integer quotationlineid= Env.getContextAsInt(ctx, WindowNo, mTab.getTabNo(), "C_QuotationLine_ID");
-		MQuotationLine quotline= new MQuotationLine(Env.getCtx(),quotationlineid,null);
-
-		mTab.setValue("PriceKondisi",FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice"))));
-		if (quotline.getDiscount()==null){
-			mTab.setValue("PriceEntered", FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice"))));
-			mTab.setValue("PriceActual", FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice"))));
-		}
-		else{
-			BigDecimal priceentered= FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice")));
-			BigDecimal pricediscount = priceentered.multiply(quotline.getDiscount().divide(Env.ONEHUNDRED));
-			BigDecimal LineNetAmt = priceentered.multiply(quotline.getQtyEntered());
-
-			mTab.setValue("PriceEntered", priceentered.subtract(pricediscount));
-			mTab.setValue("PriceActual", priceentered.subtract(pricediscount));
-			mTab.setValue("LineNetAmt", LineNetAmt);
-		}
-		return "";
-	}
-
-
-
 	public String warehouse (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		if (isCalloutActive())		//	assuming it is resetting value
@@ -897,15 +872,16 @@ public class TCS_CalloutQuotationLine extends CalloutEngine implements IColumnCa
 		boolean isEnforcePriceLimit = pl.isEnforcePriceLimit();
 		BigDecimal QtyEntered, QtyOrdered, PriceEntered, PriceActual, PriceLimit, Discount, PriceList;
 		//	get values
-		QtyEntered = (BigDecimal)mTab.getValue("QtyEntered");
-		QtyOrdered = (BigDecimal)mTab.getValue("QtyOrdered");
+		QtyEntered = mTab.getValue("QtyEntered") != null ? (BigDecimal)mTab.getValue("QtyEntered") : BigDecimal.ZERO;
+		QtyOrdered = mTab.getValue("QtyOrdered") != null ? (BigDecimal)mTab.getValue("QtyOrdered") : BigDecimal.ZERO;
 		if (log.isLoggable(Level.FINE)) log.fine("QtyEntered=" + QtyEntered + ", Ordered=" + QtyOrdered + ", UOM=" + C_UOM_To_ID);
 		//
-		PriceEntered = (BigDecimal)mTab.getValue("PriceEntered");
-		PriceActual = (BigDecimal)mTab.getValue("PriceActual");
-		Discount = (BigDecimal)mTab.getValue("Discount");
-		PriceLimit = (BigDecimal)mTab.getValue("PriceLimit");
-		PriceList = (BigDecimal)mTab.getValue("PriceList");
+		PriceEntered = mTab.getValue("PriceEntered") != null ? (BigDecimal)mTab.getValue("PriceEntered") : BigDecimal.ZERO;
+		PriceActual = mTab.getValue("PriceActual") != null ? (BigDecimal)mTab.getValue("PriceActual") : BigDecimal.ZERO;
+		Discount = mTab.getValue("Discount") != null ? (BigDecimal)mTab.getValue("Discount") : BigDecimal.ZERO;
+		PriceLimit = mTab.getValue("PriceLimit") != null ? (BigDecimal)mTab.getValue("PriceLimit") : BigDecimal.ZERO;
+		PriceList = mTab.getValue("PriceList") != null ? (BigDecimal)mTab.getValue("PriceList") : BigDecimal.ZERO;
+		
 		if (log.isLoggable(Level.FINE)){
 			log.fine("PriceList=" + PriceList + ", Limit=" + PriceLimit + ", Precision=" + StdPrecision);
 			log.fine("PriceEntered=" + PriceEntered + ", Actual=" + PriceActual + ", Discount=" + Discount);
