@@ -3,6 +3,7 @@ package id.tcs.webui.apps.form;
 import id.tcs.model.X_M_MatchPR;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -75,6 +76,11 @@ public class TCS_CreateFromOrder extends CreateFrom {
         sqlStmt.append("INNER JOIN M_Requisition mr ON mr.M_Requisition_ID=rl.M_Requisition_ID ");
         sqlStmt.append("WHERE rl.AD_Client_ID=? ");
         
+        //@win added filter by org
+        int AD_Org_ID = Env.getContextAsInt(Env.getCtx(), getGridTab().getWindowNo(), "AD_Org_ID");
+        sqlStmt.append("AND mr.AD_Org_ID=? ");
+        //@win end added filter by org
+        
         if (M_Requisition_ID > 0) {
         	sqlStmt.append("AND rl.M_Requisition_ID=? ");
         }
@@ -99,13 +105,21 @@ public class TCS_CreateFromOrder extends CreateFrom {
         if (salesRepID> 0) {
         	sqlStmt.append("AND mr.SalesRep_ID=? ");
         }*/
+        
         //@Stephan, unprocessedpofrompr not available
         //sqlStmt.append("AND (rl.MovementQty-unprocessedpofrompr(rl.M_RequisitionLine_ID)) > 0 AND mr.DocStatus IN (?,?) ");
+        
         try
         {
         	int count = 1;
         	PreparedStatement pstmt = DB.prepareStatement(sqlStmt.toString(), null);
             pstmt.setInt(count, Env.getAD_Client_ID(Env.getCtx()));
+            
+            //@win add filter by org, begin
+            count++;
+            pstmt.setInt(count, AD_Org_ID);
+            //@win add filter by org, end
+            
             if (M_Requisition_ID > 0) {
             	count++;
             	pstmt.setInt(count, M_Requisition_ID);
@@ -150,7 +164,7 @@ public class TCS_CreateFromOrder extends CreateFrom {
             	
             	BigDecimal qtys = DB.getSQLValueBD(null, sqls.toString());
                 Vector<Object> line = new Vector<Object>(8);
-                line.add(new Boolean(false));           //  0-Selection
+                line.add(Boolean.FALSE);           //  0-Selection
                 
                 KeyNamePair lineKNPair = new KeyNamePair(rs.getInt(1), rs.getString(2)); // 1-Line
                 line.add(lineKNPair);
@@ -222,7 +236,7 @@ public class TCS_CreateFromOrder extends CreateFrom {
     			
                 if (reqLine.getM_Product_ID() > 0) {
 	                int C_UOM_To_ID = reqLine.getC_UOM_ID();
-	                BigDecimal qty1 = qty.setScale(MUOM.getPrecision(Env.getCtx(), C_UOM_To_ID), BigDecimal.ROUND_HALF_UP);
+	                BigDecimal qty1 = qty.setScale(MUOM.getPrecision(Env.getCtx(), C_UOM_To_ID), RoundingMode.HALF_UP);
 	    			if (qty.compareTo(qty1) != 0)
 	    			{
 	    				log.fine("Corrected Qty Scale UOM=" + C_UOM_To_ID 
@@ -320,7 +334,7 @@ public class TCS_CreateFromOrder extends CreateFrom {
         		
         		BigDecimal Qty = reqLine.getQty();
         		boolean IsSOTrx = order.isSOTrx();
-        		MProductPricing pricing = new MProductPricing (reqLine.getM_Product_ID(), C_BPartner_ID, Qty, IsSOTrx);
+        		MProductPricing pricing = new MProductPricing (reqLine.getM_Product_ID(), C_BPartner_ID, Qty, IsSOTrx, null);
         		int M_PriceList_ID = order.getM_PriceList_ID();
         		pricing.setM_PriceList_ID(M_PriceList_ID);
         		
@@ -396,7 +410,7 @@ public class TCS_CreateFromOrder extends CreateFrom {
 		ArrayList<KeyNamePair> list = new ArrayList<KeyNamePair>();
 
 		int AD_Client_ID = Env.getContextAsInt(Env.getCtx(), getGridTab().getWindowNo(), "AD_Client_ID");
-        
+	     
 		//	Display
 		StringBuilder display = new StringBuilder("r.DocumentNo");
 			//.append(DB.TO_CHAR("r.TotaLines", DisplayType.Amount, Env.getAD_Language(Env.getCtx())));
@@ -404,7 +418,8 @@ public class TCS_CreateFromOrder extends CreateFrom {
 		StringBuilder sql = new StringBuilder("SELECT DISTINCT r.M_Requisition_ID,").append(display)
 			.append(" FROM M_Requisition r ")
 			.append(" WHERE EXISTS (SELECT 1 FROM M_RequisitionLine l WHERE r.M_Requisition_ID=l.M_Requisition_ID")
-			.append(" AND l.AD_Client_ID=? AND r.DocStatus IN (?,?))");
+			.append(" AND r.AD_Client_ID=? AND r.DocStatus=?)")
+			.append(" AND r.AD_Org_ID=? ");
 		//	.append(" AND (l.QtyRequisite - unprocessedpofrompr(m_requisitionline_ID)) > 0) ");
 		//@Stephan
 		if (C_Project_ID > 0) {
@@ -426,7 +441,8 @@ public class TCS_CreateFromOrder extends CreateFrom {
 			pstmt = DB.prepareStatement(sql.toString(), null);
 			pstmt.setInt(++count, AD_Client_ID);
 			pstmt.setString(++count, DocAction.STATUS_Completed);
-			pstmt.setString(++count, DocAction.STATUS_Closed);
+			int AD_Org_ID = Env.getContextAsInt(Env.getCtx(), getGridTab().getWindowNo(), "AD_Org_ID");
+			pstmt.setInt(++count, AD_Org_ID);
 			if (C_Project_ID > 0) {
 				pstmt.setInt(++count, C_Project_ID);
 			}
