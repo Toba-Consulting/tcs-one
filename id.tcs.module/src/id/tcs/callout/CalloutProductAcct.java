@@ -11,7 +11,7 @@ public class CalloutProductAcct implements IColumnCallout {
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		// TODO Auto-generated method stub
+
 		if (mField.getColumnName().equals("C_ElementValue_Asset_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_Asset_ID");
 		if (mField.getColumnName().equals("C_ElementValue_CA_ID"))
@@ -55,13 +55,13 @@ public class CalloutProductAcct implements IColumnCallout {
 			return setElementValue(ctx, WindowNo, mTab, mField, value, oldValue);
 		return null;
 	}
-	
+
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
-		// TODO Auto-generated method stub
+
 		if (value == null)
 			return "";
-		
+
 		MAccount validAccount = MAccount.get(ctx, (int)mTab.getValue("AD_Client_ID"), 0, (int)mTab.getValue("C_AcctSchema_ID"), (int)mTab.getValue(columnName), 0, (int)mTab.getValue("M_Product_ID"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
 		if(columnName.equals("C_ElementValue_Asset_ID"))	
 			mTab.setValue("P_Asset_Acct", validAccount.get_ID());
@@ -89,18 +89,18 @@ public class CalloutProductAcct implements IColumnCallout {
 			mTab.setValue("P_TradeDiscountGrant_Acct", validAccount.get_ID());
 		else if(columnName.equals("C_ElementValue_ACV_ID"))
 			mTab.setValue("P_AverageCostVariance_Acct", validAccount.get_ID());
-		
+
 		return "";
 	}		
-	
+
 	//Set Element Value
 	protected String setElementValue(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		if(value == null)
 			return "";
-		
+
 		int C_ValidCombination_ID = (int)value;
 		MAccount validCombination = new MAccount(ctx, C_ValidCombination_ID, null);
-		
+
 		if (mField.getColumnName().equals("P_Asset_Acct")) {
 			mTab.setValue("C_ElementValue_Asset_ID", validCombination.getAccount_ID());
 		}else if (mField.getColumnName().equals("P_CostAdjustment_Acct")) {
@@ -128,7 +128,7 @@ public class CalloutProductAcct implements IColumnCallout {
 		}else if (mField.getColumnName().equals("P_AverageCostVariance_Acct")) {
 			mTab.setValue("C_ElementValue_ACV_ID", validCombination.getAccount_ID());
 		}
-		
+
 		return "";
 	}
 }

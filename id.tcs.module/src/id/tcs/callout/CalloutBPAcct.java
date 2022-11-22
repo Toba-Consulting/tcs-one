@@ -11,7 +11,7 @@ public class CalloutBPAcct implements IColumnCallout{
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		// TODO Auto-generated method stub
+
 		if (mField.getColumnName().equals("C_ElementValue_CP_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_CP_ID");
 		if (mField.getColumnName().equals("C_ElementValue_CR_ID"))
@@ -31,7 +31,7 @@ public class CalloutBPAcct implements IColumnCallout{
 
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
-		// TODO Auto-generated method stub
+
 		if (value == null) 
 			return "";
 		

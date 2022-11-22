@@ -26,7 +26,6 @@ public class TCS_CalloutQuotation extends CalloutEngine implements IColumnCallou
 	
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		// TODO Auto-generated method stub
 		if (mField.getColumnName().equals(MQuotation.COLUMNNAME_C_BPartner_ID)) {
 			return setPriceList(ctx, WindowNo, mTab, mField, value, oldValue);
 		}

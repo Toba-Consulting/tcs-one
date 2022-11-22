@@ -12,7 +12,7 @@ public class CalloutChargeAcct implements IColumnCallout{
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		// TODO Auto-generated method stub
+
 		if(mField.getColumnName().equals("C_ElementValue_Charge_ID"))
 			return setAccount(ctx, WindowNo, mTab, mField, value, oldValue, "C_ElementValue_Charge_ID");
 		if(mField.getColumnName().equals("Ch_Expense_Acct"))
@@ -22,7 +22,7 @@ public class CalloutChargeAcct implements IColumnCallout{
 	
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
-		// TODO Auto-generated method stub
+
 		if(value == null)
 			return "";
 	
@@ -36,6 +36,7 @@ public class CalloutChargeAcct implements IColumnCallout{
 	
 	//Set C_ElementValue_ID
 	protected String setElementValue(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
+		
 		if(value == null)
 			return "";
 		

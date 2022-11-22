@@ -35,6 +35,7 @@ public class CalloutBankCash implements IColumnCallout {
 
 	public String setAccount(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
 			Object oldValue, String columnName) {
+		
 		if(value == null)
 			return "";
 			
@@ -59,6 +60,7 @@ public class CalloutBankCash implements IColumnCallout {
 	
 	//set Element Value
 	protected String setElementValue(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
+		
 		if(value == null) {
 			return "";
 		}

@@ -1,9 +1,5 @@
 package id.tcs.callout;
 
-import id.tcs.model.I_C_InquiryLine;
-import id.tcs.model.MInquiry;
-import id.tcs.model.MInquiryLine;
-
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Properties;
@@ -17,6 +13,10 @@ import org.compiere.model.MProduct;
 import org.compiere.model.MProductPricing;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+
+import id.tcs.model.I_C_InquiryLine;
+import id.tcs.model.MInquiry;
+import id.tcs.model.MInquiryLine;
 
 public class TCS_CalloutInquiryLine extends CalloutEngine implements IColumnCallout{
 	
@@ -41,7 +41,7 @@ public class TCS_CalloutInquiryLine extends CalloutEngine implements IColumnCall
 		int C_BPartner_ID = Env.getContextAsInt(ctx, WindowNo, "C_BPartner_ID");
 		BigDecimal Qty = (BigDecimal)mTab.getValue("Qty");
 		//boolean IsSOTrx = Env.getContext(ctx, WindowNo, "IsSOTrx").equals("Y");
-		MProductPricing pp = new MProductPricing (M_Product_ID.intValue(), C_BPartner_ID, Qty, true);
+		MProductPricing pp = new MProductPricing (M_Product_ID.intValue(), C_BPartner_ID, Qty, true, null);
 		//
 		int M_PriceList_ID = Env.getContextAsInt(ctx, WindowNo, "M_PriceList_ID");
 		pp.setM_PriceList_ID(M_PriceList_ID);
@@ -73,9 +73,9 @@ public class TCS_CalloutInquiryLine extends CalloutEngine implements IColumnCall
 		mTab.setValue("PriceLimit", pp.getPriceLimit());
 		mTab.setValue("PriceActual", pp.getPriceStd());
 		mTab.setValue("PriceEntered", pp.getPriceStd());
-		mTab.setValue("C_Currency_ID", new Integer(pp.getC_Currency_ID()));
+		mTab.setValue("C_Currency_ID", Integer.valueOf(pp.getC_Currency_ID()));
 		mTab.setValue("Discount", pp.getDiscount());
-		mTab.setValue("C_UOM_ID", new Integer(pp.getC_UOM_ID()));
+		mTab.setValue("C_UOM_ID", Integer.valueOf(pp.getC_UOM_ID()));
 		mTab.setValue("QtyOrdered", mTab.getValue("QtyEntered"));
 		Env.setContext(ctx, WindowNo, "EnforcePriceLimit", pp.isEnforcePriceLimit() ? "Y" : "N");
 		Env.setContext(ctx, WindowNo, "DiscountSchema", pp.isDiscountSchema() ? "Y" : "N");
