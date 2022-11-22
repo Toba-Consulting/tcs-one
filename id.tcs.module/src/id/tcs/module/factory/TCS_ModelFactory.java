@@ -29,11 +29,13 @@ import org.compiere.model.I_C_Order;
 import org.compiere.model.I_C_Payment;
 import org.compiere.model.I_M_InOut;
 import org.compiere.model.I_M_Inventory;
+import org.compiere.model.I_M_InventoryLine;
 import org.compiere.model.I_M_Movement;
 import org.compiere.model.I_M_RMA;
 import org.compiere.model.I_M_Requisition;
 import org.compiere.model.I_TCS_AllocateCharge;
 import org.compiere.model.PO;
+import org.compiere.model.X_C_DocType;
 import org.compiere.model.X_M_Periodic_Cost;
 import org.compiere.util.Env;
 
@@ -85,6 +87,8 @@ public class TCS_ModelFactory implements IModelFactory {
 		*/
 		mapTableModels.put(I_C_BankStatement.Table_Name, "org.compiere.model.TCS_MBankStatement");
 		mapTableModels.put(I_M_Inventory.Table_Name, "org.compiere.model.TCS_MInventory");
+		mapTableModels.put(I_M_InventoryLine.Table_Name, "org.compiere.model.TCS_MInventoryLine");
+		
 		mapTableModels.put(I_M_Movement.Table_Name, "org.compiere.model.TCS_MMovement");
 		
 		mapTableModels.put(I_TCS_AllocateCharge.Table_Name, "org.compiere.model.MTCS_AllocateCharge");
@@ -111,7 +115,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MDDOrder.Table_Name, "id.tcs.model.TCS_MDDOrder");
 		mapTableModels.put(X_M_MatchQuotation.Table_Name, "id.tcs.model.X_M_MatchQuotation");
 		mapTableModels.put(X_M_Periodic_Cost.Table_Name, "org.compiere.model.X_M_Periodic_Cost");
-		
+		mapTableModels.put(X_C_DocType.Table_Name, "org.compiere.model.X_C_DocType");
 	}
 	
 	@Override
