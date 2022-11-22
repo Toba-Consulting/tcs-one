@@ -1,5 +1,6 @@
 package org.compiere.model;
 
+import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.compiere.process.DocAction;
@@ -14,12 +15,21 @@ public class TCS_MInventoryLine extends MInventoryLine {
 		super(ctx, M_InventoryLine_ID, trxName);
 	}
 
+	public TCS_MInventoryLine(Properties ctx, ResultSet rs, String trxName) {
+		super(ctx, rs, trxName);
+	}
+
+	
+	private String DOCSUBTYPEINV_MiscReceipt = "MR";
+	
+//	/** Parent							*/
+//	protected TCS_MInventory 	m_parent = null;
+	
 	/**
 	 * 	Before Save
 	 *	@param newRecord new
 	 *	@return true if can be saved
 	 */
-	@Override
 	protected boolean beforeSave (boolean newRecord)
 	{
 		if (newRecord && getParent().isProcessed()) {
@@ -121,7 +131,7 @@ public class TCS_MInventoryLine extends MInventoryLine {
 			}
 			setM_Locator_ID(0);
 
-		} else if (X_C_DocType.DOCSUBTYPEINV_MiscReceipt.equals(docSubTypeInv)) {
+		} else if (DOCSUBTYPEINV_MiscReceipt.equals(docSubTypeInv)) {
 
 			// Internal Use Inventory validations
 			if (!INVENTORYTYPE_ChargeAccount.equals(getInventoryType()))
@@ -159,4 +169,24 @@ public class TCS_MInventoryLine extends MInventoryLine {
 
 		return true;
 	}	//	beforeSave
+	
+//	/**
+//	 * 	Get Parent
+//	 *	@param parent parent
+//	 */
+//	protected void setParent(TCS_MInventory parent)
+//	{
+//		m_parent = parent; 
+//	}	//	setParent
+//
+//	/**
+//	 * 	Get Parent
+//	 *	@return parent
+//	 */
+//	public MInventory getParent()
+//	{
+//		if (m_parent == null)
+//			m_parent = new TCS_MInventory (getCtx(), getM_Inventory_ID(), get_TrxName());
+//		return m_parent;
+//	}	//	getParent
 }

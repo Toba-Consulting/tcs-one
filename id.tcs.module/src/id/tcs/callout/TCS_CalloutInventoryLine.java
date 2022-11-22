@@ -10,16 +10,15 @@ import org.compiere.model.CalloutEngine;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MDocType;
-import org.compiere.model.MInventoryLine;
 import org.compiere.model.MProduct;
-import org.compiere.model.MUOM;
 import org.compiere.model.MUOMConversion;
-import org.compiere.model.X_C_DocType;
 import org.compiere.util.Env;
 
 
 public class TCS_CalloutInventoryLine extends CalloutEngine implements IColumnCallout {
 
+	private String DOCSUBTYPEINV_MiscReceipt = "MR";
+	
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab,
 			GridField mField, Object value, Object oldValue) {
@@ -57,11 +56,17 @@ public class TCS_CalloutInventoryLine extends CalloutEngine implements IColumnCa
 		if (docType.getDocSubTypeInv().equals(MDocType.DOCSUBTYPEINV_InternalUseInventory)) {
 			isInternalUse = true;
 		}
-		else if (docType.getDocSubTypeInv().equals(X_C_DocType.DOCSUBTYPEINV_MiscReceipt)) {
+		else if (docType.getDocSubTypeInv().equals(DOCSUBTYPEINV_MiscReceipt)) {
 			isMiscReceipt = true;
 		}
 		
-		int precision = MProduct.get(ctx, M_Product_ID).getUOMPrecision();
+		MProduct product = MProduct.get(ctx, M_Product_ID);
+		if (product==null){
+			return msg;
+		}
+		
+		
+		int precision = product.getUOMPrecision();
 		BigDecimal QtyEntered1 = QtyEntered.setScale(precision, RoundingMode.HALF_UP);
 		if (QtyEntered.compareTo(QtyEntered1) != 0)
 		{
@@ -125,7 +130,12 @@ public class TCS_CalloutInventoryLine extends CalloutEngine implements IColumnCa
 			isMiscReceipt = true;
 		}
 		
-		int precision = MProduct.get(ctx, M_Product_ID).getUOMPrecision();
+		MProduct product = MProduct.get(ctx, M_Product_ID);
+		
+		if (product == null)
+			return msg;
+		
+		int precision = product.getUOMPrecision();
 		BigDecimal QtyEntered1 = QtyEntered.setScale(precision, RoundingMode.HALF_UP);
 		if (QtyEntered.compareTo(QtyEntered1) != 0)
 		{
