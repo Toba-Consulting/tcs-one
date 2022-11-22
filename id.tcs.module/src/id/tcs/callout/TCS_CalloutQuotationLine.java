@@ -1,9 +1,5 @@
 package id.tcs.callout;
 
-import id.tcs.model.I_C_Quotation;
-import id.tcs.model.MQuotationLine;
-import id.tcs.model.X_C_Quotation;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.PreparedStatement;
@@ -38,24 +34,31 @@ import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 
+import id.tcs.model.I_C_Quotation;
+import id.tcs.model.MQuotationLine;
+import id.tcs.model.X_C_Quotation;
+
 public class TCS_CalloutQuotationLine extends CalloutEngine implements IColumnCallout{
 
-boolean steps = false;
-boolean isNewProductDes = false;
-	
+	boolean steps = false;
+	boolean isNewProductDes = false;
+
 	public String total(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value){
-		
-		//BigDecimal priceList = (BigDecimal)mTab.getValue("PriceList");
+
 		BigDecimal baseprice = (BigDecimal)mTab.getValue("BasePrice");
 		BigDecimal discount = (BigDecimal)mTab.getValue("Discount");
 		BigDecimal qtyEntered = (BigDecimal)mTab.getValue("QtyEntered");
+		BigDecimal beforeDisc = baseprice.multiply(discount).divide(Env.ONEHUNDRED);
+		BigDecimal afterDisc = baseprice.subtract(beforeDisc).setScale(0, RoundingMode.UP);
+
+		/* @win HWH custom code
 		BigDecimal faktorkondisi = (BigDecimal)mTab.getValue("FaktorKondisi");
-		//BigDecimal beforeDisc = priceList.multiply(faktorkondisi).multiply(discount).divide(Env.ONEHUNDRED);
 		BigDecimal beforeDisc = baseprice.multiply(faktorkondisi).multiply(discount).divide(Env.ONEHUNDRED);
-		//BigDecimal afterDisc = priceList.multiply(faktorkondisi).subtract(beforeDisc).setScale(0, RoundingMode.UP);
 		BigDecimal afterDisc = baseprice.multiply(faktorkondisi).subtract(beforeDisc).setScale(0, RoundingMode.UP);
+		 */
+
 		int price = 0;
-		
+
 		if(afterDisc.intValueExact()>100){
 			String stringPrice = Integer.toString(afterDisc.intValueExact());
 			int len = stringPrice.length();
@@ -81,18 +84,10 @@ boolean isNewProductDes = false;
 		mTab.setValue("LineNetAmt", priceEntered.multiply(qtyEntered));
 		return "";
 	}
-	
-//public String Product(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value){
-//		Integer M_Product_ID = (Integer)value;
-//		MProduct product = new MProduct(ctx, M_Product_ID, null);
-//		mTab.setValue("M_Product_Category_ID", product.getM_Product_Category_ID());
-//		mTab.setValue("Size", product.get_Value("Size"));
-//		return "";
-//	}
-	
+
 	public String docType (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
-		Integer C_DocType_ID = (Integer)value;		//	Actually C_DocTypeTarget_ID
+		Integer C_DocType_ID = (Integer) value;		//	Actually C_DocTypeTarget_ID
 		if (C_DocType_ID == null || C_DocType_ID.intValue() == 0)
 			return "";
 
@@ -100,16 +95,19 @@ boolean isNewProductDes = false;
 		//	and the existing source used a different Sequence number
 		String oldDocNo = (String)mTab.getValue("DocumentNo");
 		boolean newDocNo = (oldDocNo == null);
+
 		if (!newDocNo && oldDocNo.startsWith("<") && oldDocNo.endsWith(">"))
 			newDocNo = true;
+
 		Integer oldC_DocType_ID = (Integer)mTab.getValue("C_DocType_ID");
 
 		String sql = "SELECT d.DocSubTypeSO,d.HasCharges,"			//	1..2
-			+ "d.IsDocNoControlled,"     //  3
-			+ "s.AD_Sequence_ID,d.IsSOTrx "                             //	4..5
-			+ "FROM C_DocType d "
-			+ "LEFT OUTER JOIN AD_Sequence s ON (d.DocNoSequence_ID=s.AD_Sequence_ID) "
-			+ "WHERE C_DocType_ID=?";	//	#1
+				+ "d.IsDocNoControlled,"     //  3
+				+ "s.AD_Sequence_ID,d.IsSOTrx "                             //	4..5
+				+ "FROM C_DocType d "
+				+ "LEFT OUTER JOIN AD_Sequence s ON (d.DocNoSequence_ID=s.AD_Sequence_ID) "
+				+ "WHERE C_DocType_ID=?";	//	#1
+
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try
@@ -128,7 +126,7 @@ boolean isNewProductDes = false;
 				rs = null;
 				pstmt = null;
 			}
-			
+
 			pstmt = DB.prepareStatement(sql, null);
 			pstmt.setInt(1, C_DocType_ID.intValue());
 			rs = pstmt.executeQuery();
@@ -141,8 +139,8 @@ boolean isNewProductDes = false;
 				if (DocSubTypeSO == null)
 					DocSubTypeSO = "--";
 				Env.setContext(ctx, WindowNo, "OrderType", DocSubTypeSO);
-				
-				
+
+
 				//	IsSOTrx
 				if ("N".equals(rs.getString("IsSOTrx")))
 					IsSOTrx = false;
@@ -161,26 +159,26 @@ boolean isNewProductDes = false;
 					}
 				}
 			}
-			
-			
+
+
 			DB.close(rs, pstmt);
 			rs = null;
 			pstmt = null;
-			
+
 			//  When BPartner is changed, the Rules are not set if
 			//  it is a POS or Credit Order (i.e. defaults from Standard BPartner)
 			//  This re-reads the Rules and applies them.
 			if (DocSubTypeSO.equals(MOrder.DocSubTypeSO_POS) 
-				|| DocSubTypeSO.equals(MOrder.DocSubTypeSO_Prepay))    //  not for POS/PrePay
+					|| DocSubTypeSO.equals(MOrder.DocSubTypeSO_Prepay))    //  not for POS/PrePay
 				;
 			else
 			{
 				sql = "SELECT PaymentRule,C_PaymentTerm_ID,"            //  1..2
-					+ "InvoiceRule,DeliveryRule,"                       //  3..4
-					+ "FreightCostRule,DeliveryViaRule, "               //  5..6
-					+ "PaymentRulePO,PO_PaymentTerm_ID "
-					+ "FROM C_BPartner "
-					+ "WHERE C_BPartner_ID=?";		//	#1
+						+ "InvoiceRule,DeliveryRule,"                       //  3..4
+						+ "FreightCostRule,DeliveryViaRule, "               //  5..6
+						+ "PaymentRulePO,PO_PaymentTerm_ID "
+						+ "FROM C_BPartner "
+						+ "WHERE C_BPartner_ID=?";		//	#1
 				pstmt = DB.prepareStatement(sql, null);
 				int C_BPartner_ID = Env.getContextAsInt(ctx, WindowNo, "C_BPartner_ID");
 				pstmt.setInt(1, C_BPartner_ID);
@@ -199,7 +197,7 @@ boolean isNewProductDes = false;
 						mTab.setValue("PaymentRule", s);
 					}
 					//	Payment Term
-					Integer ii =new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
+					Integer ii = Integer.valueOf(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
 					if (!rs.wasNull())
 						mTab.setValue("C_PaymentTerm_ID", ii);
 					//	InvoiceRule
@@ -234,27 +232,28 @@ boolean isNewProductDes = false;
 		}
 		return "";
 	}
-	
+
 	public String bPartner (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		Integer C_BPartner_ID = (Integer)value;
 		if (C_BPartner_ID == null || C_BPartner_ID.intValue() == 0)
 			return "";
+		
 		String sql = "SELECT p.AD_Language,p.C_PaymentTerm_ID,"
-			+ " COALESCE(p.M_PriceList_ID,g.M_PriceList_ID) AS M_PriceList_ID, p.PaymentRule,p.POReference,"
-			+ " p.SO_Description,p.IsDiscountPrinted,"
-			+ " p.InvoiceRule,p.DeliveryRule,p.FreightCostRule,DeliveryViaRule,"
-			+ " p.SO_CreditLimit, p.SO_CreditLimit-p.SO_CreditUsed AS CreditAvailable,"
-			+ " lship.C_BPartner_Location_ID,c.AD_User_ID,"
-			+ " COALESCE(p.PO_PriceList_ID,g.PO_PriceList_ID) AS PO_PriceList_ID, p.PaymentRulePO,p.PO_PaymentTerm_ID,"
-			+ " lbill.C_BPartner_Location_ID AS Bill_Location_ID, p.SOCreditStatus, "
-			+ " p.SalesRep_ID "
-			+ "FROM C_BPartner p"
-			+ " INNER JOIN C_BP_Group g ON (p.C_BP_Group_ID=g.C_BP_Group_ID)"
-			+ " LEFT OUTER JOIN C_BPartner_Location lbill ON (p.C_BPartner_ID=lbill.C_BPartner_ID AND lbill.IsBillTo='Y' AND lbill.IsActive='Y')"
-			+ " LEFT OUTER JOIN C_BPartner_Location lship ON (p.C_BPartner_ID=lship.C_BPartner_ID AND lship.IsShipTo='Y' AND lship.IsActive='Y')"
-			+ " LEFT OUTER JOIN AD_User c ON (p.C_BPartner_ID=c.C_BPartner_ID AND c.IsActive='Y') "
-			+ "WHERE p.C_BPartner_ID=? AND p.IsActive='Y'";		//	#1
+				+ " COALESCE(p.M_PriceList_ID,g.M_PriceList_ID) AS M_PriceList_ID, p.PaymentRule,p.POReference,"
+				+ " p.SO_Description,p.IsDiscountPrinted,"
+				+ " p.InvoiceRule,p.DeliveryRule,p.FreightCostRule,DeliveryViaRule,"
+				+ " p.SO_CreditLimit, p.SO_CreditLimit-p.SO_CreditUsed AS CreditAvailable,"
+				+ " lship.C_BPartner_Location_ID,c.AD_User_ID,"
+				+ " COALESCE(p.PO_PriceList_ID,g.PO_PriceList_ID) AS PO_PriceList_ID, p.PaymentRulePO,p.PO_PaymentTerm_ID,"
+				+ " lbill.C_BPartner_Location_ID AS Bill_Location_ID, p.SOCreditStatus, "
+				+ " p.SalesRep_ID "
+				+ "FROM C_BPartner p"
+				+ " INNER JOIN C_BP_Group g ON (p.C_BP_Group_ID=g.C_BP_Group_ID)"
+				+ " LEFT OUTER JOIN C_BPartner_Location lbill ON (p.C_BPartner_ID=lbill.C_BPartner_ID AND lbill.IsBillTo='Y' AND lbill.IsActive='Y')"
+				+ " LEFT OUTER JOIN C_BPartner_Location lship ON (p.C_BPartner_ID=lship.C_BPartner_ID AND lship.IsShipTo='Y' AND lship.IsActive='Y')"
+				+ " LEFT OUTER JOIN AD_User c ON (p.C_BPartner_ID=c.C_BPartner_ID AND c.IsActive='Y') "
+				+ "WHERE p.C_BPartner_ID=? AND p.IsActive='Y'";		//	#1
 
 		boolean IsSOTrx = "Y".equals(Env.getContext(ctx, WindowNo, "IsSOTrx"));
 		PreparedStatement pstmt = null;
@@ -274,9 +273,10 @@ boolean isNewProductDes = false;
 				}
 
 				//	PriceList (indirect: IsTaxIncluded & Currency)
-				Integer ii = new Integer(rs.getInt(IsSOTrx ? "M_PriceList_ID" : "PO_PriceList_ID"));
+				Integer priceListID = Integer.valueOf(rs.getInt(IsSOTrx ? "M_PriceList_ID" : "PO_PriceList_ID"));
+				
 				if (!rs.wasNull())
-					mTab.setValue("M_PriceList_ID", ii);
+					mTab.setValue("M_PriceList_ID", priceListID);
 				else
 				{	//	get default PriceList
 					int i = Env.getContextAsInt(ctx, "#M_PriceList_ID");
@@ -284,13 +284,13 @@ boolean isNewProductDes = false;
 					{
 						MPriceList pl = new MPriceList(ctx, i, null);
 						if (IsSOTrx == pl.isSOPriceList())
-							mTab.setValue("M_PriceList_ID", new Integer(i));
+							mTab.setValue("M_PriceList_ID", Integer.valueOf(i));
 						else
 						{
 							String sql2 = "SELECT M_PriceList_ID FROM M_PriceList WHERE AD_Client_ID=? AND IsSOPriceList=? AND IsActive='Y' ORDER BY IsDefault DESC";
-							ii = DB.getSQLValue (null, sql2, Env.getAD_Client_ID(ctx), IsSOTrx);
-							if (ii != 0)
-								mTab.setValue("M_PriceList_ID", new Integer(ii));
+							priceListID = DB.getSQLValue (null, sql2, Env.getAD_Client_ID(ctx), IsSOTrx);
+							if (priceListID != 0)
+								mTab.setValue("M_PriceList_ID", priceListID);
 						}
 					}
 				}
@@ -321,7 +321,7 @@ boolean isNewProductDes = false;
 				if (bill_Location_ID == 0)
 					mTab.setValue("Bill_Location_ID", null);
 				else
-					mTab.setValue("Bill_Location_ID", new Integer(bill_Location_ID));
+					mTab.setValue("Bill_Location_ID", Integer.valueOf(bill_Location_ID));
 				// Ship-To Location
 				if (shipTo_ID == 0)
 					shipTo_ID = rs.getInt("C_BPartner_Location_ID");
@@ -329,22 +329,22 @@ boolean isNewProductDes = false;
 				if (shipTo_ID == 0)
 					mTab.setValue("C_BPartner_Location_ID", null);
 				else
-					mTab.setValue("C_BPartner_Location_ID", new Integer(shipTo_ID));
+					mTab.setValue("C_BPartner_Location_ID", Integer.valueOf(shipTo_ID));
 
 				//	Contact - overwritten by InfoBP selection
-				int contID = rs.getInt("AD_User_ID");
+				int contactID = rs.getInt("AD_User_ID");
 				if (C_BPartner_ID.toString().equals(Env.getContext(ctx, WindowNo, Env.TAB_INFO, "C_BPartner_ID")))
 				{
 					String cont = Env.getContext(ctx, WindowNo, Env.TAB_INFO, "AD_User_ID");
 					if (cont.length() > 0)
-						contID = Integer.parseInt(cont);
+						contactID = Integer.parseInt(cont);
 				}
-				if (contID == 0)
+				if (contactID == 0)
 					mTab.setValue("AD_User_ID", null);
 				else
 				{
-					mTab.setValue("AD_User_ID", new Integer(contID));
-					mTab.setValue("Bill_User_ID", new Integer(contID));
+					mTab.setValue("AD_User_ID", Integer.valueOf(contactID));
+					mTab.setValue("Bill_User_ID", Integer.valueOf(contactID));
 				}
 
 				//	CreditAvailable
@@ -356,8 +356,8 @@ boolean isNewProductDes = false;
 						double CreditAvailable = rs.getDouble("CreditAvailable");
 						if (!rs.wasNull() && CreditAvailable < 0)
 							mTab.fireDataStatusEEvent("CreditLimitOver",
-								DisplayType.getNumberFormat(DisplayType.Amount).format(CreditAvailable),
-								false);
+									DisplayType.getNumberFormat(DisplayType.Amount).format(CreditAvailable),
+									false);
 					}
 				}
 
@@ -406,9 +406,9 @@ boolean isNewProductDes = false;
 						mTab.setValue("PaymentRule", s);
 					}
 					//	Payment Term
-					ii = new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
+					priceListID = Integer.valueOf(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
 					if (!rs.wasNull())
-						mTab.setValue("C_PaymentTerm_ID", ii);
+						mTab.setValue("C_PaymentTerm_ID", priceListID);
 					//	InvoiceRule
 					s = rs.getString("InvoiceRule");
 					if (s != null && s.length() != 0)
@@ -440,7 +440,7 @@ boolean isNewProductDes = false;
 		}
 		return "";
 	}	//	bPartner
-	
+
 	public String bPartnerBill (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		if (isCalloutActive())
@@ -450,17 +450,17 @@ boolean isNewProductDes = false;
 			return "";
 
 		String sql = "SELECT p.AD_Language,p.C_PaymentTerm_ID,"
-			+ "p.M_PriceList_ID,p.PaymentRule,p.POReference,"
-			+ "p.SO_Description,p.IsDiscountPrinted,"
-			+ "p.InvoiceRule,p.DeliveryRule,p.FreightCostRule,DeliveryViaRule,"
-			+ "p.SO_CreditLimit, p.SO_CreditLimit-p.SO_CreditUsed AS CreditAvailable,"
-			+ "c.AD_User_ID,"
-			+ "p.PO_PriceList_ID, p.PaymentRulePO, p.PO_PaymentTerm_ID,"
-			+ "lbill.C_BPartner_Location_ID AS Bill_Location_ID "
-			+ "FROM C_BPartner p"
-			+ " LEFT OUTER JOIN C_BPartner_Location lbill ON (p.C_BPartner_ID=lbill.C_BPartner_ID AND lbill.IsBillTo='Y' AND lbill.IsActive='Y')"
-			+ " LEFT OUTER JOIN AD_User c ON (p.C_BPartner_ID=c.C_BPartner_ID AND c.IsActive='Y') "
-			+ "WHERE p.C_BPartner_ID=? AND p.IsActive='Y'";		//	#1
+				+ "p.M_PriceList_ID,p.PaymentRule,p.POReference,"
+				+ "p.SO_Description,p.IsDiscountPrinted,"
+				+ "p.InvoiceRule,p.DeliveryRule,p.FreightCostRule,DeliveryViaRule,"
+				+ "p.SO_CreditLimit, p.SO_CreditLimit-p.SO_CreditUsed AS CreditAvailable,"
+				+ "c.AD_User_ID,"
+				+ "p.PO_PriceList_ID, p.PaymentRulePO, p.PO_PaymentTerm_ID,"
+				+ "lbill.C_BPartner_Location_ID AS Bill_Location_ID "
+				+ "FROM C_BPartner p"
+				+ " LEFT OUTER JOIN C_BPartner_Location lbill ON (p.C_BPartner_ID=lbill.C_BPartner_ID AND lbill.IsBillTo='Y' AND lbill.IsActive='Y')"
+				+ " LEFT OUTER JOIN AD_User c ON (p.C_BPartner_ID=c.C_BPartner_ID AND c.IsActive='Y') "
+				+ "WHERE p.C_BPartner_ID=? AND p.IsActive='Y'";		//	#1
 
 		boolean IsSOTrx = "Y".equals(Env.getContext(ctx, WindowNo, "IsSOTrx"));
 		PreparedStatement pstmt = null;
@@ -473,7 +473,7 @@ boolean isNewProductDes = false;
 			if (rs.next())
 			{
 				//	PriceList (indirect: IsTaxIncluded & Currency)
-				Integer ii = new Integer(rs.getInt(IsSOTrx ? "M_PriceList_ID" : "PO_PriceList_ID"));
+				Integer ii = Integer.valueOf(rs.getInt(IsSOTrx ? "M_PriceList_ID" : "PO_PriceList_ID"));
 				if (!rs.wasNull())
 					mTab.setValue("M_PriceList_ID", ii);
 				else
@@ -483,13 +483,13 @@ boolean isNewProductDes = false;
 					{
 						MPriceList pl = new MPriceList(ctx, i, null);
 						if (IsSOTrx == pl.isSOPriceList())
-							mTab.setValue("M_PriceList_ID", new Integer(i));
+							mTab.setValue("M_PriceList_ID", Integer.valueOf(i));
 						else
 						{
 							String sql2 = "SELECT M_PriceList_ID FROM M_PriceList WHERE AD_Client_ID=? AND IsSOPriceList=? AND IsActive='Y' ORDER BY IsDefault DESC";
 							ii = DB.getSQLValue (null, sql2, Env.getAD_Client_ID(ctx), IsSOTrx);
 							if (ii != 0)
-								mTab.setValue("M_PriceList_ID", new Integer(ii));
+								mTab.setValue("M_PriceList_ID", Integer.valueOf(ii));
 						}
 					}
 				}
@@ -512,7 +512,7 @@ boolean isNewProductDes = false;
 				if (bill_Location_ID == 0)
 					mTab.setValue("Bill_Location_ID", null);
 				else
-					mTab.setValue("Bill_Location_ID", new Integer(bill_Location_ID));
+					mTab.setValue("Bill_Location_ID", Integer.valueOf(bill_Location_ID));
 
 				//	Contact - overwritten by InfoBP selection
 				int contID = rs.getInt("AD_User_ID");
@@ -525,7 +525,7 @@ boolean isNewProductDes = false;
 				if (contID == 0)
 					mTab.setValue("Bill_User_ID", null);
 				else
-					mTab.setValue("Bill_User_ID", new Integer(contID));
+					mTab.setValue("Bill_User_ID", Integer.valueOf(contID));
 
 				//	CreditAvailable
 				if (IsSOTrx)
@@ -536,8 +536,8 @@ boolean isNewProductDes = false;
 						double CreditAvailable = rs.getDouble("CreditAvailable");
 						if (!rs.wasNull() && CreditAvailable < 0)
 							mTab.fireDataStatusEEvent("CreditLimitOver",
-								DisplayType.getNumberFormat(DisplayType.Amount).format(CreditAvailable),
-								false);
+									DisplayType.getNumberFormat(DisplayType.Amount).format(CreditAvailable),
+									false);
 					}
 				}
 
@@ -579,7 +579,7 @@ boolean isNewProductDes = false;
 						mTab.setValue("PaymentRule", s);
 					}
 					//	Payment Term
-					ii = new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
+					ii = Integer.valueOf(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
 					if (!rs.wasNull())
 						mTab.setValue("C_PaymentTerm_ID", ii);
 					//	InvoiceRule
@@ -601,42 +601,42 @@ boolean isNewProductDes = false;
 		}
 		return "";
 	}	//	bPartnerBill
-	
-	
+
+
 	public String PriceKondisi (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
-			BigDecimal FaktorKondisi= (BigDecimal)value;
-			Integer quotationlineid= Env.getContextAsInt(ctx, WindowNo, mTab.getTabNo(), "C_QuotationLine_ID");
-			MQuotationLine quotline= new MQuotationLine(Env.getCtx(),quotationlineid,null);
-			
-			mTab.setValue("PriceKondisi",FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice"))));
-			if (quotline.getDiscount()==null){
-				mTab.setValue("PriceEntered", FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice"))));
-				mTab.setValue("PriceActual", FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice"))));
-			}
-			else{
-				BigDecimal priceentered= FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice")));
-				BigDecimal pricediscount = priceentered.multiply(quotline.getDiscount().divide(Env.ONEHUNDRED));
-				BigDecimal LineNetAmt = priceentered.multiply(quotline.getQtyEntered());
-				
-				mTab.setValue("PriceEntered", priceentered.subtract(pricediscount));
-				mTab.setValue("PriceActual", priceentered.subtract(pricediscount));
-				mTab.setValue("LineNetAmt", LineNetAmt);
-			}
+		BigDecimal FaktorKondisi= (BigDecimal)value;
+		Integer quotationlineid= Env.getContextAsInt(ctx, WindowNo, mTab.getTabNo(), "C_QuotationLine_ID");
+		MQuotationLine quotline= new MQuotationLine(Env.getCtx(),quotationlineid,null);
+
+		mTab.setValue("PriceKondisi",FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice"))));
+		if (quotline.getDiscount()==null){
+			mTab.setValue("PriceEntered", FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice"))));
+			mTab.setValue("PriceActual", FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice"))));
+		}
+		else{
+			BigDecimal priceentered= FaktorKondisi.multiply(BigDecimal.valueOf(quotline.get_ValueAsInt("BasePrice")));
+			BigDecimal pricediscount = priceentered.multiply(quotline.getDiscount().divide(Env.ONEHUNDRED));
+			BigDecimal LineNetAmt = priceentered.multiply(quotline.getQtyEntered());
+
+			mTab.setValue("PriceEntered", priceentered.subtract(pricediscount));
+			mTab.setValue("PriceActual", priceentered.subtract(pricediscount));
+			mTab.setValue("LineNetAmt", LineNetAmt);
+		}
 		return "";
 	}
-	
-	
-	
+
+
+
 	public String warehouse (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		if (isCalloutActive())		//	assuming it is resetting value
 			return "";
-		
+
 		Integer M_Warehouse_ID = (Integer)value;
 		if (M_Warehouse_ID == null || M_Warehouse_ID.intValue() == 0)
 			return "";
-		
+
 		MWarehouse wh = MWarehouse.get(ctx, M_Warehouse_ID);
 		String DeliveryRule = mTab.get_ValueAsString("DeliveryRule");
 		if((wh.isDisallowNegativeInv() && DeliveryRule.equals(X_C_Quotation.DELIVERYRULE_Force)) ||
@@ -645,7 +645,7 @@ boolean isNewProductDes = false;
 
 		return "";
 	}	//	warehouse
-	
+
 	public String priceList (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		Integer M_PriceList_ID = (Integer) mTab.getValue("M_PriceList_ID");
@@ -655,13 +655,13 @@ boolean isNewProductDes = false;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String sql = "SELECT pl.IsTaxIncluded,pl.EnforcePriceLimit,pl.C_Currency_ID,c.StdPrecision,"
-			+ "plv.M_PriceList_Version_ID,plv.ValidFrom "
-			+ "FROM M_PriceList pl,C_Currency c,M_PriceList_Version plv "
-			+ "WHERE pl.C_Currency_ID=c.C_Currency_ID"
-			+ " AND pl.M_PriceList_ID=plv.M_PriceList_ID"
-			+ " AND pl.M_PriceList_ID=? "						//	1
-			+ " AND plv.ValidFrom <= ? "
-			+ "ORDER BY plv.ValidFrom DESC";
+				+ "plv.M_PriceList_Version_ID,plv.ValidFrom "
+				+ "FROM M_PriceList pl,C_Currency c,M_PriceList_Version plv "
+				+ "WHERE pl.C_Currency_ID=c.C_Currency_ID"
+				+ " AND pl.M_PriceList_ID=plv.M_PriceList_ID"
+				+ " AND pl.M_PriceList_ID=? "						//	1
+				+ " AND plv.ValidFrom <= ? "
+				+ "ORDER BY plv.ValidFrom DESC";
 		//	Use newest price list - may not be future
 		try
 		{
@@ -678,11 +678,11 @@ boolean isNewProductDes = false;
 			if (rs.next())
 			{
 				//	Tax Included
-				mTab.setValue("IsTaxIncluded", new Boolean("Y".equals(rs.getString(1))));
+				mTab.setValue("IsTaxIncluded", Boolean.valueOf("Y".equals(rs.getString(1))));
 				//	Price Limit Enforce
 				Env.setContext(ctx, WindowNo, "EnforcePriceLimit", rs.getString(2));
 				//	Currency
-				Integer ii = new Integer(rs.getInt(3));
+				Integer ii = Integer.valueOf(rs.getInt(3));
 				mTab.setValue("C_Currency_ID", ii);
 				//	PriceList Version
 				Env.setContext(ctx, WindowNo, "M_PriceList_Version_ID", rs.getInt(5));
@@ -702,122 +702,122 @@ boolean isNewProductDes = false;
 
 		return "";
 	}	//	priceList
-	
+
 	public String paymentTerm (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		Integer C_PaymentTerm_ID = (Integer)value;
 		int C_Quotation_ID = Env.getContextAsInt(ctx, WindowNo, "C_Order_ID");
 		if (C_PaymentTerm_ID == null || C_PaymentTerm_ID.intValue() == 0
-			|| C_Quotation_ID == 0)	//	not saved yet
+				|| C_Quotation_ID == 0)	//	not saved yet
 			return "";
 		//
 		MPaymentTerm pt = new MPaymentTerm (ctx, C_PaymentTerm_ID.intValue(), null);
 		if (pt.get_ID() == 0)
 			return "PaymentTerm not found";
-		
+
 		boolean valid = pt.applyOrder (C_Quotation_ID);
 		mTab.setValue("IsPayScheduleValid", valid ? "Y" : "N");
-		
+
 		return "";
 	}	//	paymentTerm
 
 	public String product (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
-	try{
-		Integer M_Product_ID = (Integer)value;
-		MProduct product = new MProduct(ctx, M_Product_ID, null);
-		mTab.setValue("M_Product_Category_ID", product.getM_Product_Category_ID());
-		//mTab.setValue("Size", product.get_Value("Size"));
-		
-		
-		//Integer M_Product_ID = (Integer)value;
-		if (M_Product_ID == null || M_Product_ID.intValue() == 0)
-			return "";
-		if (steps) log.warning("init");
-		//
-		mTab.setValue("C_Charge_ID", null);
-		//	Set Attribute
-		if (Env.getContextAsInt(ctx, WindowNo, Env.TAB_INFO, "M_Product_ID") == M_Product_ID.intValue()
-			&& Env.getContextAsInt(ctx, WindowNo, Env.TAB_INFO, "M_AttributeSetInstance_ID") != 0)
-			mTab.setValue("M_AttributeSetInstance_ID", Env.getContextAsInt(ctx, WindowNo, Env.TAB_INFO, "M_AttributeSetInstance_ID"));
-		else
-			mTab.setValue("M_AttributeSetInstance_ID", null);
+		try{
+			Integer M_Product_ID = (Integer)value;
+			MProduct product = new MProduct(ctx, M_Product_ID, null);
+			mTab.setValue("M_Product_Category_ID", product.getM_Product_Category_ID());
+			//mTab.setValue("Size", product.get_Value("Size"));
 
-		/*****	Price Calculation see also qty	****/
-		int C_BPartner_ID = Env.getContextAsInt(ctx, WindowNo, "C_BPartner_ID");
-		BigDecimal Qty = (BigDecimal)mTab.getValue("QtyOrdered");
-		boolean IsSOTrx = Env.getContext(ctx, WindowNo, "IsSOTrx").equals("Y");
-		MProductPricing pp = new MProductPricing (M_Product_ID.intValue(), C_BPartner_ID, Qty, IsSOTrx);
-		//
-		int M_PriceList_ID = Env.getContextAsInt(ctx, WindowNo, "M_PriceList_ID");
-		pp.setM_PriceList_ID(M_PriceList_ID);
-		Timestamp orderDate = (Timestamp)mTab.getValue("DateOrdered");
-		/** PLV is only accurate if PL selected in header */
-		int M_PriceList_Version_ID = Env.getContextAsInt(ctx, WindowNo, "M_PriceList_Version_ID");
-		if ( M_PriceList_Version_ID == 0 && M_PriceList_ID > 0)
-		{
-			String sql = "SELECT plv.M_PriceList_Version_ID "
-				+ "FROM M_PriceList_Version plv "
-				+ "WHERE plv.M_PriceList_ID=? "						//	1
-				+ " AND plv.ValidFrom <= ? "
-				+ "ORDER BY plv.ValidFrom DESC";
-			//	Use newest price list - may not be future
 
-			M_PriceList_Version_ID = DB.getSQLValueEx(null, sql, M_PriceList_ID, orderDate);
-			if ( M_PriceList_Version_ID > 0 )
-				Env.setContext(ctx, WindowNo, "M_PriceList_Version_ID", M_PriceList_Version_ID );
-		}
-		
-		BigDecimal priceList = (BigDecimal)mTab.getValue("PriceList");
-		BigDecimal price = (BigDecimal)mTab.getValue("PriceEntered");
-		String newProduct = (String)mTab.getValue("Product");
-		if (newProduct!=null){
-			isNewProductDes = true;
-		}
-		pp.setM_PriceList_Version_ID(M_PriceList_Version_ID);
-		pp.setPriceDate(orderDate);
-		//
-		
-		//@tegar : set new product price on quotation line 
-		if (priceList.compareTo(Env.ZERO) > 0 && isNewProductDes){
-			mTab.setValue("PriceList", priceList);
-			mTab.setValue("PriceEntered", price);
-			mTab.setValue("PriceActual", price);
-			mTab.setValue("PriceLimit", price);
+			//Integer M_Product_ID = (Integer)value;
+			if (M_Product_ID == null || M_Product_ID.intValue() == 0)
+				return "";
+			if (steps) log.warning("init");
+			//
+			mTab.setValue("C_Charge_ID", null);
+			//	Set Attribute
+			if (Env.getContextAsInt(ctx, WindowNo, Env.TAB_INFO, "M_Product_ID") == M_Product_ID.intValue()
+					&& Env.getContextAsInt(ctx, WindowNo, Env.TAB_INFO, "M_AttributeSetInstance_ID") != 0)
+				mTab.setValue("M_AttributeSetInstance_ID", Env.getContextAsInt(ctx, WindowNo, Env.TAB_INFO, "M_AttributeSetInstance_ID"));
+			else
+				mTab.setValue("M_AttributeSetInstance_ID", null);
 
-		}	else{
-			
-			mTab.setValue("PriceList", pp.getPriceList());
-			mTab.setValue("PriceEntered", pp.getPriceStd());
-			mTab.setValue("PriceActual", pp.getPriceStd());
-			mTab.setValue("PriceLimit", pp.getPriceLimit());
+			/*****	Price Calculation see also qty	****/
+			int C_BPartner_ID = Env.getContextAsInt(ctx, WindowNo, "C_BPartner_ID");
+			BigDecimal Qty = (BigDecimal)mTab.getValue("QtyOrdered");
+			boolean IsSOTrx = Env.getContext(ctx, WindowNo, "IsSOTrx").equals("Y");
+			MProductPricing pp = new MProductPricing (M_Product_ID.intValue(), C_BPartner_ID, Qty, IsSOTrx, null);
+			//
+			int M_PriceList_ID = Env.getContextAsInt(ctx, WindowNo, "M_PriceList_ID");
+			pp.setM_PriceList_ID(M_PriceList_ID);
+			Timestamp orderDate = (Timestamp)mTab.getValue("DateOrdered");
+			/** PLV is only accurate if PL selected in header */
+			int M_PriceList_Version_ID = Env.getContextAsInt(ctx, WindowNo, "M_PriceList_Version_ID");
+			if ( M_PriceList_Version_ID == 0 && M_PriceList_ID > 0)
+			{
+				String sql = "SELECT plv.M_PriceList_Version_ID "
+						+ "FROM M_PriceList_Version plv "
+						+ "WHERE plv.M_PriceList_ID=? "						//	1
+						+ " AND plv.ValidFrom <= ? "
+						+ "ORDER BY plv.ValidFrom DESC";
+				//	Use newest price list - may not be future
 
-		}
-		
-		mTab.setValue("C_Currency_ID", new Integer(pp.getC_Currency_ID()));
-		mTab.setValue("Discount", pp.getDiscount());
-		mTab.setValue("C_UOM_ID", new Integer(pp.getC_UOM_ID()));
-		mTab.setValue("QtyOrdered", mTab.getValue("QtyEntered"));
-		Env.setContext(ctx, WindowNo, "EnforcePriceLimit", pp.isEnforcePriceLimit() ? "Y" : "N");
-		Env.setContext(ctx, WindowNo, "DiscountSchema", pp.isDiscountSchema() ? "Y" : "N");
+				M_PriceList_Version_ID = DB.getSQLValueEx(null, sql, M_PriceList_ID, orderDate);
+				if ( M_PriceList_Version_ID > 0 )
+					Env.setContext(ctx, WindowNo, "M_PriceList_Version_ID", M_PriceList_Version_ID );
+			}
 
-		//	Check/Update Warehouse Setting
-		//	int M_Warehouse_ID = Env.getContextAsInt(ctx, WindowNo, "M_Warehouse_ID");
-		//	Integer wh = (Integer)mTab.getValue("M_Warehouse_ID");
-		//	if (wh.intValue() != M_Warehouse_ID)
-		//	{
-		//		mTab.setValue("M_Warehouse_ID", new Integer(M_Warehouse_ID));
-		//		ADialog.warn(,WindowNo, "WarehouseChanged");
-		//	}
+			BigDecimal priceList = (BigDecimal)mTab.getValue("PriceList");
+			BigDecimal price = (BigDecimal)mTab.getValue("PriceEntered");
+			String newProduct = (String)mTab.getValue("Product");
+			if (newProduct!=null){
+				isNewProductDes = true;
+			}
+			pp.setM_PriceList_Version_ID(M_PriceList_Version_ID);
+			pp.setPriceDate(orderDate);
+			//
 
-		//
-		if (steps) log.warning("fini");
-		return tax (ctx, WindowNo, mTab, mField, value);
+			//@tegar : set new product price on quotation line 
+			if (priceList.compareTo(Env.ZERO) > 0 && isNewProductDes){
+				mTab.setValue("PriceList", priceList);
+				mTab.setValue("PriceEntered", price);
+				mTab.setValue("PriceActual", price);
+				mTab.setValue("PriceLimit", price);
+
+			}	else{
+
+				mTab.setValue("PriceList", pp.getPriceList());
+				mTab.setValue("PriceEntered", pp.getPriceStd());
+				mTab.setValue("PriceActual", pp.getPriceStd());
+				mTab.setValue("PriceLimit", pp.getPriceLimit());
+
+			}
+
+			mTab.setValue("C_Currency_ID", Integer.valueOf(pp.getC_Currency_ID()));
+			mTab.setValue("Discount", pp.getDiscount());
+			mTab.setValue("C_UOM_ID", Integer.valueOf(pp.getC_UOM_ID()));
+			mTab.setValue("QtyOrdered", mTab.getValue("QtyEntered"));
+			Env.setContext(ctx, WindowNo, "EnforcePriceLimit", pp.isEnforcePriceLimit() ? "Y" : "N");
+			Env.setContext(ctx, WindowNo, "DiscountSchema", pp.isDiscountSchema() ? "Y" : "N");
+
+			//	Check/Update Warehouse Setting
+			//	int M_Warehouse_ID = Env.getContextAsInt(ctx, WindowNo, "M_Warehouse_ID");
+			//	Integer wh = (Integer)mTab.getValue("M_Warehouse_ID");
+			//	if (wh.intValue() != M_Warehouse_ID)
+			//	{
+			//		mTab.setValue("M_Warehouse_ID", new Integer(M_Warehouse_ID));
+			//		ADialog.warn(,WindowNo, "WarehouseChanged");
+			//	}
+
+			//
+			if (steps) log.warning("fini");
+			return tax (ctx, WindowNo, mTab, mField, value);
 		}catch(Exception e){
 			return"";
 		}
 	}	//	product
-	
+
 	public String tax (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		String column = mField.getColumnName();
@@ -870,19 +870,19 @@ boolean isNewProductDes = false;
 
 		//
 		int C_Tax_ID = Tax.get (ctx, M_Product_ID, C_Charge_ID, billDate, shipDate,
-			AD_Org_ID, M_Warehouse_ID, billC_BPartner_Location_ID, shipC_BPartner_Location_ID,
-			"Y".equals(Env.getContext(ctx, WindowNo, "IsSOTrx")), null);
+				AD_Org_ID, M_Warehouse_ID, billC_BPartner_Location_ID, shipC_BPartner_Location_ID,
+				"Y".equals(Env.getContext(ctx, WindowNo, "IsSOTrx")), null);
 		if (log.isLoggable(Level.INFO)) log.info("Tax ID=" + C_Tax_ID);
 		//
 		if (C_Tax_ID == 0)
 			mTab.fireDataStatusEEvent(CLogger.retrieveError());
 		else
-			mTab.setValue("C_Tax_ID", new Integer(C_Tax_ID));
+			mTab.setValue("C_Tax_ID", Integer.valueOf(C_Tax_ID));
 		//
 		if (steps) log.warning("fini");
 		return amt(ctx, WindowNo, mTab, mField, value);
 	}	//	tax
-	
+
 	public String amt (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		if (isCalloutActive() || value == null)
@@ -933,19 +933,19 @@ boolean isNewProductDes = false;
 		}
 		//	Product Qty changed - recalc price
 		else if ((mField.getColumnName().equals("QtyOrdered")
-			|| mField.getColumnName().equals("QtyEntered")
-			|| mField.getColumnName().equals("C_UOM_ID")
-			|| mField.getColumnName().equals("M_Product_ID"))
-			&& !"N".equals(Env.getContext(ctx, WindowNo, "DiscountSchema")))
+				|| mField.getColumnName().equals("QtyEntered")
+				|| mField.getColumnName().equals("C_UOM_ID")
+				|| mField.getColumnName().equals("M_Product_ID"))
+				&& !"N".equals(Env.getContext(ctx, WindowNo, "DiscountSchema")))
 		{
 			int C_BPartner_ID = Env.getContextAsInt(ctx, WindowNo, "C_BPartner_ID");
 			if (mField.getColumnName().equals("QtyEntered"))
 				QtyOrdered = MUOMConversion.convertProductFrom (ctx, M_Product_ID,
-					C_UOM_To_ID, QtyEntered);
+						C_UOM_To_ID, QtyEntered);
 			if (QtyOrdered == null)
 				QtyOrdered = QtyEntered;
 			boolean IsSOTrx = Env.getContext(ctx, WindowNo, "IsSOTrx").equals("Y");
-			MProductPricing pp = new MProductPricing (M_Product_ID, C_BPartner_ID, QtyOrdered, IsSOTrx);
+			MProductPricing pp = new MProductPricing (M_Product_ID, C_BPartner_ID, QtyOrdered, IsSOTrx, null);
 			pp.setM_PriceList_ID(M_PriceList_ID);
 			int M_PriceList_Version_ID = Env.getContextAsInt(ctx, WindowNo, "M_PriceList_Version_ID");
 			pp.setM_PriceList_Version_ID(M_PriceList_Version_ID);
@@ -953,12 +953,12 @@ boolean isNewProductDes = false;
 			pp.setPriceDate(date);
 			//
 			PriceEntered = MUOMConversion.convertProductFrom (ctx, M_Product_ID,
-				C_UOM_To_ID, pp.getPriceStd());
+					C_UOM_To_ID, pp.getPriceStd());
 			if (PriceEntered == null)
 				PriceEntered = pp.getPriceStd();
 			//
 			if (log.isLoggable(Level.FINE)) log.fine("QtyChanged -> PriceActual=" + pp.getPriceStd()
-				+ ", PriceEntered=" + PriceEntered + ", Discount=" + pp.getDiscount());
+			+ ", PriceEntered=" + PriceEntered + ", Discount=" + pp.getDiscount());
 			PriceActual = pp.getPriceStd();
 			mTab.setValue("PriceActual", pp.getPriceStd());
 			mTab.setValue("Discount", pp.getDiscount());
@@ -969,24 +969,24 @@ boolean isNewProductDes = false;
 		{
 			PriceActual = (BigDecimal)value;
 			PriceEntered = MUOMConversion.convertProductFrom (ctx, M_Product_ID,
-				C_UOM_To_ID, PriceActual);
+					C_UOM_To_ID, PriceActual);
 			if (PriceEntered == null)
 				PriceEntered = PriceActual;
 			//
 			if (log.isLoggable(Level.FINE)) log.fine("PriceActual=" + PriceActual
-				+ " -> PriceEntered=" + PriceEntered);
+					+ " -> PriceEntered=" + PriceEntered);
 			mTab.setValue("PriceEntered", PriceEntered);
 		}
 		else if (mField.getColumnName().equals("PriceEntered"))
 		{
 			PriceEntered = (BigDecimal)value;
 			PriceActual = MUOMConversion.convertProductTo (ctx, M_Product_ID,
-				C_UOM_To_ID, PriceEntered);
+					C_UOM_To_ID, PriceEntered);
 			if (PriceActual == null)
 				PriceActual = PriceEntered;
 			//
 			if (log.isLoggable(Level.FINE)) log.fine("PriceEntered=" + PriceEntered
-				+ " -> PriceActual=" + PriceActual);
+					+ " -> PriceActual=" + PriceActual);
 			mTab.setValue("PriceActual", PriceActual);
 		}
 
@@ -996,9 +996,9 @@ boolean isNewProductDes = false;
 			if ( PriceList.doubleValue() != 0 )
 				PriceActual = BigDecimal.valueOf((100.0 - Discount.doubleValue()) / 100.0 * PriceList.doubleValue());
 			if (PriceActual.scale() > StdPrecision)
-				PriceActual = PriceActual.setScale(StdPrecision, BigDecimal.ROUND_HALF_UP);
+				PriceActual = PriceActual.setScale(StdPrecision, RoundingMode.HALF_UP);
 			PriceEntered = MUOMConversion.convertProductFrom (ctx, M_Product_ID,
-				C_UOM_To_ID, PriceActual);
+					C_UOM_To_ID, PriceActual);
 			if (PriceEntered == null)
 				PriceEntered = PriceActual;
 			mTab.setValue("PriceActual", PriceActual);
@@ -1011,8 +1011,10 @@ boolean isNewProductDes = false;
 				Discount = Env.ZERO;
 			else
 				Discount = BigDecimal.valueOf((PriceList.doubleValue() - PriceActual.doubleValue()) / PriceList.doubleValue() * 100.0);
+			
 			if (Discount.scale() > 2)
-				Discount = Discount.setScale(2, BigDecimal.ROUND_HALF_UP);
+				Discount = Discount.setScale(2, RoundingMode.HALF_UP);
+			
 			mTab.setValue("Discount", Discount);
 		}
 		if (log.isLoggable(Level.FINE)) log.fine("PriceEntered=" + PriceEntered + ", Actual=" + PriceActual + ", Discount=" + Discount);
@@ -1022,7 +1024,7 @@ boolean isNewProductDes = false;
 		boolean enforce = Env.isSOTrx(ctx, WindowNo) && epl != null && !epl.equals("") ? epl.equals("Y") : isEnforcePriceLimit;
 		if (enforce && MRole.getDefault().isOverwritePriceLimit())
 			enforce = false;
-		
+
 		//	Check Price Limit?
 		//@tegar validate null pricelimit
 		if(PriceLimit==null){
@@ -1030,7 +1032,7 @@ boolean isNewProductDes = false;
 			mTab.setValue ("PriceLimit", PriceLimit);
 		}//end
 		if (enforce && PriceLimit.doubleValue() != 0.0
-		  && PriceActual.compareTo(PriceLimit) < 0)
+				&& PriceActual.compareTo(PriceLimit) < 0)
 		{
 			//@tegar
 			if(isNewProductDes==true){
@@ -1038,7 +1040,7 @@ boolean isNewProductDes = false;
 			}//end
 			PriceActual = PriceLimit;
 			PriceEntered = MUOMConversion.convertProductFrom (ctx, M_Product_ID,
-				C_UOM_To_ID, PriceLimit);
+					C_UOM_To_ID, PriceLimit);
 			if (PriceEntered == null)
 				PriceEntered = PriceLimit;
 			if (log.isLoggable(Level.FINE)) log.fine("(under) PriceEntered=" + PriceEntered + ", Actual" + PriceLimit);
@@ -1049,43 +1051,39 @@ boolean isNewProductDes = false;
 			{
 				Discount = BigDecimal.valueOf((PriceList.doubleValue () - PriceActual.doubleValue ()) / PriceList.doubleValue () * 100.0);
 				if (Discount.scale () > 2)
-					Discount = Discount.setScale (2, BigDecimal.ROUND_HALF_UP);
+					Discount = Discount.setScale (2, RoundingMode.HALF_UP);
 				mTab.setValue ("Discount", Discount);
 			}
 		}
 
 		//@tegar
-		BigDecimal Diskon = (BigDecimal)mTab.getValue("Discount");
-				if (Discount.compareTo(Env.ZERO) < 0){
-						mTab.setValue("Discount", Env.ZERO);
-					}
+		//BigDecimal Diskon = (BigDecimal)mTab.getValue("Discount");
+		if (Discount.compareTo(Env.ZERO) < 0){
+			mTab.setValue("Discount", Env.ZERO);
+		}
 		//	Line Net Amt
-		
+
 		//@tegar
 		BigDecimal price = (BigDecimal)mTab.getValue("PriceEntered");
-		if (price.compareTo(Env.ZERO)>0){
+		if (price.compareTo(Env.ZERO)>0) {
 			BigDecimal LineNetAmt = QtyOrdered.multiply(price);
 			if (LineNetAmt.scale() > StdPrecision)
-				LineNetAmt = LineNetAmt.setScale(StdPrecision, BigDecimal.ROUND_HALF_UP);
+				LineNetAmt = LineNetAmt.setScale(StdPrecision, RoundingMode.HALF_UP);
 			if (log.isLoggable(Level.INFO)) log.info("LineNetAmt=" + LineNetAmt);
 			mTab.setValue("LineNetAmt", LineNetAmt);//end tegar
-		}else{
-		BigDecimal LineNetAmt = QtyOrdered.multiply(PriceActual);
-		if (LineNetAmt.scale() > StdPrecision)
-			LineNetAmt = LineNetAmt.setScale(StdPrecision, BigDecimal.ROUND_HALF_UP);
-		if (log.isLoggable(Level.INFO)) log.info("LineNetAmt=" + LineNetAmt);
-		mTab.setValue("LineNetAmt", LineNetAmt);
-		//
-		
-		
-				
+		} else {
+			BigDecimal LineNetAmt = QtyOrdered.multiply(PriceActual);
+			if (LineNetAmt.scale() > StdPrecision)
+				LineNetAmt = LineNetAmt.setScale(StdPrecision, RoundingMode.HALF_UP);
+			if (log.isLoggable(Level.INFO)) log.info("LineNetAmt=" + LineNetAmt);
+			mTab.setValue("LineNetAmt", LineNetAmt);
+			//
 		}
-		
+
 		return "";
-		
-			
+
 	}	//	amt
-	
+
 	public String qty (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		if (isCalloutActive() || value == null)
@@ -1107,28 +1105,28 @@ boolean isNewProductDes = false;
 		{
 			int C_UOM_To_ID = ((Integer)value).intValue();
 			QtyEntered = (BigDecimal)mTab.getValue("QtyEntered");
-			BigDecimal QtyEntered1 = QtyEntered.setScale(MUOM.getPrecision(ctx, C_UOM_To_ID), BigDecimal.ROUND_HALF_UP);
+			BigDecimal QtyEntered1 = QtyEntered.setScale(MUOM.getPrecision(ctx, C_UOM_To_ID), RoundingMode.HALF_UP);
 			if (QtyEntered.compareTo(QtyEntered1) != 0)
 			{
 				if (log.isLoggable(Level.FINE)) log.fine("Corrected QtyEntered Scale UOM=" + C_UOM_To_ID
-					+ "; QtyEntered=" + QtyEntered + "->" + QtyEntered1);
+						+ "; QtyEntered=" + QtyEntered + "->" + QtyEntered1);
 				QtyEntered = QtyEntered1;
 				mTab.setValue("QtyEntered", QtyEntered);
 			}
 			QtyOrdered = MUOMConversion.convertProductFrom (ctx, M_Product_ID,
-				C_UOM_To_ID, QtyEntered);
+					C_UOM_To_ID, QtyEntered);
 			if (QtyOrdered == null)
 				QtyOrdered = QtyEntered;
 			boolean conversion = QtyEntered.compareTo(QtyOrdered) != 0;
 			PriceActual = (BigDecimal)mTab.getValue("PriceActual");
 			PriceEntered = MUOMConversion.convertProductFrom (ctx, M_Product_ID,
-				C_UOM_To_ID, PriceActual);
+					C_UOM_To_ID, PriceActual);
 			if (PriceEntered == null)
 				PriceEntered = PriceActual;
 			if (log.isLoggable(Level.FINE)) log.fine("UOM=" + C_UOM_To_ID
-				+ ", QtyEntered/PriceActual=" + QtyEntered + "/" + PriceActual
-				+ " -> " + conversion
-				+ " QtyOrdered/PriceEntered=" + QtyOrdered + "/" + PriceEntered);
+					+ ", QtyEntered/PriceActual=" + QtyEntered + "/" + PriceActual
+					+ " -> " + conversion
+					+ " QtyOrdered/PriceEntered=" + QtyOrdered + "/" + PriceEntered);
 			Env.setContext(ctx, WindowNo, "UOMConversion", conversion ? "Y" : "N");
 			mTab.setValue("QtyOrdered", QtyOrdered);
 			mTab.setValue("PriceEntered", PriceEntered);
@@ -1138,23 +1136,23 @@ boolean isNewProductDes = false;
 		{
 			int C_UOM_To_ID = Env.getContextAsInt(ctx, WindowNo, mTab.getTabNo(), "C_UOM_ID");
 			QtyEntered = (BigDecimal)value;
-			BigDecimal QtyEntered1 = QtyEntered.setScale(MUOM.getPrecision(ctx, C_UOM_To_ID), BigDecimal.ROUND_HALF_UP);
+			BigDecimal QtyEntered1 = QtyEntered.setScale(MUOM.getPrecision(ctx, C_UOM_To_ID), RoundingMode.HALF_UP);
 			if (QtyEntered.compareTo(QtyEntered1) != 0)
 			{
 				if (log.isLoggable(Level.FINE)) log.fine("Corrected QtyEntered Scale UOM=" + C_UOM_To_ID
-					+ "; QtyEntered=" + QtyEntered + "->" + QtyEntered1);
+						+ "; QtyEntered=" + QtyEntered + "->" + QtyEntered1);
 				QtyEntered = QtyEntered1;
 				mTab.setValue("QtyEntered", QtyEntered);
 			}
 			QtyOrdered = MUOMConversion.convertProductFrom (ctx, M_Product_ID,
-				C_UOM_To_ID, QtyEntered);
+					C_UOM_To_ID, QtyEntered);
 			if (QtyOrdered == null)
 				QtyOrdered = QtyEntered;
 			boolean conversion = QtyEntered.compareTo(QtyOrdered) != 0;
 			if (log.isLoggable(Level.FINE)) log.fine("UOM=" + C_UOM_To_ID
-				+ ", QtyEntered=" + QtyEntered
-				+ " -> " + conversion
-				+ " QtyOrdered=" + QtyOrdered);
+					+ ", QtyEntered=" + QtyEntered
+					+ " -> " + conversion
+					+ " QtyOrdered=" + QtyOrdered);
 			Env.setContext(ctx, WindowNo, "UOMConversion", conversion ? "Y" : "N");
 			mTab.setValue("QtyOrdered", QtyOrdered);
 		}
@@ -1164,23 +1162,23 @@ boolean isNewProductDes = false;
 			int C_UOM_To_ID = Env.getContextAsInt(ctx, WindowNo, mTab.getTabNo(), "C_UOM_ID");
 			QtyOrdered = (BigDecimal)value;
 			int precision = MProduct.get(ctx, M_Product_ID).getUOMPrecision();
-			BigDecimal QtyOrdered1 = QtyOrdered.setScale(precision, BigDecimal.ROUND_HALF_UP);
+			BigDecimal QtyOrdered1 = QtyOrdered.setScale(precision, RoundingMode.HALF_UP);
 			if (QtyOrdered.compareTo(QtyOrdered1) != 0)
 			{
 				if (log.isLoggable(Level.FINE)) log.fine("Corrected QtyOrdered Scale "
-					+ QtyOrdered + "->" + QtyOrdered1);
+						+ QtyOrdered + "->" + QtyOrdered1);
 				QtyOrdered = QtyOrdered1;
 				mTab.setValue("QtyOrdered", QtyOrdered);
 			}
 			QtyEntered = MUOMConversion.convertProductTo (ctx, M_Product_ID,
-				C_UOM_To_ID, QtyOrdered);
+					C_UOM_To_ID, QtyOrdered);
 			if (QtyEntered == null)
 				QtyEntered = QtyOrdered;
 			boolean conversion = QtyOrdered.compareTo(QtyEntered) != 0;
 			if (log.isLoggable(Level.FINE)) log.fine("UOM=" + C_UOM_To_ID
-				+ ", QtyOrdered=" + QtyOrdered
-				+ " -> " + conversion
-				+ " QtyEntered=" + QtyEntered);
+					+ ", QtyOrdered=" + QtyOrdered
+					+ " -> " + conversion
+					+ " QtyEntered=" + QtyEntered);
 			Env.setContext(ctx, WindowNo, "UOMConversion", conversion ? "Y" : "N");
 			mTab.setValue("QtyEntered", QtyEntered);
 		}
@@ -1189,52 +1187,52 @@ boolean isNewProductDes = false;
 			QtyOrdered = (BigDecimal)mTab.getValue("QtyOrdered");
 		}
 
-				//
+		//
 		return "";
 	}	//	qty
-	
+
 	public String SalesOrderTenderType (Properties ctx, int WindowNo,
 			GridTab mTab, GridField mField, Object value, Object oldValue)
 	{
 		log.info("");
 		// Called from tender type in Sales Order - POS Payments
 		// to fill IsPostDated and TenderType
-		
+
 		if (value == null)
 			return "";
-		
+
 		int tendertype_id = ((Integer) value).intValue();
-		
+
 		X_C_POSTenderType tendertype = new X_C_POSTenderType(ctx, tendertype_id, null);
 		mTab.setValue("IsPostDated", tendertype.isPostDated());
 		mTab.setValue("TenderType", tendertype.getTenderType());
-		
+
 		return "";
 	}	//	SalesOrderTenderType
 
 	public String organization(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value){
-		
+
 		//Return if Organization field is empty
 		if(value == null || (Integer)value == 0)
 			return "";
-		
+
 		log.info("Set default Warehouse for Organization " + value + " on Window " + WindowNo);
-		
+
 		//Get the current Warehouse
 		Integer m_warehouse_id = (Integer) mTab.getValue("M_Warehouse_ID");
-		
+
 		//Only set Warehouse if the field is empty
 		if(m_warehouse_id == null || m_warehouse_id == 0){
 			Integer ad_org_id = (Integer) value;
 			MOrgInfo orginfo = MOrgInfo.get(ctx, ad_org_id.intValue(), null);
-			
+
 			//only set Warehouse if there is a default Warehouse on OrgInfo
 			if(orginfo!=null && orginfo.getM_Warehouse_ID() != 0)
 				mTab.setValue("M_Warehouse_ID", orginfo.getM_Warehouse_ID());
 		}
 		return "";
 	}
-	
+
 	public String charge (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
 	{
 		Integer C_Charge_ID = (Integer)value;
@@ -1248,7 +1246,7 @@ boolean isNewProductDes = false;
 		}
 		mTab.setValue("M_AttributeSetInstance_ID", null);
 		mTab.setValue("S_ResourceAssignment_ID", null);
-		mTab.setValue("C_UOM_ID", new Integer(100));	//	EA
+		mTab.setValue("C_UOM_ID", null);	//	EA
 
 		Env.setContext(ctx, WindowNo, "DiscountSchema", "N");
 		String sql = "SELECT ChargeAmt FROM C_Charge WHERE C_Charge_ID=?";
@@ -1282,13 +1280,13 @@ boolean isNewProductDes = false;
 		//
 		return tax (ctx, WindowNo, mTab, mField, value);
 	}	//	charge
-	
+
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab,
 			GridField mField, Object value, Object oldValue) {
-		
+
 		String msg = "";
-		
+
 		if(mField.getColumnName().equals(MQuotationLine.COLUMNNAME_Discount)){
 			msg += total(ctx, WindowNo, mTab, mField, value);
 			msg += amt(ctx, WindowNo, mTab, mField, oldValue);
@@ -1330,7 +1328,7 @@ boolean isNewProductDes = false;
 			msg += amt(ctx, WindowNo, mTab, mField, value);
 			return msg;
 		}
-		
+
 		return null;
 	}
 }
