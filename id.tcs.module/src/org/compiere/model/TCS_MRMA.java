@@ -56,7 +56,7 @@ public class TCS_MRMA extends MRMA implements DocOptions {
 	 * 	Re-activate
 	 * 	@return true if success
 	 */
-	@Override
+
 	public boolean reActivateIt()
 	{
 		if (log.isLoggable(Level.INFO)) log.info("reActivateIt - " + toString());
