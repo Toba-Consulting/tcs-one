@@ -100,7 +100,7 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, I_C_Invoice.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, I_C_Invoice.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, I_C_Invoice.Table_Name);
-		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, I_C_Invoice.Table_Name);		
+		//registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, I_C_Invoice.Table_Name);		
 		
 		//Payment
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, I_C_Payment.Table_Name);		
