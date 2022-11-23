@@ -25,6 +25,7 @@ public class TCS_InvoiceValidator {
 			if (!invoice.isReversal())
 				msg += validateRelatedInOut(invoice);
 				msg += validateRelatedOrder(invoice);
+				
 		}
 
 		return msg;

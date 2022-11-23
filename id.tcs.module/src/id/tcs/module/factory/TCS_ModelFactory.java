@@ -115,7 +115,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MDDOrder.Table_Name, "id.tcs.model.TCS_MDDOrder");
 		mapTableModels.put(X_M_MatchQuotation.Table_Name, "id.tcs.model.X_M_MatchQuotation");
 		mapTableModels.put(X_M_Periodic_Cost.Table_Name, "org.compiere.model.X_M_Periodic_Cost");
-		mapTableModels.put(X_C_DocType.Table_Name, "org.compiere.model.X_C_DocType");
+		//mapTableModels.put(X_C_DocType.Table_Name, "org.compiere.model.X_C_DocType");
 	}
 	
 	@Override
