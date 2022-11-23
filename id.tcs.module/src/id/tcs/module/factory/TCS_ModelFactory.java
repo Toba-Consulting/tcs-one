@@ -35,7 +35,7 @@ import org.compiere.model.I_M_RMA;
 import org.compiere.model.I_M_Requisition;
 import org.compiere.model.I_TCS_AllocateCharge;
 import org.compiere.model.PO;
-import org.compiere.model.X_C_DocType;
+import org.compiere.model.TCS_MDDOrder;
 import org.compiere.model.X_M_Periodic_Cost;
 import org.compiere.util.Env;
 
@@ -49,7 +49,6 @@ import id.tcs.model.MQuotationTax;
 import id.tcs.model.MTCSAmortizationLine;
 import id.tcs.model.MTCSAmortizationPlan;
 import id.tcs.model.MTCSAmortizationRun;
-import id.tcs.model.TCS_MDDOrder;
 import id.tcs.model.TCS_MRequestLine;
 import id.tcs.model.TCS_MRfQ;
 import id.tcs.model.TCS_MRfQLine;
@@ -112,7 +111,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MRfQTopic.Table_Name, "id.tcs.model.TCS_MRfQTopic");
 		mapTableModels.put(TCS_MRfQTopicSubscriber.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriber");
 		mapTableModels.put(TCS_MRfQTopicSubscriberOnly.Table_Name, "id.tcs.model.TCS_MRfQTopicSubscriberOnly");
-		mapTableModels.put(TCS_MDDOrder.Table_Name, "id.tcs.model.TCS_MDDOrder");
+		mapTableModels.put(TCS_MDDOrder.Table_Name, "org.compiere.model.TCS_MDDOrder");
 		mapTableModels.put(X_M_MatchQuotation.Table_Name, "id.tcs.model.X_M_MatchQuotation");
 		mapTableModels.put(X_M_Periodic_Cost.Table_Name, "org.compiere.model.X_M_Periodic_Cost");
 		//mapTableModels.put(X_C_DocType.Table_Name, "org.compiere.model.X_C_DocType");
