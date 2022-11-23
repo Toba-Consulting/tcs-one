@@ -2,17 +2,22 @@ package id.tcs.validator;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.adempiere.base.event.IEventTopics;
+import org.compiere.model.MDocType;
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MMatchPO;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MPayment;
+import org.compiere.model.MProduct;
 import org.compiere.model.MRequisition;
 import org.compiere.model.MRequisitionLine;
+import org.compiere.model.MStorageReservation;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.process.DocAction;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
@@ -27,7 +32,8 @@ public class TCS_OrderValidator {
 		String msg = "";
 		MOrder order = (MOrder) po;
 		if (event.getTopic().equals(IEventTopics.DOC_AFTER_REACTIVATE)) {
-			msg += unreserveQty(order);
+			if (order.isSOTrx())
+				msg += unreserveQty(order);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
 			msg += checkMatchPO(order);
@@ -127,12 +133,10 @@ public class TCS_OrderValidator {
 	}
 
 	public static String unreserveQty(MOrder order){
-		MOrderLine [] lines = order.getLines();
-		for (MOrderLine line : lines) {
-			line.setQtyReserved(Env.ZERO);
-			line.saveEx();
+		if (!reserveStock(order)) {
+			return "Cannot unreserve stock, Failed to update reservations";
 		}
-		
+	
 		return "";
 	}
 	
@@ -198,4 +202,85 @@ public class TCS_OrderValidator {
 		return "";
 	}
 
+	private static boolean reserveStock (MOrder order)
+	{
+		MDocType dt = MDocType.get(order.getCtx(), order.getC_DocType_ID());
+		MOrderLine [] lines = order.getLines();
+		//	Binding
+		boolean binding = !dt.isProposal();
+		//	Not binding - i.e. Target=0
+		if (DocAction.ACTION_Void.equals(order.getDocAction())
+			//	Closing Binding Quotation
+			|| (MDocType.DOCSUBTYPESO_Quotation.equals(dt.getDocSubTypeSO()) 
+				&& DocAction.ACTION_Close.equals(order.getDocAction())) 
+			) // || isDropShip() )
+			binding = false;
+		boolean isSOTrx = order.isSOTrx();
+		//	Force same WH for all but SO/PO
+		int header_M_Warehouse_ID = order.getM_Warehouse_ID();
+		if (MDocType.DOCSUBTYPESO_StandardOrder.equals(dt.getDocSubTypeSO())
+			|| MDocType.DOCBASETYPE_PurchaseOrder.equals(dt.getDocBaseType()))
+			header_M_Warehouse_ID = 0;		//	don't enforce
+		
+		BigDecimal Volume = Env.ZERO;
+		BigDecimal Weight = Env.ZERO;
+		
+		//	Always check and (un) Reserve Inventory		
+		for (int i = 0; i < lines.length; i++)
+		{
+			MOrderLine line = lines[i];
+			//	Check/set WH/Org
+			if (header_M_Warehouse_ID != 0)	//	enforce WH
+			{
+				if (header_M_Warehouse_ID != line.getM_Warehouse_ID())
+					line.setM_Warehouse_ID(header_M_Warehouse_ID);
+				if (order.getAD_Org_ID() != line.getAD_Org_ID())
+					line.setAD_Org_ID(order.getAD_Org_ID());
+			}
+			//	Binding
+			BigDecimal target = Env.ZERO; 
+			BigDecimal difference = target
+				.subtract(line.getQtyOrdered());
+
+			if (difference.signum() == 0 || line.getQtyOrdered().signum() < 0)
+			{
+				if (difference.signum() == 0 || line.getQtyReserved().signum() == 0)
+				{
+					MProduct product = line.getProduct();
+					if (product != null)
+					{
+						Volume = Volume.add(product.getVolume().multiply(line.getQtyOrdered()));
+						Weight = Weight.add(product.getWeight().multiply(line.getQtyOrdered()));
+					}
+					continue;
+				}
+				else if (line.getQtyOrdered().signum() < 0 && line.getQtyReserved().signum() > 0)
+				{
+					difference = line.getQtyReserved().negate();
+				}
+			}
+
+			//	Check Product - Stocked and Item
+			MProduct product = line.getProduct();
+			if (product != null) 
+			{
+				if (product.isStocked())
+				{
+					//	Update Reservation Storage
+					if (!MStorageReservation.add(order.getCtx(), line.getM_Warehouse_ID(), 
+						line.getM_Product_ID(), 
+						line.getM_AttributeSetInstance_ID(),
+						difference, isSOTrx, order.get_TrxName()))
+						return false;
+				}	//	stocked
+				//
+				Volume = Volume.add(product.getVolume().multiply(line.getQtyOrdered()));
+				Weight = Weight.add(product.getWeight().multiply(line.getQtyOrdered()));
+			}	//	product
+		}	//	reverse inventory
+		
+		order.setVolume(Volume);
+		order.setWeight(Weight);
+		return true;
+	}	//	reserveStock
 }
