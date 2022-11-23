@@ -75,10 +75,12 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			options[index++] = DocAction.ACTION_Complete;
 			options[index++] = DocAction.ACTION_Void;
 			options[index++] = DocAction.ACTION_Prepare;
-		} else if (docStatus.equals(DocAction.STATUS_Completed)) {
+		}
+		/* @win take out reversal 
+		else if (docStatus.equals(DocAction.STATUS_Completed)) {
 			options[index++] = DocAction.ACTION_Reverse_Correct;
 		}
-
+		*/
 		return index;
 	}
 
@@ -608,17 +610,17 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		if(m_processMsg != null)
 			return false;
 		
-		StringBuilder info = reverse(false);
-		if (info == null)
-			return false;
-		
+//		StringBuilder info = reverse(false);
+//		if (info == null)
+//			return false;
+//		
 		//after reverseCorrect
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_REVERSECORRECT);
 		if(m_processMsg != null)
 			return false;
 		
-		m_processMsg = info.toString();
-		return true;
+		//m_processMsg = info.toString();
+		return false;
 	}
 
 	@Override
