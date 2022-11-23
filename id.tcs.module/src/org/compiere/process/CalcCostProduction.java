@@ -1,6 +1,7 @@
 package org.compiere.process;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.Level;
@@ -121,12 +122,12 @@ public class CalcCostProduction extends SvrProcess{
 					fgAmt = fgAmt.add(lineAmt);
 
 					//Update Component Cost Detail
-					updateProductionLineCostDetail(line, lineAmt.divide(lineQty.abs(), 9, BigDecimal.ROUND_HALF_DOWN), lineQty);
+					updateProductionLineCostDetail(line, lineAmt.divide(lineQty.abs(), 9, RoundingMode.HALF_DOWN), lineQty);
 				}
 
 			}
 			//Update Finished Goods Cost Detail
-			updateProductionLineCostDetail(fgLine, fgAmt.divide(fgQty, 9, BigDecimal.ROUND_HALF_DOWN), fgQty);
+			updateProductionLineCostDetail(fgLine, fgAmt.divide(fgQty, 9, RoundingMode.HALF_DOWN), fgQty);
 		}
 
 	}
