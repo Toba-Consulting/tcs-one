@@ -2,7 +2,6 @@ package id.tcs.validator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.logging.Level;
 
 import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.MRequisition;
@@ -30,7 +29,46 @@ public class TCS_RequisitionValidator {
 			msg += setQtyRequiredRequisitionLine(req);
 		}
 
+		else if ((event.getTopic().equals(IEventTopics.DOC_AFTER_CLOSE))) {
+			//Fix Qty in Requisition Line - it's err after close code in core
+			msg += fixQtyRequisitionLine(req);
+		}
 		return msg;
+	}
+
+	private static String fixQtyRequisitionLine(MRequisition req) {
+		//		Close Not delivered Qty
+		MRequisitionLine[] lines = req.getLines();
+		BigDecimal totalLines = Env.ZERO;
+		for (MRequisitionLine line : lines)
+		{
+			BigDecimal QtyOrdered = line.get_Value("QtyOrdered") != null ? (BigDecimal)line.get_Value("QtyOrdered") : BigDecimal.ZERO;				
+			BigDecimal QtyEntered = line.get_Value("QtyEntered") != null ? (BigDecimal)line.get_Value("QtyEntered") : BigDecimal.ZERO;
+			BigDecimal Qty = MUOMConversion.convertProductFrom (req.getCtx(), line.getM_Product_ID(),
+					line.getC_UOM_ID(), QtyEntered);
+
+			BigDecimal finalQty = QtyOrdered.compareTo(BigDecimal.ZERO) > 0 ? QtyOrdered : BigDecimal.ZERO;
+
+			//	final qty is not line qty
+			if (finalQty.compareTo(line.getQty()) != 0)
+			{
+				String description = line.getDescription();
+				if (description == null)
+					description = "";
+				description += " [" + Qty + "]"; 
+				line.setDescription(description);
+				line.setQty(finalQty);
+				line.setLineNetAmt();
+				line.saveEx();
+			}
+			totalLines = totalLines.add (line.getLineNetAmt());
+		}
+		if (totalLines.compareTo(req.getTotalLines()) != 0)
+		{
+			req.setTotalLines(totalLines);
+			req.saveEx();
+		}
+		return null;
 	}
 
 	private static String setQtyRequiredRequisitionLine(MRequisition req) {
@@ -43,7 +81,7 @@ public class TCS_RequisitionValidator {
 			BigDecimal Qty = line.getQty();
 			int C_UOM_ID = line.getC_UOM_ID();
 			boolean needSave = false;
-			
+
 			BigDecimal QtyEntered1 = QtyEntered.setScale(MUOM.getPrecision(req.getCtx(), C_UOM_ID), RoundingMode.HALF_UP);
 			if (QtyEntered.compareTo(QtyEntered1) != 0) {
 				QtyEntered = QtyEntered1;
@@ -59,15 +97,15 @@ public class TCS_RequisitionValidator {
 				line.setQty(Qty);
 				needSave = true;
 			}
-			
+
 			if (needSave)
 				line.saveEx();
 		}
-		
+
 		return "";
-		
+
 	}
-	
+
 	public static String checkPO(MRequisition req){
 
 		boolean match = false;
@@ -83,4 +121,5 @@ public class TCS_RequisitionValidator {
 
 		return "";
 	}
+
 }

@@ -371,14 +371,6 @@ public class TCS_CreateFromOrder extends CreateFrom {
                 orderLine.setPriceLimit(pricing.getPriceLimit());
                 orderLine.saveEx();
                 
-                //create in matching table
-                X_M_MatchPR match = new X_M_MatchPR(Env.getCtx(), 0, trxName);
-                match.setC_Order_ID(orderLine.getC_Order_ID());
-                match.setC_OrderLine_ID(orderLine.getC_OrderLine_ID());
-                match.setM_Requisition_ID(reqLine.getM_Requisition_ID());
-                match.setM_RequisitionLine_ID(reqLine.getM_RequisitionLine_ID());
-                match.setQtyOrdered(qtyOrdered);
-                match.saveEx();
                 //end of code
             }
         }

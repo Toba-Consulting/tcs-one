@@ -1,5 +1,7 @@
 package org.compiere.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -7,6 +9,11 @@ import java.util.logging.Level;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
+import org.compiere.util.Env;
+
+import id.tcs.model.I_M_MatchPR;
+import id.tcs.model.MMatchPR;
+import id.tcs.model.X_M_MatchPR;
 
 public class TCS_MRequisition extends MRequisition implements DocOptions {
 
@@ -104,4 +111,27 @@ public class TCS_MRequisition extends MRequisition implements DocOptions {
 		
 	}
 
+	/**
+	 * @param M_RequisitionLine_ID
+	 * @return temporary table for calculation
+	 */
+	protected int[] getMatchToReqLines(int M_RequisitionLine_ID){
+		String where = "M_RequisitionLine_ID="+M_RequisitionLine_ID;
+		int[] matchPRIDs = new Query(getCtx(), MMatchPR.Table_Name, where, get_TrxName())
+			.setOnlyActiveRecords(true)
+			.getIDs();
+		
+		return matchPRIDs;
+	}
+	
+	public boolean hasMatchPR() {
+
+		final String whereClause = I_M_MatchPR.COLUMNNAME_M_Requisition_ID + "=?";
+		boolean match = new Query(getCtx(),X_M_MatchPR.Table_Name, whereClause, get_TrxName())
+				.setParameters(get_ID())
+				.match();
+
+		return match;
+	}
+	
 }

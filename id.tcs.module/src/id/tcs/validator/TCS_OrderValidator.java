@@ -31,11 +31,7 @@ public class TCS_OrderValidator {
 	public static String executeEvent(Event event, PO po) {
 		String msg = "";
 		MOrder order = (MOrder) po;
-		if (event.getTopic().equals(IEventTopics.DOC_AFTER_REACTIVATE)) {
-			if (order.isSOTrx())
-				msg += unreserveQty(order);
-		} 
-		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
+		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
 			msg += checkMatchPO(order);
 //			msg += checkLinkedPayment(order);
 			msg += checkActiveLinkedInOut(order);
@@ -44,13 +40,29 @@ public class TCS_OrderValidator {
 			msg += checkMatchPO(order);
 //			msg += checkLinkedPayment(order);
 			msg += checkActiveLinkedInOut(order);
-			msg += removeMatchQuotation(order);
 //		} else  if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)){
 //			msg += generateRequisition(order);
+		
 		} else  if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL) || 
 				event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT)){
-			msg += removeRequisition(order);
+			if (!order.isSOTrx())
+				msg += removeRequisition(order);
 		}
+		
+		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_REACTIVATE)) {
+			if (order.isSOTrx())
+				msg += unreserveQty(order);
+		} 
+		
+		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_VOID)) {
+			if (order.isSOTrx()) {
+				msg += removeMatchQuotation(order);
+			} else {
+				msg += removeMatchPR(order);
+			}
+
+		} 
+		
 		return msg;
 	}
 	
@@ -114,7 +126,6 @@ public class TCS_OrderValidator {
 				if(M_RequisitionLine_ID <= 0)
 					continue;
 				MRequisitionLine requisitionLine = new MRequisitionLine(Env.getCtx(), M_RequisitionLine_ID, null);
-				requisitionLine.set_ValueOfColumn("QtyRequired", ((BigDecimal) requisitionLine.get_Value("QtyRequired")).add(orderLine.getQtyOrdered()));
 				requisitionLine.set_ValueOfColumn("QtyOrdered",requisitionLine.getQtyOrdered().subtract(orderLine.getQtyOrdered()));
 				requisitionLine.saveEx();	
 			}
@@ -283,4 +294,17 @@ public class TCS_OrderValidator {
 		order.setWeight(Weight);
 		return true;
 	}	//	reserveStock
+	
+	/**
+	 * Delete related Match PR records for a certain Purchase Order
+	 * @param order
+	 * @return
+	 */
+	private static String removeMatchPR(MOrder order) {
+		StringBuilder sql = new StringBuilder("DELETE FROM ").append(X_M_MatchPR.Table_Name)
+				.append(" WHERE C_Order_ID=?");
+		DB.executeUpdateEx(sql.toString(), new Object[] {order.get_ID()}, order.get_TrxName());
+
+		return "";
+	}
 }
