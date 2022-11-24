@@ -39,23 +39,24 @@ public class TCS_RequisitionValidator {
 
 		for (MRequisitionLine line : lines) {
 
-			BigDecimal QtyRequired = line.get_Value("QtyRequired") != null ? (BigDecimal)line.get_Value("QtyRequired") : BigDecimal.ZERO;
+			BigDecimal QtyEntered = line.get_Value("QtyEntered") != null ? (BigDecimal)line.get_Value("QtyEntered") : BigDecimal.ZERO;
 			BigDecimal Qty = line.getQty();
 			int C_UOM_ID = line.getC_UOM_ID();
 			boolean needSave = false;
 			
-			BigDecimal Qty1 = Qty.setScale(MUOM.getPrecision(req.getCtx(), C_UOM_ID), RoundingMode.HALF_UP);
-			if (Qty.compareTo(Qty1) != 0) {
-				Qty = Qty1;
-				line.setQty(Qty1);
+			BigDecimal QtyEntered1 = QtyEntered.setScale(MUOM.getPrecision(req.getCtx(), C_UOM_ID), RoundingMode.HALF_UP);
+			if (QtyEntered.compareTo(QtyEntered1) != 0) {
+				QtyEntered = QtyEntered1;
+				line.set_CustomColumn("QtyEntered", QtyEntered1);
+
 				needSave = true;
 			}
 
-			BigDecimal QtyRequired1 = MUOMConversion.convertProductFrom (req.getCtx(), line.getM_Product_ID(),
-					C_UOM_ID, Qty);
-			if (QtyRequired.compareTo(QtyRequired1) != 0) {
-				QtyRequired = QtyRequired1;
-				line.set_CustomColumn("QtyRequired", QtyRequired);
+			BigDecimal Qty1 = MUOMConversion.convertProductFrom (req.getCtx(), line.getM_Product_ID(),
+					C_UOM_ID, QtyEntered);
+			if (Qty.compareTo(Qty1) != 0) {
+				Qty = Qty1;
+				line.setQty(Qty);
 				needSave = true;
 			}
 			
