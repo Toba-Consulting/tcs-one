@@ -117,7 +117,6 @@ public class TCS_WFActivityValidator {
 					activityApproval.setApprovalAmt(approvalLine.getApprovalAmt());
 					activityApproval.setSequence(approvalLine.getSequence());
 					activityApproval.saveEx();
-					
 					if(approvalAmount.compareTo(approvalLine.getApprovalAmt()) <= 0)
 						break;
 					

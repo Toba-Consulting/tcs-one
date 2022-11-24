@@ -37,12 +37,12 @@ public class TCS_OrderValidator {
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
 			msg += checkMatchPO(order);
-			msg += checkLinkedPayment(order);
+//			msg += checkLinkedPayment(order);
 			msg += checkActiveLinkedInOut(order);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)) {
 			msg += checkMatchPO(order);
-			msg += checkLinkedPayment(order);
+//			msg += checkLinkedPayment(order);
 			msg += checkActiveLinkedInOut(order);
 			msg += removeMatchQuotation(order);
 //		} else  if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)){
@@ -190,7 +190,7 @@ public class TCS_OrderValidator {
 				.addJoinClause("JOIN M_InOut mi on mi.M_InOut_ID=M_InOutLine.M_InOut_ID")
 				.match();
 		if (match) {
-			return "Cannot Reverse Order : Active InOut Exists For Order Line";
+			return "Cannot Reactivate Order : Active InOut Exists For Order Line";
 		}
 		return "";
 }
