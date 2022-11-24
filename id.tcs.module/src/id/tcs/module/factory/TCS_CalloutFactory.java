@@ -34,6 +34,7 @@ import id.tcs.callout.TCS_CalloutInventoryLine;
 import id.tcs.callout.TCS_CalloutPayment;
 import id.tcs.callout.TCS_CalloutQuotation;
 import id.tcs.callout.TCS_CalloutQuotationLine;
+import id.tcs.callout.TCS_CalloutRequisition;
 import id.tcs.callout.TCS_Callout_PP_Product_BOMLine;
 import id.tcs.model.MTCSAmortizationPlan;
 
@@ -44,6 +45,10 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 	public IColumnCallout[] getColumnCallouts(String tableName,
 			String columnName) {
 		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
+
+		if (tableName.equals("M_RequisitionLine")){
+			list.add(new TCS_CalloutRequisition());
+		}
 
 		if (tableName.equals("A_Asset_Reval")){
 			list.add(new TCS_CalloutAssetReval());
