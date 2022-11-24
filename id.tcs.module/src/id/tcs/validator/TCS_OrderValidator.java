@@ -301,6 +301,14 @@ public class TCS_OrderValidator {
 	 * @return
 	 */
 	private static String removeMatchPR(MOrder order) {
+		for (MOrderLine orderLine : order.getLines()) {
+			int M_RequisitionLine_ID = orderLine.get_ValueAsInt("M_RequisitionLine_ID");
+			if(M_RequisitionLine_ID <= 0)
+				continue;
+			MRequisitionLine requisitionLine = new MRequisitionLine(Env.getCtx(), M_RequisitionLine_ID, null);
+			requisitionLine.set_ValueOfColumn("QtyOrdered",requisitionLine.getQtyOrdered().subtract(orderLine.getQtyOrdered()));
+			requisitionLine.saveEx();	
+		}
 		StringBuilder sql = new StringBuilder("DELETE FROM ").append(X_M_MatchPR.Table_Name)
 				.append(" WHERE C_Order_ID=?");
 		DB.executeUpdateEx(sql.toString(), new Object[] {order.get_ID()}, order.get_TrxName());
