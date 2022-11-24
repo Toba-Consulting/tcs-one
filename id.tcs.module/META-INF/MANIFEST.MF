@@ -19,5 +19,6 @@ Import-Package: org.adempiere.webui.factory,
  org.apache.commons.collections.keyvalue;version="3.2.2"
 Service-Component: OSGI-INF/tcscalloutfactory.xml,OSGI-INF/tcsvalidatorfactory.xml,OSGI-INF/tcsprocessfactory.xml,OSGI-INF/tcsmodelfactory.xml,OSGI-INF/tcsformfactory.xml,OSGI-INF/tcsdocfactory.xml,
  OSGI-INF/tcscreatefromfactory.xml
-Export-Package: id.tcs.model
+Export-Package: id.tcs.model,
+ org.compiere.model
 Bundle-Vendor: Toba Technology
