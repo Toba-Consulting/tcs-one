@@ -18,11 +18,13 @@ import org.compiere.model.I_M_InOut;
 import org.compiere.model.I_M_Movement;
 import org.compiere.model.I_M_RMA;
 import org.compiere.model.I_M_Requisition;
-import id.tcs.model.I_C_Quotation;
-import id.tcs.model.I_C_QuotationLine;
+import org.compiere.util.CLogger;
 import org.eevolution.model.I_DD_Order;
 import org.eevolution.model.I_PP_Product_BOMLine;
+import org.osgi.service.event.Event;
 
+import id.tcs.model.I_C_Quotation;
+import id.tcs.model.I_C_QuotationLine;
 import id.tcs.validator.TCS_BankStatementDocValidator;
 import id.tcs.validator.TCS_DDOrderValidator;
 import id.tcs.validator.TCS_InOutValidator;
@@ -41,9 +43,6 @@ import id.tcs.validator.TCS_RMAValidator;
 import id.tcs.validator.TCS_RequisitionValidator;
 import id.tcs.validator.TCS_RfQValidator;
 import id.tcs.validator.TCS_WFActivityValidator;
-
-import org.compiere.util.CLogger;
-import org.osgi.service.event.Event;
 
 public class TCS_ValidatorFactory extends AbstractEventHandler {
 	private CLogger log = CLogger.getCLogger(TCS_ValidatorFactory.class);
@@ -86,11 +85,14 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, I_C_Order.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_VOID, I_C_Order.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REACTIVATE, I_C_Order.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_CLOSE, I_C_Order.Table_Name);
 		
 		
 		//Order Line
 		registerTableEvent(IEventTopics.PO_BEFORE_DELETE, I_C_OrderLine.Table_Name);
+		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_C_OrderLine.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_C_OrderLine.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_C_OrderLine.Table_Name);
 		
 		//RMA
 		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, I_M_RMA.Table_Name);

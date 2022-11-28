@@ -17,43 +17,45 @@ import org.compiere.model.MRequisitionLine;
 import org.compiere.model.MStorageReservation;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.model.TCS_MOrder;
 import org.compiere.process.DocAction;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
 
+import id.tcs.model.MMatchPR;
 import id.tcs.model.X_M_MatchPR;
 import id.tcs.model.X_M_MatchQuotation;
 
 public class TCS_OrderValidator {
 
-	
+
 	public static String executeEvent(Event event, PO po) {
 		String msg = "";
 		MOrder order = (MOrder) po;
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
 			msg += checkMatchPO(order);
-//			msg += checkLinkedPayment(order);
+			//			msg += checkLinkedPayment(order);
 			msg += checkActiveLinkedInOut(order);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)) {
 			msg += checkMatchPO(order);
-//			msg += checkLinkedPayment(order);
+			//			msg += checkLinkedPayment(order);
 			msg += checkActiveLinkedInOut(order);
-//		} else  if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)){
-//			msg += generateRequisition(order);
-		
+			//		} else  if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)){
+			//			msg += generateRequisition(order);
+
 		} else  if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL) || 
 				event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT)){
 			if (!order.isSOTrx())
 				msg += removeRequisition(order);
 		}
-		
+
 		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_REACTIVATE)) {
 			if (order.isSOTrx())
 				msg += unreserveQty(order);
 		} 
-		
+
 		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_VOID)) {
 			if (order.isSOTrx()) {
 				msg += removeMatchQuotation(order);
@@ -62,14 +64,42 @@ public class TCS_OrderValidator {
 			}
 
 		} 
-		
+
+		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_CLOSE)) {
+			if (!order.isSOTrx()) {
+				//Update QtyOrdered Information on all related requisition line when closing order
+				msg += updateRequisitionQtyOrdered(order);
+			} 
+
+		} 
+
 		return msg;
 	}
-	
+
+	private static String updateRequisitionQtyOrdered(MOrder order) {
+		MOrderLine[] orderLines = order.getLines();
+		for (MOrderLine oLine : orderLines) {
+			MMatchPR matchPR = new Query(Env.getCtx(), MMatchPR.Table_Name, "C_OrderLine_ID=?", null)
+					.setParameters(oLine.getC_OrderLine_ID())
+					.first();
+
+			if (matchPR != null) {				
+				BigDecimal diffQty = matchPR.getQtyOrdered().subtract(oLine.getQtyDelivered());
+				matchPR.setQtyOrdered(oLine.getQtyDelivered());
+				matchPR.saveEx();
+				MRequisitionLine rLine = new MRequisitionLine(Env.getCtx(), matchPR.getM_RequisitionLine_ID(), null);
+				BigDecimal reqLineQtyOrdered = (BigDecimal) rLine.get_Value("QtyOrdered");
+				rLine.set_CustomColumn("QtyOrdered", reqLineQtyOrdered.subtract(diffQty));
+				rLine.saveEx();
+			}
+		}
+		return null;
+	}
+
 	private static String generateRequisition(MOrder order) {
 		if(!order.isSOTrx())
 			updateRequisition(order);
-		
+
 		return "";
 	}
 
@@ -78,12 +108,12 @@ public class TCS_OrderValidator {
 				+ "FROM M_RequisitionLine mrl "
 				+ "JOIN C_OrderLine col ON col.M_RequisitionLine_ID=mrl.M_RequisitionLine_ID "
 				+ "WHERE col.C_Order_ID=?)";
-		
+
 		List<MRequisition> requisitions = new Query(Env.getCtx(), MRequisition.Table_Name, whereClause, null)
-								.setParameters(order.getC_Order_ID())
-								.setOnlyActiveRecords(true)
-								.list();
-		
+				.setParameters(order.getC_Order_ID())
+				.setOnlyActiveRecords(true)
+				.list();
+
 		if (!requisitions.isEmpty()) {
 			StringBuilder sb = new StringBuilder();
 			for (MRequisition req : requisitions) {
@@ -91,9 +121,9 @@ public class TCS_OrderValidator {
 			}
 			sb.deleteCharAt(sb.length()-1);
 			return "Abort.. Please check document status for Requisition: ";
-			
+
 		}
-		
+
 		for (MOrderLine orderLine : order.getLines()) {
 			int M_RequisitionLine_ID = orderLine.get_ValueAsInt("M_RequisitionLine_ID");
 			if(M_RequisitionLine_ID <= 0)
@@ -105,20 +135,20 @@ public class TCS_OrderValidator {
 			requisitionLine.set_ValueOfColumn("QtyRequired", ((BigDecimal) requisitionLine.get_Value("QtyRequired")).subtract(orderLine.getQtyOrdered()));
 			requisitionLine.set_ValueOfColumn("QtyOrdered", requisitionLine.getQtyOrdered().add(orderLine.getQtyOrdered()));
 			requisitionLine.saveEx();
-			
+
 			X_M_MatchPR matchPR = new X_M_MatchPR(Env.getCtx(),0,null);
-	        matchPR.setC_OrderLine_ID(orderLine.getC_OrderLine_ID());
-	        matchPR.setM_Requisition_ID(requisitionLine.getM_Requisition_ID());
-	        matchPR.setM_RequisitionLine_ID(requisitionLine.get_ID());
-	        matchPR.setC_Order_ID(orderLine.getC_Order_ID());
-	        matchPR.setDateTrx(orderLine.getC_Order().getDateOrdered());
-	        matchPR.setQtyOrdered(orderLine.getQtyOrdered());
-	        matchPR.saveEx();
+			matchPR.setC_OrderLine_ID(orderLine.getC_OrderLine_ID());
+			matchPR.setM_Requisition_ID(requisitionLine.getM_Requisition_ID());
+			matchPR.setM_RequisitionLine_ID(requisitionLine.get_ID());
+			matchPR.setC_Order_ID(orderLine.getC_Order_ID());
+			matchPR.setDateTrx(orderLine.getC_Order().getDateOrdered());
+			matchPR.setQtyOrdered(orderLine.getQtyOrdered());
+			matchPR.saveEx();
 		}
-		
+
 		return "";
 	}
-	
+
 	private static String removeRequisition(MOrder order){
 		if (order.getDocStatus().equals("CO")) {
 			for (MOrderLine orderLine : order.getLines()) {
@@ -131,7 +161,7 @@ public class TCS_OrderValidator {
 			}
 			String sqlDelete = "DELETE FROM M_MatchPR WHERE C_Order_ID=?";
 			DB.executeUpdate(sqlDelete, order.get_ID(), null);
-			
+
 		}
 		return "";
 		/*//@win: for now we prefer not removing the reference to Requisition Line to preserve audit reference
@@ -140,20 +170,20 @@ public class TCS_OrderValidator {
 	        int no = DB.executeUpdate(sql, get_ID(), get_TrxName());
 	        log.info("UPDATED Order Line "+no);
 		}
-		*/	
+		 */	
 	}
 
 	public static String unreserveQty(MOrder order){
 		if (!reserveStock(order)) {
 			return "Cannot unreserve stock, Failed to update reservations";
 		}
-	
+
 		return "";
 	}
-	
+
 	public static String checkMatchPO(MOrder order){
 		int [] temp = new Query(order.getCtx(), MOrderLine.Table_Name, "C_Order_ID="+order.getC_Order_ID(), order.get_TrxName())
-					.getIDs();
+				.getIDs();
 		if (temp==null || temp.length==0) {
 			return "";
 		}
@@ -166,27 +196,27 @@ public class TCS_OrderValidator {
 		//match PO tetap ada setelah MR direverse
 		String sqlWhere = "M_MatchPO.C_OrderLine_ID IN ("+IDs+") AND mi.DocStatus IN ('CO','CL','IP')";
 		boolean match = new Query(order.getCtx(), MMatchPO.Table_Name, sqlWhere, order.get_TrxName())
-							.addJoinClause("JOIN M_InOutLine mil on mil.M_InOutline_ID=M_MatchPO.M_InOutLine_ID")
-							.addJoinClause("JOIN M_InOut mi on mi.M_InOut_ID=mil.M_InOut_ID")
-							.match();
+				.addJoinClause("JOIN M_InOutLine mil on mil.M_InOutline_ID=M_MatchPO.M_InOutLine_ID")
+				.addJoinClause("JOIN M_InOut mi on mi.M_InOut_ID=mil.M_InOut_ID")
+				.match();
 		if (match) {
 			return "Cannot Reverse Order : Existing Match PO Exist For Order Line";
 		}
 		return "";
 	}
-	
+
 	public static String checkLinkedPayment(MOrder order){
 		String sqlWhere="C_Order_ID="+order.getC_Order_ID()+" AND DocStatus IN ('CO','CL','IP')";
 		boolean match = new Query(order.getCtx(), MPayment.Table_Name, sqlWhere, order.get_TrxName())
-						.match();
-		
+				.match();
+
 		if (match) return "Cannot Reactivate / Void : Linked Payment Exist";
 		return "";
 	}
-	
+
 	public static String checkActiveLinkedInOut(MOrder order){
 		int [] temp = new Query(order.getCtx(), MOrderLine.Table_Name, "C_Order_ID="+order.getC_Order_ID(), order.get_TrxName())
-		.getIDs();
+				.getIDs();
 		if (temp==null || temp.length==0) {
 			return "";
 		}
@@ -204,7 +234,7 @@ public class TCS_OrderValidator {
 			return "Cannot Reactivate Order : Active InOut Exists For Order Line";
 		}
 		return "";
-}
+	}
 	private static String removeMatchQuotation(MOrder order) {
 		StringBuilder sql = new StringBuilder("DELETE FROM ").append(X_M_MatchQuotation.Table_Name)
 				.append(" WHERE C_Order_ID=?");
@@ -221,21 +251,21 @@ public class TCS_OrderValidator {
 		boolean binding = !dt.isProposal();
 		//	Not binding - i.e. Target=0
 		if (DocAction.ACTION_Void.equals(order.getDocAction())
-			//	Closing Binding Quotation
-			|| (MDocType.DOCSUBTYPESO_Quotation.equals(dt.getDocSubTypeSO()) 
-				&& DocAction.ACTION_Close.equals(order.getDocAction())) 
-			) // || isDropShip() )
+				//	Closing Binding Quotation
+				|| (MDocType.DOCSUBTYPESO_Quotation.equals(dt.getDocSubTypeSO()) 
+						&& DocAction.ACTION_Close.equals(order.getDocAction())) 
+				) // || isDropShip() )
 			binding = false;
 		boolean isSOTrx = order.isSOTrx();
 		//	Force same WH for all but SO/PO
 		int header_M_Warehouse_ID = order.getM_Warehouse_ID();
 		if (MDocType.DOCSUBTYPESO_StandardOrder.equals(dt.getDocSubTypeSO())
-			|| MDocType.DOCBASETYPE_PurchaseOrder.equals(dt.getDocBaseType()))
+				|| MDocType.DOCBASETYPE_PurchaseOrder.equals(dt.getDocBaseType()))
 			header_M_Warehouse_ID = 0;		//	don't enforce
-		
+
 		BigDecimal Volume = Env.ZERO;
 		BigDecimal Weight = Env.ZERO;
-		
+
 		//	Always check and (un) Reserve Inventory		
 		for (int i = 0; i < lines.length; i++)
 		{
@@ -251,7 +281,7 @@ public class TCS_OrderValidator {
 			//	Binding
 			BigDecimal target = Env.ZERO; 
 			BigDecimal difference = target
-				.subtract(line.getQtyOrdered());
+					.subtract(line.getQtyOrdered());
 
 			if (difference.signum() == 0 || line.getQtyOrdered().signum() < 0)
 			{
@@ -279,9 +309,9 @@ public class TCS_OrderValidator {
 				{
 					//	Update Reservation Storage
 					if (!MStorageReservation.add(order.getCtx(), line.getM_Warehouse_ID(), 
-						line.getM_Product_ID(), 
-						line.getM_AttributeSetInstance_ID(),
-						difference, isSOTrx, order.get_TrxName()))
+							line.getM_Product_ID(), 
+							line.getM_AttributeSetInstance_ID(),
+							difference, isSOTrx, order.get_TrxName()))
 						return false;
 				}	//	stocked
 				//
@@ -289,12 +319,12 @@ public class TCS_OrderValidator {
 				Weight = Weight.add(product.getWeight().multiply(line.getQtyOrdered()));
 			}	//	product
 		}	//	reverse inventory
-		
+
 		order.setVolume(Volume);
 		order.setWeight(Weight);
 		return true;
 	}	//	reserveStock
-	
+
 	/**
 	 * Delete related Match PR records for a certain Purchase Order
 	 * @param order
