@@ -54,19 +54,22 @@ public class TCS_OrderLineValidator {
 
 		if (orderLine.get_ValueAsInt("M_RequisitionLine_ID") == 0)
 			return "";
-		
-		//Update MatchPR according 
-		BigDecimal sumMatchedQty = new Query(Env.getCtx(), MMatchPR.Table_Name, "C_OrderLine_ID=?", null)
-				.setParameters(orderLine.getC_OrderLine_ID())
-				.sum(MMatchPR.COLUMNNAME_QtyOrdered);
 
-		MRequisitionLine reqLine = new MRequisitionLine(orderLine.getCtx(), orderLine.get_ValueAsInt("M_RequisitionLine_ID"), orderLine.get_TrxName());
+		if (orderLine.is_ValueChanged(MOrderLine.COLUMNNAME_QtyEntered)) {
 		
-		BigDecimal finalQtyOrdered = orderLine.getQtyOrdered().add(sumMatchedQty);
-		
-		if (finalQtyOrdered.compareTo(reqLine.getQty()) > 0)
-			return "Line " +orderLine.getLine() + ", QtyOrdered = "+orderLine.getQtyOrdered() + ", Previously Matched Qty = " + sumMatchedQty 
-					+ ", Total Requisition Qty = " + reqLine.getQty() + " - Total Qty Ordered > Qty on Requisition";
+			//Update MatchPR according 
+			BigDecimal sumMatchedQty = new Query(Env.getCtx(), MMatchPR.Table_Name, "C_OrderLine_ID=?", null)
+					.setParameters(orderLine.getC_OrderLine_ID())
+					.sum(MMatchPR.COLUMNNAME_QtyOrdered);
+	
+			MRequisitionLine reqLine = new MRequisitionLine(orderLine.getCtx(), orderLine.get_ValueAsInt("M_RequisitionLine_ID"), orderLine.get_TrxName());
+			
+			BigDecimal finalQtyOrdered = orderLine.getQtyOrdered().add(sumMatchedQty);
+			
+			if (finalQtyOrdered.compareTo(reqLine.getQty()) > 0)
+				return "Line " +orderLine.getLine() + ", QtyOrdered = "+orderLine.getQtyOrdered() + ", Previously Matched Qty = " + sumMatchedQty 
+						+ ", Total Requisition Qty = " + reqLine.getQty() + " - Total Qty Ordered > Qty on Requisition";
+		}
 		return null;
 	}
 
