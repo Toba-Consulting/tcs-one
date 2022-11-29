@@ -16,7 +16,8 @@ public class TCS_PaymentValidator {
 
 		if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL)) ||
 				(event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT))) {
-			msg = checkAllocation(payment);
+			msg += checkAllocation(payment);
+			msg += checkReconcile(payment);
 		}
 		return msg;
 	}
@@ -36,5 +37,19 @@ public class TCS_PaymentValidator {
 		if(match)
 			throw new AdempiereException("Cannot reverse payment.. Related allocation exists..");
 		return "";
+	}
+	
+	/**
+	 * Validation before reverse correct / accrual
+	 * Cannot reverse reconciled payment
+	 * @param payment
+	 * @return
+	 */
+	public static String checkReconcile(MPayment payment) {
+		String msg = "";
+		if (payment.isReconciled())
+			msg = "Error: Payment is reconciled. Please reversed related bank statement first";
+		return msg;
+				
 	}
 }
