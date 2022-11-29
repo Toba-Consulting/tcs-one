@@ -52,9 +52,12 @@ public class TCSBankRegisterNoRecon extends SvrProcess{
 							+" (CASE WHEN ((cp.isReceipt = 'Y' AND cp.PayAmt > 0) OR (cp.isReceipt = 'N' AND cp.PayAmt < 0)) THEN abs(cp.PayAmt) ELSE 0 END) - "
 							+" (CASE WHEN ((cp.isReceipt = 'N' AND cp.PayAmt > 0) OR (cp.isReceipt = 'Y' AND cp.PayAmt < 0)) THEN abs(cp.PayAmt) ELSE 0 END) ) "
 							+" FROM C_Payment cp"
-							+" WHERE cp.DocStatus IN ('CO','CL','RE') AND C_BankAccount_ID="+p_C_BankAccount_ID
+							//@win remove reversed Payment
+//							+" WHERE cp.DocStatus IN ('CO','CL','RE') AND C_BankAccount_ID="+p_C_BankAccount_ID
+							+" WHERE cp.DocStatus IN ('CO','CL') AND C_BankAccount_ID="+p_C_BankAccount_ID
 							+" AND cp.PayAmt != 0 AND cp.DateAcct<'"+p_DateFrom+"'";
 
+		
 		balance = DB.getSQLValueBD(get_TrxName(), begBalQuery);
 		if(balance == null) balance = Env.ZERO;
 		
@@ -128,8 +131,11 @@ public class TCSBankRegisterNoRecon extends SvrProcess{
 		.append("join c_bpartner bp on bp.c_bpartner_id=cp.c_bpartner_id ")
 		//.append("join c_bankaccount ba on ba.c_bankaccount_id=cp.c_bankaccount_id ")
 		.append("where cp.c_bankaccount_id="+p_C_BankAccount_ID) 
-		.append(" and cp.docstatus IN ('CO','CL','RE') AND cp.isreconciled='N'") 
-//		.append(" and cp.dateacct <= '"+p_DateTo+"'")
+		//@win remove reversed payment
+		//		.append(" and cp.docstatus IN ('CO','CL','RE') AND cp.isreconciled='N'") 
+		.append(" and cp.docstatus IN ('CO','CL') AND cp.isreconciled='N'") 
+
+		//		.append(" and cp.dateacct <= '"+p_DateTo+"'")
 		.append(" and cp.dateacct BETWEEN '"+p_DateFrom+"' AND '"+p_DateTo+"'")
 		.append(" and cp.payamt != 0")
 		.append(" order by cp.dateacct, cp.c_payment_id ");

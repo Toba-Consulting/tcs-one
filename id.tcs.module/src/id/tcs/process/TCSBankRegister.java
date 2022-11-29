@@ -217,7 +217,10 @@ public class TCSBankRegister extends SvrProcess{
 		.append("join c_bpartner bp on bp.c_bpartner_id=cp.c_bpartner_id ")
 		//.append("join c_bankaccount ba on ba.c_bankaccount_id=cp.c_bankaccount_id ")
 		.append("where cp.c_bankaccount_id="+p_C_BankAccount_ID) 
-		.append(" and cp.docstatus IN ('CO','CL','RE') AND cp.isreconciled='N'") 
+		//@win remove Reversed Payment
+		//		.append(" and cp.docstatus IN ('CO','CL','RE') AND cp.isreconciled='N'") 
+		.append(" and cp.docstatus IN ('CO','CL') AND cp.isreconciled='N'") 
+
 		.append(" and cp.dateacct <= '"+p_DateTo+"'")
 		.append(" and cp.payamt != 0")
 		.append(" order by cp.dateacct, cp.c_payment_id ");
