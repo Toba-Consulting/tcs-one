@@ -672,6 +672,7 @@ public class TCS_MPayment extends MPayment {
 		if (getC_Order_ID() != 0 && getC_Invoice_ID() == 0)
 		{	//	see WebOrder.process
 			MOrder order = new MOrder (getCtx(), getC_Order_ID(), get_TrxName());
+			
 			if (DOCSTATUS_WaitingPayment.equals(order.getDocStatus()))
 			{
 				order.setC_Payment_ID(getC_Payment_ID());
@@ -686,6 +687,7 @@ public class TCS_MPayment extends MPayment {
 				//	Set Invoice
 				MInvoice[] invoices = order.getInvoices();
 				int length = invoices.length;
+
 				if (length > 0)		//	get last invoice
 					setC_Invoice_ID (invoices[length-1].getC_Invoice_ID());
 				//
@@ -694,7 +696,20 @@ public class TCS_MPayment extends MPayment {
 					m_processMsg = "@NotFound@ @C_Invoice_ID@";
 					return DocAction.STATUS_Invalid;
 				}
-			}	//	WaitingPayment
+			} //	WaitingPayment
+			else if(getC_Invoice_ID() <= 0 && order.getPaymentRule().equals("A"))	{
+				MInvoice[] invoices = order.getInvoices();
+				int length = invoices.length;
+
+				if (length > 0)		//	get last invoice
+					setC_Invoice_ID (invoices[length-1].getC_Invoice_ID());
+				//
+				if (getC_Invoice_ID() == 0)
+				{
+					m_processMsg = "@NotFound@ @C_Invoice_ID@";
+					return DocAction.STATUS_Invalid;
+				}
+			} // Extra Payments from Order Payment
 		}
 		
 		MPaymentAllocate[] pAllocs = MPaymentAllocate.get(this);

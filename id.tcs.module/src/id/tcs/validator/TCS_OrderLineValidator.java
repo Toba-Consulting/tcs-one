@@ -1,6 +1,7 @@
 package id.tcs.validator;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.MOrderLine;
@@ -39,17 +40,32 @@ public class TCS_OrderLineValidator {
 			if (!orderLine.getC_Order().isSOTrx()) {
 				msg += createMatchPR(orderLine);
 			}
+			msg += setDiscount(orderLine);
 		}
 		
 		else if (event.getTopic().equals(IEventTopics.PO_AFTER_CHANGE)) {
 			if (!orderLine.getC_Order().isSOTrx()) {
 				msg += updateMatchPR(orderLine);
 			}
+			msg += setDiscount(orderLine);
 		}
 
 		return msg;
 	}
 
+	
+	private static String setDiscount(MOrderLine orderLine) {
+		BigDecimal list = orderLine.getPriceList();
+
+		BigDecimal discount = list.subtract(orderLine.getPriceActual())
+				.multiply(Env.ONEHUNDRED)
+				.divide(list, 2, RoundingMode.HALF_UP);
+		
+		String sql = "UPDATE C_OrderLine set discount = " + discount + "where c_orderline_id = " + orderLine.get_ID();
+		DB.executeUpdate(sql, orderLine.get_TrxName());
+		return "";
+	}
+	
 	private static String ValidateMatchPR(MOrderLine orderLine) {
 
 		if (orderLine.get_ValueAsInt("M_RequisitionLine_ID") == 0)

@@ -2,6 +2,7 @@ package id.tcs.model;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.List;
@@ -106,6 +107,81 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 
 		return match;
 	}
+	
+	public String checkQuotationDependency() {
+		MQuotationLine quotationLines[] = getLines();
+		//StringBuilder sqlWhere = new StringBuilder("C_QuotationLine_ID=?");
+
+		StringBuilder sql = new StringBuilder();
+		ResultSet rs = null;
+		PreparedStatement pstmt = null;
+
+		String orderNo = "";
+		int orderID = 0;
+		boolean match = false;
+		for (MQuotationLine quotationLine : quotationLines) {
+			/*
+			match = new Query(quotation.getCtx(), X_M_MatchQuotation.Table_Name, sqlWhere.toString(), quotation.get_TrxName())
+			.setParameters(quotationLine.getC_QuotationLine_ID())
+			.match();
+			*/
+			
+			try{
+				//sql.append("LEFT JOIN C_Order o ON o.C_Order_ID = m.C_Order_ID ");
+				sql = new StringBuilder();
+				sql.append("SELECT o.DocumentNo, m.C_Order_ID FROM M_MatchQuotation m LEFT JOIN C_Order o ON o.C_Order_ID = m.C_Order_ID ");
+				sql.append("WHERE m.C_Quotation_ID=? AND o.documentno is not null ");
+				pstmt = DB.prepareStatement(sql.toString(), get_TrxName());
+				pstmt.setInt(1, quotationLine.getC_Quotation_ID());
+				rs = pstmt.executeQuery();
+				if(rs.next()){
+					orderNo = rs.getString(1);
+					orderID = rs.getInt(2);
+				}
+			}catch(Exception e){
+				return "Error: "+e;
+			}finally{
+				DB.close(rs, pstmt);
+				rs = null;
+				pstmt = null;
+				sql = null;
+			}
+			
+			if (orderID == 0){
+				match = false;
+			}else{
+				match = true;
+			}
+
+			if(match){
+				return "Sales Order "+orderNo+" must be void first";
+			}
+		}
+		
+		return "";
+
+	}
+	
+	public String checkLinkedOrder(){
+	
+
+		String sqlWhere="C_Quotation_ID="+getC_Quotation_ID()+" AND C_OrderLine_ID IS NOT NULL";
+		boolean match = new Query(getCtx(), X_M_MatchQuotation.Table_Name, sqlWhere, get_TrxName())
+						.match();
+
+		if (match) return "Cannot Reactivate / Void : Match Quotation Exist";
+
+		return "";
+	}
+
+	private String removeMatchQuotation() {
+		StringBuilder sql = new StringBuilder("DELETE FROM ").append(X_M_MatchQuotation.Table_Name)
+				.append(" WHERE C_Quotation_ID=?");
+		DB.executeUpdateEx(sql.toString(), new Object[] {get_ID()}, get_TrxName());
+
+		return "";
+	}
+
 	
 	// getLines
 
@@ -226,12 +302,20 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 			m_processMsg = valid;
 			return false;
 		}
+		
+		// Before Void - From Validator
+		checkQuotationDependency();
+		checkLinkedOrder();
+		
 		// put logic here
 		setProcessed(true);
 		setDocAction(DocAction.ACTION_None);
 		setDocStatus(DOCSTATUS_Voided);
 		saveEx();
 
+		// After Void - From Validator
+		removeMatchQuotation();
+		
 		// User Validation
 		valid = ModelValidationEngine.get().fireDocValidate(this,
 				ModelValidator.TIMING_AFTER_VOID);
@@ -239,7 +323,7 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 			m_processMsg = valid;
 			return false;
 		}
-
+		
 		return true;
 	}
 
@@ -271,6 +355,9 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 		if (m_processMsg != null)
 			return false;		
 
+		// Before Reactivate  - From Validator
+		checkLinkedOrder();
+		
 		setProcessed(false);
 		setDocAction(DocAction.ACTION_Complete);
 		setDocStatus(MQuotation.DOCSTATUS_InProgress);
@@ -783,5 +870,6 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 		MQuotationTax[] taxes = list.toArray(new MQuotationTax[list.size()]);
 		return taxes;
 	}	//	getTaxes
+	
 	
 }

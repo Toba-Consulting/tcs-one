@@ -1,7 +1,9 @@
 package id.tcs.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -17,6 +19,7 @@ import org.compiere.model.MTaxCategory;
 import org.compiere.model.MTaxProvider;
 import org.compiere.model.MUOM;
 import org.compiere.model.MUOMConversion;
+import org.compiere.model.Query;
 import org.compiere.model.Tax;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -103,6 +106,41 @@ public class MQuotationLine extends X_C_QuotationLine {
 		setM_AttributeSetInstance_ID(0);
 	}	//	setProduct
 
+	
+	private void setTotalLines(){
+		BigDecimal price = Env.ZERO;
+		MQuotation quotation = getParent();
+		if(quotation.getTotalLines().compareTo(Env.ZERO)>0){
+			StringBuilder sqlprice = new StringBuilder();
+			sqlprice.append("SELECT SUM(LineNetAmt) FROM C_QuotationLine WHERE C_Quotation_ID = "+ quotation.getC_Quotation_ID());
+			price = DB.getSQLValueBDEx(quotation.get_TrxName(), sqlprice.toString());
+			
+			MQuotation quot = new MQuotation(getCtx(), getC_Quotation_ID(),get_TrxName());
+			quot.setTotalLines(price.setScale(0, RoundingMode.HALF_UP));
+			quot.saveEx();
+		}
+	}
+	
+	private void removeMatchQuotation() {
+		StringBuilder sql = new StringBuilder("DELETE FROM ").append(X_M_MatchQuotation.Table_Name)
+				.append(" WHERE C_QuotationLine_ID=?");
+		DB.executeUpdateEx(sql.toString(), new Object[] {get_ID()}, get_TrxName());
+
+	}
+	
+	private void updateMatchQty(){
+		
+		if (is_ValueChanged(X_M_MatchQuotation.COLUMNNAME_QtyOrdered))
+		{
+			String sqlMatchQuot = "C_QuotationLine_ID="+get_ID();
+			List<X_M_MatchQuotation> matchQuots = new Query(getCtx(), X_M_MatchQuotation.Table_Name, sqlMatchQuot, get_TrxName())
+												.list();
+			for (X_M_MatchQuotation match : matchQuots) {
+				match.setQtyOrdered(getQtyEntered());
+				match.saveEx(get_TrxName());
+			}
+		}
+	}
 
 	protected boolean afterSave(boolean newRecord, boolean success){
 		if(!success){
@@ -115,6 +153,12 @@ public class MQuotationLine extends X_C_QuotationLine {
 		TCS_TaxProvider calc = new TCS_TaxProvider();
 		if(calc == null){
 			throw new AdempiereException(Msg.getMsg(getCtx(), "TaxNoProvider"));
+		}
+		
+		// After New/Change - From Validator
+		if(newRecord || !newRecord) {
+			setTotalLines();
+			updateMatchQty();
 		}
 		return calc.recalculateTax(provider, this, newRecord);
 	}//afterSave
@@ -235,6 +279,11 @@ public class MQuotationLine extends X_C_QuotationLine {
 	{
 		if (!success)
 			return success;
+		// After Delete - From Validator - setTotalLines()
+		setTotalLines();
+		
+		// After Delete - From Validator - removeMatchQuotation()
+		removeMatchQuotation();
 		
 		return updateHeaderTax();
 	}	//	afterDelete

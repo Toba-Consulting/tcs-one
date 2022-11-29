@@ -53,14 +53,14 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerEvent(IEventTopics.AFTER_LOGIN);
 		
 		//Quotation
-		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, I_C_Quotation.Table_Name);
-		registerTableEvent(IEventTopics.DOC_BEFORE_VOID, I_C_Quotation.Table_Name);
-		registerTableEvent(IEventTopics.DOC_AFTER_VOID, I_C_Quotation.Table_Name);
+//		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, I_C_Quotation.Table_Name);
+//		registerTableEvent(IEventTopics.DOC_BEFORE_VOID, I_C_Quotation.Table_Name);
+//		registerTableEvent(IEventTopics.DOC_AFTER_VOID, I_C_Quotation.Table_Name);
 
 		//Quotation Line
-		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_C_QuotationLine.Table_Name);
-		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_C_QuotationLine.Table_Name);
-		registerTableEvent(IEventTopics.PO_AFTER_DELETE, I_C_QuotationLine.Table_Name);
+//		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_C_QuotationLine.Table_Name);
+//		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_C_QuotationLine.Table_Name);
+//		registerTableEvent(IEventTopics.PO_AFTER_DELETE, I_C_QuotationLine.Table_Name);
 		
 		//RfQ
 		registerTableEvent(IEventTopics.DOC_AFTER_VOID, I_C_RfQ.Table_Name);
@@ -161,14 +161,14 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		}		
 		
 		//Quotation
-		else if(getPO(event).get_TableName().equals(I_C_Quotation.Table_Name)) {
-			msg = TCS_QuotationValidator.executeEvent(event, getPO(event));
-		}
+//		else if(getPO(event).get_TableName().equals(I_C_Quotation.Table_Name)) {
+//			msg = TCS_QuotationValidator.executeEvent(event, getPO(event));
+//		}
 		
 		//Quotation Line
-		else if(getPO(event).get_TableName().equals(I_C_QuotationLine.Table_Name)) {
-			msg = TCS_QuotationLineValidator.executeEvent(event, getPO(event));
-		}
+//		else if(getPO(event).get_TableName().equals(I_C_QuotationLine.Table_Name)) {
+//			msg = TCS_QuotationLineValidator.executeEvent(event, getPO(event));
+//		}
 		
 		//RfQ
 		else if(getPO(event).get_TableName().equals(I_C_RfQ.Table_Name)) {

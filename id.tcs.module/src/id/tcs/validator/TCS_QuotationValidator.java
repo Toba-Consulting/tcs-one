@@ -26,16 +26,16 @@ public class TCS_QuotationValidator {
 
 		
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)){
-			msgQuotation = checkQuotationDependency(quotation);
-			msgQuotation = checkLinkedOrder(quotation);
+//			msgQuotation = checkQuotationDependency(quotation);
+//			msgQuotation = checkLinkedOrder(quotation);
 		}
 
 		if (event.getTopic().equals(IEventTopics.DOC_AFTER_VOID)){
-			msgQuotation = removeMatchQuotation(quotation);
+//			msgQuotation = removeMatchQuotation(quotation);
 		}
 		
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
-			msgQuotation = checkLinkedOrder(quotation);
+//			msgQuotation = checkLinkedOrder(quotation);
 		}
 		
 		

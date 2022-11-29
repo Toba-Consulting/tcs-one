@@ -39,6 +39,7 @@ import org.compiere.model.TCS_MDDOrder;
 import org.compiere.model.X_M_Periodic_Cost;
 import org.compiere.util.Env;
 
+import id.tcs.model.I_C_OrderPayment;
 import id.tcs.model.I_M_MatchRequest;
 import id.tcs.model.MBankTransfer;
 import id.tcs.model.MInquiry;
@@ -115,6 +116,9 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(X_M_MatchQuotation.Table_Name, "id.tcs.model.X_M_MatchQuotation");
 		mapTableModels.put(X_M_Periodic_Cost.Table_Name, "org.compiere.model.X_M_Periodic_Cost");
 		//mapTableModels.put(X_C_DocType.Table_Name, "org.compiere.model.X_C_DocType");
+		
+		mapTableModels.put(I_C_OrderPayment.Table_Name, "id.tcs.model.TCS_MOrderPayment");
+		
 	}
 	
 	@Override

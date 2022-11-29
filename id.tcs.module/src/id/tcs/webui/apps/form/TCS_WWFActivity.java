@@ -319,7 +319,6 @@ public class TCS_WWFActivity extends ADForm implements EventListener<Event>
 	public int getActivitiesCount()
 	{
 		int count = 0;
-
 		String sql = "SELECT COUNT(*) FROM AD_WF_Activity a "
 			+ "WHERE " + getWhereActivities();
 		int AD_User_ID = Env.getAD_User_ID(Env.getCtx());
