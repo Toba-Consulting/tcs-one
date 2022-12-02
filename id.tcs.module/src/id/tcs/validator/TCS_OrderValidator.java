@@ -93,7 +93,7 @@ public class TCS_OrderValidator {
 				rLine.saveEx();
 			}
 		}
-		return null;
+		return "";
 	}
 
 	private static String generateRequisition(MOrder order) {

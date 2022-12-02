@@ -68,7 +68,7 @@ public class TCS_RequisitionValidator {
 			req.setTotalLines(totalLines);
 			req.saveEx();
 		}
-		return null;
+		return "";
 	}
 
 	private static String setQtyRequiredRequisitionLine(MRequisition req) {

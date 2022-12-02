@@ -53,7 +53,7 @@ public class TCS_RMAValidator {
 		if (match)
 			return "Cannot Reactivate, RMA has link to completed vendor/customer return";
 		
-		return null;
+		return "";
 	}
 
 	/**
