@@ -40,7 +40,10 @@ public class TCS_OrderLineValidator {
 			if (!orderLine.getC_Order().isSOTrx()) {
 				msg += createMatchPR(orderLine);
 			}
-			msg += setDiscount(orderLine);
+			else {
+				if (orderLine.getM_Product_ID() > 0 || orderLine.getC_Charge_ID() > 0)
+					msg += setDiscount(orderLine);
+			}
 		}
 		
 		else if (event.getTopic().equals(IEventTopics.PO_AFTER_CHANGE)) {
@@ -56,7 +59,10 @@ public class TCS_OrderLineValidator {
 	
 	private static String setDiscount(MOrderLine orderLine) {
 		BigDecimal list = orderLine.getPriceList();
-
+		
+		if (list.compareTo(BigDecimal.ZERO) == 0)
+			list = orderLine.getPriceActual();
+		
 		BigDecimal discount = list.subtract(orderLine.getPriceActual())
 				.multiply(Env.ONEHUNDRED)
 				.divide(list, 2, RoundingMode.HALF_UP);
