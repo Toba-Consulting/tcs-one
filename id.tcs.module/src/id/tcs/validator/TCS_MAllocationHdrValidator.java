@@ -11,6 +11,7 @@ import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.I_C_AllocationLine;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
+import org.compiere.model.MPayment;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.util.DB;
@@ -35,9 +36,22 @@ public class TCS_MAllocationHdrValidator {
 		if(event.getTopic().equals(IEventTopics.DOC_AFTER_REVERSECORRECT))
 			deleteMatchAllocation(allocationHdr);
 
+		if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL)) ||
+				(event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT))) {
+			msg += checkBankTransfer(allocationHdr);
+		}
+		
 		return msg;
 	}
 
+	
+	private static String checkBankTransfer(MAllocationHdr allocationHdr) {
+		String msg = "";
+		if (allocationHdr.get_ValueAsInt("C_BankTransfer_ID") > 0)
+			msg = "Error: Allocation is generated from Bank Transfer, cannot reverse allocation manually.";
+		return msg;
+	}
+	
 	private static void deleteMatchAllocation (MAllocationHdr hdr) {		
 		String sqlDelete = "DELETE FROM TCS_Match_Allocation WHERE C_AllocationHdr_ID=?";
 		int result = DB.executeUpdate(sqlDelete, hdr.get_ID(), hdr.get_TrxName());		

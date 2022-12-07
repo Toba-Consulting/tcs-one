@@ -123,7 +123,8 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, I_C_AllocationHdr.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, I_C_AllocationHdr.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, I_C_AllocationHdr.Table_Name);	
-		
+		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, I_C_AllocationHdr.Table_Name);		
+		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, I_C_AllocationHdr.Table_Name);
 		//Bank Statement
 		registerTableEvent(IEventTopics.DOC_AFTER_REACTIVATE, I_C_BankStatement.Table_Name);
 

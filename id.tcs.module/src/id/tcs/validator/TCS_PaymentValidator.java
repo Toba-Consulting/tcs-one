@@ -6,6 +6,7 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MPayment;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.util.Env;
 import org.osgi.service.event.Event;
 
 public class TCS_PaymentValidator {
@@ -16,12 +17,20 @@ public class TCS_PaymentValidator {
 
 		if ((event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL)) ||
 				(event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT))) {
+			msg += checkBankTransfer(payment);
 			msg += checkAllocation(payment);
 			msg += checkReconcile(payment);
 		}
 		return msg;
 	}
 	
+	private static String checkBankTransfer(MPayment payment) {
+		String msg = "";
+		if (payment.get_ValueAsInt("C_BankTransfer_ID") > 0)
+			msg = "Error: Payment is generated from Bank Transfer, cannot reverse payment manually.";
+		return msg;
+	}
+
 	public static String checkAllocation(MPayment payment){
 		String whereClause =  " C_AllocationLine.C_Payment_ID = ? AND (cp.C_Charge_ID IS NULL OR cp.C_Charge_ID=0) AND cdr.docStatus='CO' AND"
 							+ " NOT EXISTS ("

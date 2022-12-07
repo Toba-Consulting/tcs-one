@@ -15,6 +15,7 @@ import org.compiere.model.MPeriod;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
+import org.compiere.model.TCS_MPayment;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
@@ -76,11 +77,9 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			options[index++] = DocAction.ACTION_Void;
 			options[index++] = DocAction.ACTION_Prepare;
 		}
-		/* @win take out reversal 
 		else if (docStatus.equals(DocAction.STATUS_Completed)) {
-			options[index++] = DocAction.ACTION_Reverse_Correct;
+			options[index++] = DocAction.ACTION_Void;
 		}
-		*/
 		return index;
 	}
 
@@ -236,11 +235,12 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			
 			MPayment paymentFrom = new MPayment(getCtx(), 0, get_TrxName());			
 			paymentFrom.setAD_Org_ID(getC_BankAccount_From().getAD_Org_ID());
-			paymentFrom.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
+			paymentFrom.setTenderType(MPayment.TENDERTYPE_Account);
 			paymentFrom.setC_BankAccount_ID(getC_BankAccount_From_ID());
 			paymentFrom.setC_BPartner_ID(getC_BPartner_ID());
 			paymentFrom.setC_DocType_ID(false); 
 			paymentFrom.setC_Currency_ID(getC_Currency_From_ID());
+			paymentFrom.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
 			if(getDescription() == null) {
 				paymentFrom.setDescription("Generated From Bank Transfer " + getDocumentNo());								
 			}
@@ -249,11 +249,12 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			}
 			paymentFrom.setDateAcct(getDateAcct());
 			paymentFrom.setDateTrx(getDateAcct()); 
-			
-			if(getTransferFeeType().equals("F"))
-				paymentFrom.setPayAmt(getPayAmtFrom().add(getChargeAmt()));
-			else
+
+			if(!get_ValueAsBoolean("isHasTransferFee"))
 				paymentFrom.setPayAmt(getPayAmtFrom());
+			else if(getTransferFeeType().equals("F") && get_ValueAsBoolean("isHasTransferFee"))
+				paymentFrom.setPayAmt(getPayAmtFrom().add(getChargeAmt()));
+			
 			
 			if (funcCurrencyID!=getC_Currency_From_ID()) {
 				paymentFrom.setC_ConversionType_ID(getC_ConversionType_ID());
@@ -269,11 +270,12 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			
 			MPayment paymentTo = new MPayment(getCtx(), 0, get_TrxName());
 			paymentTo.setAD_Org_ID(getC_BankAccount_To().getAD_Org_ID());
-			paymentTo.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
+			paymentTo.setTenderType(MPayment.TENDERTYPE_Account);
 			paymentTo.setC_BankAccount_ID(getC_BankAccount_To_ID());
 			paymentTo.setC_BPartner_ID(getC_BPartner_ID());
 			paymentTo.setC_DocType_ID(true);
 			paymentTo.setC_Currency_ID(getC_Currency_To_ID());
+			paymentTo.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
 			if(getDescription() == null) {
 				paymentTo.setDescription("Generated From Bank Transfer " + getDocumentNo());								
 			}
@@ -282,10 +284,10 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			}
 			paymentTo.setDateAcct(getDateAcct());
 			paymentTo.setDateTrx(getDateAcct());
-			if(getTransferFeeType().equals("T"))
-				paymentTo.setPayAmt(getPayAmtTo().add(getChargeAmt()));
-			else
+			if(!get_ValueAsBoolean("isHasTransferFee"))
 				paymentTo.setPayAmt(getPayAmtTo());
+			else if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee"))
+				paymentTo.setPayAmt(getPayAmtTo().add(getChargeAmt()));
 			
 			if (funcCurrencyID!=getC_Currency_From_ID()) {
 				paymentTo.setC_ConversionType_ID(getC_ConversionType_ID());
@@ -383,6 +385,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			allocHdr.setDateAcct(getDateAcct());
 			allocHdr.setDateTrx(getDateAcct());
 			allocHdr.setC_Currency_ID(getC_Currency_ID());
+			allocHdr.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
 
 			if(getDescription() == null) {
 				allocHdr.setDescription("Generated From Bank Transfer " + getDocumentNo());								
@@ -403,10 +406,11 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				alloclineAP.setAmount(paymentFrom.getPayAmt().multiply(multiplyRate).negate());
 			else if(getC_Currency_From_ID() != getC_Currency_ID() && getC_Currency_To_ID() != getC_Currency_ID())
 				alloclineAP.setAmount(paymentFrom.getPayAmt().multiply(multiplyRateCurrencynotIDRFrom).negate());
-			else if(getTransferFeeType().equals("F"))
-				alloclineAP.setAmount(getPayAmtFrom().negate());
-			else
+			else if(!get_ValueAsBoolean("isHasTransferFee"))
 				alloclineAP.setAmount(getAmountFrom().negate());
+			else if(getTransferFeeType().equals("F") && get_ValueAsBoolean("isHasTransferFee"))
+				alloclineAP.setAmount(getPayAmtFrom().negate());
+			
 			alloclineAP.saveEx();
 			
 			MAllocationLine alloclineAR = new MAllocationLine(allocHdr);
@@ -420,10 +424,11 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				alloclineAR.setAmount(paymentTo.getPayAmt().multiply(divideRate));
 			else if(getC_Currency_From_ID() != getC_Currency_ID() && getC_Currency_To_ID() != getC_Currency_ID())
 				alloclineAR.setAmount(paymentTo.getPayAmt().multiply(multiplyRateCurrencynotIDRTo));
-			else if(getTransferFeeType().equals("T"))
-				alloclineAR.setAmount(getPayAmtTo());
-			else
+			else if(!get_ValueAsBoolean("isHasTransferFee"))
 				alloclineAR.setAmount(getAmountTo());
+			else if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee"))
+				alloclineAR.setAmount(getPayAmtTo());
+		
 			alloclineAR.saveEx();
 			
 			if(isHasTransferFee()){
@@ -431,9 +436,9 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				
 				alloclineCharge.setAD_Org_ID(allocHdr.getAD_Org_ID());
 				alloclineCharge.setC_BPartner_ID(getC_BPartner_ID());
-				if(getTransferFeeType().equals("F"))
+				if(getTransferFeeType().equals("F") && get_ValueAsBoolean("isHasTransferFee"))
 					alloclineCharge.setAmount(getChargeAmt());
-				else if(getTransferFeeType().equals("T"))
+				else if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee"))
 					alloclineCharge.setAmount(getChargeAmt().negate());
 				alloclineCharge.setC_Charge_ID(getC_Charge_ID());
 				
@@ -443,11 +448,11 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				MAllocationLine alloclineChargePay= new MAllocationLine(allocHdr);
 				alloclineChargePay.setAD_Org_ID(allocHdr.getAD_Org_ID());
 				alloclineChargePay.setC_BPartner_ID(getC_BPartner_ID());
-				if(getTransferFeeType().equals("F")) {
+				if(getTransferFeeType().equals("F") && get_ValueAsBoolean("isHasTransferFee")) {
 					alloclineChargePay.setAmount(getChargeAmt().negate());
 					alloclineChargePay.setC_Payment_ID(paymentFrom.getC_Payment_ID());
 				}
-				else if(getTransferFeeType().equals("T")) {
+				else if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee")) {
 					alloclineChargePay.setAmount(getChargeAmt());
 					alloclineChargePay.setC_Payment_ID(paymentTo.getC_Payment_ID());
 				}
@@ -497,32 +502,90 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		//set payamtfrom, payamtto, chargeamt=0
 		//set description = original description + [VOIDED], payamt from = xxx, payamtto = yyy, chargeamt= zzz
 		//set docstatus and docaction
-	
-		if(getDocStatus().equals(DOCSTATUS_Drafted)
-				|| getDocStatus().equals(DOCSTATUS_Invalid)
-				|| getDocStatus().equals(DOCSTATUS_InProgress))
-		{
+		
+		if(getDocStatus().equals(DOCSTATUS_Completed)) {
 			m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_VOID);
 			if (m_processMsg != null)
-				return false;
+				return false;	
 			
-			setDescription(getDescription() + "[VOIDED], Pay Amount From = " + getPayAmtFrom() 
-				+ ", Pay Amount To = " + getPayAmtTo() + ", Charge Amount = " + getChargeAmt());
-			setPayAmtFrom(Env.ZERO);
-			setPayAmtTo(Env.ZERO);
-			setChargeAmt(Env.ZERO);
-			setDocStatus(DOCSTATUS_Voided);
+			TCS_MPayment paymentFrom =  new TCS_MPayment(getCtx(), getC_Payment_From_ID(), get_TrxName());
+			TCS_MPayment paymentTo =  new TCS_MPayment(getCtx(), getC_Payment_To_ID(), get_TrxName());
+			
+			String sqlAllocationFrom = "select c_allocationhdr_id  from c_allocationline ca where c_payment_id = ?";
+			int allocFrom_ID = DB.getSQLValue(get_TrxName(), sqlAllocationFrom, paymentFrom.get_ID());
+		
+			String sqlAllocationTo = "select c_allocationhdr_id  from c_allocationline ca where c_payment_id = ?";
+			int allocTo_ID = DB.getSQLValue(get_TrxName(), sqlAllocationFrom, paymentTo.get_ID());
+			
+			
+			MAllocationHdr allocFrom =  new MAllocationHdr(getCtx(), allocFrom_ID, get_TrxName());
+			MAllocationHdr allocTo =  new MAllocationHdr(getCtx(), allocTo_ID, get_TrxName());
+			
+			allocFrom.set_ValueOfColumn("C_BankTransfer_ID", null);
+			allocFrom.saveEx();
+			
+			allocTo.set_ValueOfColumn("C_BankTransfer_ID", null);
+			allocTo.saveEx();
+			
+			paymentFrom.set_ValueOfColumn("C_BankTransfer_ID", null);
+			paymentFrom.saveEx();
+			
+			paymentTo.set_ValueOfColumn("C_BankTransfer_ID", null);
+			paymentTo.saveEx();
+									
+			allocFrom.processIt(DOCACTION_Reverse_Correct);
+			allocFrom.saveEx(get_TrxName());
+			
+			allocTo.processIt(DOCACTION_Reverse_Correct);
+			allocTo.saveEx(get_TrxName());
+			
+			paymentFrom.processIt(DOCACTION_Reverse_Correct);
+			paymentFrom.saveEx(get_TrxName());
+			
+			paymentTo.processIt(DOCACTION_Reverse_Correct);
+			paymentTo.saveEx(get_TrxName());
+
+			allocFrom.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
+			allocFrom.saveEx();
+			
+			allocTo.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
+			allocTo.saveEx();
+			
+			
+			paymentFrom.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
+			paymentFrom.saveEx();
+			
+			paymentTo.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
+			paymentTo.saveEx();
+			
 		}
-		else
-		{
-			m_processMsg = "Cannot Void Document.. Only Document with status Draft / Invalid / In Progress can be voided";
-			return false;
-		}
+	
+//		if(getDocStatus().equals(DOCSTATUS_Drafted)
+//				|| getDocStatus().equals(DOCSTATUS_Invalid)
+//				|| getDocStatus().equals(DOCSTATUS_InProgress))
+//		{
+//			m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_VOID);
+//			if (m_processMsg != null)
+//				return false;
+//			
+//			setDescription(getDescription() + "[VOIDED], Pay Amount From = " + getPayAmtFrom() 
+//				+ ", Pay Amount To = " + getPayAmtTo() + ", Charge Amount = " + getChargeAmt());
+//			setPayAmtFrom(Env.ZERO);
+//			setPayAmtTo(Env.ZERO);
+//			setChargeAmt(Env.ZERO);
+//			setDocStatus(DOCSTATUS_Voided);
+//		}
+//		else
+//		{
+//			m_processMsg = "Cannot Void Document.. Only Document with status Draft / Invalid / In Progress can be voided";
+//			return false;
+//		}
 		
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_VOID);
 		if (m_processMsg != null)
 			return false;
 		
+		setDocStatus(DOCSTATUS_Voided);
 		setDocAction(DOCACTION_None);
 		return true;
 	}
