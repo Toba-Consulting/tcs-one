@@ -135,7 +135,7 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		
 		//DD_Order
 		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, I_DD_Order.Table_Name);
-		//registerTableEvent(IEventTopics.DOC_BEFORE_VOID, I_DD_Order.Table_Name);
+		registerTableEvent(IEventTopics.DOC_BEFORE_VOID, I_DD_Order.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, I_DD_Order.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_VOID, I_DD_Order.Table_Name);
 		

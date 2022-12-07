@@ -25,12 +25,12 @@ public class TCS_DDOrderValidator {
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)) {
 			msg += checkActiveInOutBound(ddOrder);
-			//msg += unReferenceToCOrder(ddOrder);
+			msg += checkRelatedInternalSO(ddOrder);
 		} 
 		
 		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_VOID)) {
 			msg += removeInternalSOFromInternalPO(ddOrder);
-			//msg += unReferenceToCOrder(ddOrder);
+			msg += setQtyToZero(ddOrder);
 		} 
 
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
@@ -38,12 +38,37 @@ public class TCS_DDOrderValidator {
 		} 
 		
 		
-
 		if (!ddOrder.isSOTrx() && event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
 			msg += createInternalSO(ddOrder);
 
 		}
 		return msg;
+	}
+
+	private static String setQtyToZero(TCS_MDDOrder ddOrder) {
+		
+		MDDOrderLine [] ddLines = ddOrder.getLines();
+		for (MDDOrderLine ddLine : ddLines) {
+			ddLine.setQtyEntered(Env.ZERO);
+			ddLine.setQtyOrdered(Env.ZERO);
+			ddLine.setQtyDelivered(Env.ZERO);
+			ddLine.saveEx(ddOrder.get_TrxName());
+		}
+		
+		return "";
+	}
+
+	private static String checkRelatedInternalSO(TCS_MDDOrder ddOrder) {
+		//allow reactivate only if internal SO is voided
+		if(!ddOrder.isSOTrx()) {
+			if (ddOrder.get_ValueAsInt("Ref_InternalOrder_ID")!= 0) {
+				TCS_MDDOrder internalSO = new TCS_MDDOrder(ddOrder.getCtx(), ddOrder.get_ValueAsInt("Ref_InternalOrder_ID"), ddOrder.get_TrxName());
+				if (!internalSO.getDocStatus().equalsIgnoreCase(DocAction.STATUS_Voided))
+					return "Cannot Void Internal PO, Void Related Internal SO First";
+			}				
+		}
+		
+		return "";
 	}
 
 	private static String removeInternalSOFromInternalPO(TCS_MDDOrder ddOrder) {
