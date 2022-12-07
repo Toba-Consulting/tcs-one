@@ -9,6 +9,7 @@ import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.model.TCS_MDDOrder;
 import org.compiere.process.DocAction;
+import org.compiere.util.Env;
 import org.eevolution.model.MDDOrder;
 import org.eevolution.model.MDDOrderLine;
 import org.osgi.service.event.Event;
@@ -26,16 +27,34 @@ public class TCS_DDOrderValidator {
 			msg += checkActiveInOutBound(ddOrder);
 			//msg += unReferenceToCOrder(ddOrder);
 		} 
+		
+		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_VOID)) {
+			msg += removeInternalSOFromInternalPO(ddOrder);
+			//msg += unReferenceToCOrder(ddOrder);
+		} 
 
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
 			msg += validateReactivate(ddOrder);
 		} 
+		
+		
 
 		if (!ddOrder.isSOTrx() && event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
 			msg += createInternalSO(ddOrder);
 
 		}
 		return msg;
+	}
+
+	private static String removeInternalSOFromInternalPO(TCS_MDDOrder ddOrder) {
+
+		if(ddOrder.isSOTrx()) {
+			TCS_MDDOrder internalPO = new TCS_MDDOrder(Env.getCtx(), (int) ddOrder.get_Value("Ref_InternalOrder_ID"), ddOrder.get_TrxName());
+			internalPO.set_ValueOfColumn("Ref_InternalOrder_ID", null);
+			internalPO.saveEx(ddOrder.get_TrxName());
+		}
+			
+		return "";
 	}
 
 	//If DD_OrderLine.C_OrderLine_ID is not null
