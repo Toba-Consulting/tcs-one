@@ -45,6 +45,7 @@ public class TCS_GeneratePaymentFromSO extends SvrProcess {
 	protected String doIt() throws Exception {
 		MOrder order = new MOrder(getCtx(), p_C_Order_ID, get_TrxName());
 		
+		// Mixed Payment
 		if (order.getPaymentRule().equalsIgnoreCase("A")) {
 			String whereClause = "C_Order_ID=?";
 			List<X_C_OrderPayment> list = new Query(order.getCtx(), X_C_OrderPayment.Table_Name, whereClause , order.get_TrxName())
@@ -76,6 +77,7 @@ public class TCS_GeneratePaymentFromSO extends SvrProcess {
 				payment.setIsPrepayment(false);
 				payment.setIsReceipt(true);
 				payment.setC_DocType_ID(true);
+				payment.set_ValueOfColumn("C_OrderPayment_ID", orderPayment.getC_OrderPayment_ID());
 				payment.saveEx();
 
 				payment.processIt(DocAction.ACTION_Complete);
@@ -89,6 +91,7 @@ public class TCS_GeneratePaymentFromSO extends SvrProcess {
 			order.saveEx();
 
 			//	getLines
+			// P
 		} else if (!order.getPaymentRule().equalsIgnoreCase(MOrder.PAYMENTRULE_OnCredit)) {
 			TCS_MPayment payment = new TCS_MPayment(order.getCtx(), 0, order.get_TrxName());
 			payment.setAD_Org_ID(order.getAD_Org_ID());
@@ -98,7 +101,18 @@ public class TCS_GeneratePaymentFromSO extends SvrProcess {
 			payment.setDocStatus(DocAction.STATUS_Drafted);
 			payment.setC_Currency_ID(order.getC_Currency_ID());
 			payment.setPayAmt(order.getGrandTotal());
-			payment.setTenderType(TCS_MPayment.TENDERTYPE_Cash);
+			
+			if(order.getPaymentRule().equalsIgnoreCase("C"))
+				payment.setTenderType("X"); //Cash
+			else if(order.getPaymentRule().equalsIgnoreCase("E"))
+				payment.setTenderType("T"); //Account 
+			else if(order.getPaymentRule().equalsIgnoreCase("K"))
+				payment.setTenderType("E"); //Credit/Debit
+			else if(order.getPaymentRule().equalsIgnoreCase("S"))
+				payment.setTenderType("K"); //Check
+			else
+				payment.setTenderType(TCS_MPayment.TENDERTYPE_Cash);
+			
 			payment.setC_Order_ID(order.get_ID());
 			payment.setDateAcct(order.getDateAcct());
 			payment.setDateTrx(order.getDateOrdered());

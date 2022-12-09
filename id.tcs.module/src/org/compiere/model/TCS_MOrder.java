@@ -1,6 +1,7 @@
 package org.compiere.model;
 
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Properties;
 
 import org.compiere.process.DocAction;
@@ -55,5 +56,18 @@ public class TCS_MOrder extends MOrder implements DocOptions {
 		return index;
 
 	}
+	
+	public MInvoice[] getInvoices()
+	{
+		final String whereClause = "EXISTS (SELECT 1 FROM C_InvoiceLine il, C_OrderLine ol"
+							        +" WHERE il.C_Invoice_ID=C_Invoice.C_Invoice_ID"
+							        		+" AND il.C_OrderLine_ID=ol.C_OrderLine_ID"
+							        		+" AND ol.C_Order_ID=?) AND C_Invoice.Docstatus = 'CO'";
+		List<MInvoice> list = new Query(getCtx(), I_C_Invoice.Table_Name, whereClause, get_TrxName())
+									.setParameters(get_ID())
+									.setOrderBy("C_Invoice_ID DESC")
+									.list();
+		return list.toArray(new MInvoice[list.size()]);
+	}	//	getInvoices
 
 }

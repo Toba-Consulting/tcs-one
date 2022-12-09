@@ -217,7 +217,7 @@ public class TCS_MPayment extends MPayment {
 		}		
 		if (getC_Order_ID() != 0)
 		{
-			MOrder ord = new MOrder(getCtx(), getC_Order_ID(), get_TrxName());
+			TCS_MOrder ord = new TCS_MOrder(getCtx(), getC_Order_ID(), get_TrxName());
 			if (ord.getC_Payment_ID() != getC_Payment_ID())
 			{
 				ord.setC_Payment_ID(getC_Payment_ID());
@@ -671,7 +671,7 @@ public class TCS_MPayment extends MPayment {
 		//	Waiting Payment - Need to create Invoice & Shipment
 		if (getC_Order_ID() != 0 && getC_Invoice_ID() == 0)
 		{	//	see WebOrder.process
-			MOrder order = new MOrder (getCtx(), getC_Order_ID(), get_TrxName());
+			TCS_MOrder order = new TCS_MOrder (getCtx(), getC_Order_ID(), get_TrxName());
 			
 			if (DOCSTATUS_WaitingPayment.equals(order.getDocStatus()))
 			{
@@ -1066,7 +1066,7 @@ public class TCS_MPayment extends MPayment {
 					}
 				}
 				if (getC_Order_ID() != 0) {
-					MOrder ord = new MOrder(getCtx(), getC_Order_ID(), get_TrxName());
+					TCS_MOrder ord = new TCS_MOrder(getCtx(), getC_Order_ID(), get_TrxName());
 					if (ord.getC_BPartner_ID() != getC_BPartner_ID()) {
 						log.saveError("Error", Msg.parseTranslation(getCtx(), "BP different from BP Order"));
 						return false;

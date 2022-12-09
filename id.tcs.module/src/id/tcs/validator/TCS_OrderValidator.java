@@ -52,8 +52,10 @@ public class TCS_OrderValidator {
 		}
 
 		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_REACTIVATE)) {
-			if (order.isSOTrx())
+			if (order.isSOTrx()) {
 				msg += unreserveQty(order);
+				msg += removePayment(order);
+			}
 		} 
 
 		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_VOID)) {
@@ -74,6 +76,13 @@ public class TCS_OrderValidator {
 		} 
 
 		return msg;
+	}
+
+	private static String removePayment(MOrder order) {
+		order.set_ValueOfColumn("C_Payment_ID", null);
+		order.saveEx();
+		
+		return "";
 	}
 
 	private static String updateRequisitionQtyOrdered(MOrder order) {

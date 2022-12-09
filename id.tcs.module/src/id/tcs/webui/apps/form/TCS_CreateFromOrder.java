@@ -419,9 +419,9 @@ public class TCS_CreateFromOrder extends CreateFrom {
 		} else {
 			sql.append(" AND r.C_Project_ID IS NULL ");
 		}
-        if (salesRepID > 0) {
-        	sql.append("AND r.AD_User_ID=? ");
-        }
+//        if (salesRepID > 0) {
+//        	sql.append("AND r.AD_User_ID=? ");
+//        }
         
 		sql = sql.append(" ORDER BY r.DocumentNo");
 		//

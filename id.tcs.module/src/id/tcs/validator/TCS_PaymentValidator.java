@@ -6,8 +6,12 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MPayment;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.model.TCS_MOrder;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
+
+import id.tcs.model.TCS_MOrderPayment;
 
 public class TCS_PaymentValidator {
 
@@ -21,9 +25,41 @@ public class TCS_PaymentValidator {
 			msg += checkAllocation(payment);
 			msg += checkReconcile(payment);
 		}
+		else if ((event.getTopic().equals(IEventTopics.DOC_AFTER_REVERSEACCRUAL)) ||
+				(event.getTopic().equals(IEventTopics.DOC_AFTER_REVERSECORRECT))) {
+			msg += removeOrder(payment);
+		}
 		return msg;
 	}
 	
+	private static String removeOrder(MPayment payment) {
+		if(payment.get_ValueAsInt("C_OrderPayment_ID") > 0) {
+			int orderPay_ID = payment.get_ValueAsInt("C_OrderPayment_ID");
+			TCS_MOrderPayment orderPay = new TCS_MOrderPayment(Env.getCtx(), orderPay_ID, null);
+			TCS_MOrder order = new TCS_MOrder(Env.getCtx(), payment.getC_Order_ID(), null);
+			
+//			String sqlOrder = "UPDATE C_ORDER SET C_Payment_ID = null WHERE C_Order_ID = " + orderPay.getC_Order_ID();
+//			DB.executeUpdate(sqlOrder, null);
+//			
+//			String sqlPayment = "UPDATE C_Payment SET C_OrderPayment_ID = null WHERE C_Payment_ID = " + payment.getC_Order_ID();
+//			DB.executeUpdate(sqlPayment, null);
+			
+			order.set_ValueOfColumn("C_Payment_ID", null);
+			order.saveEx(payment.get_TrxName());
+			
+			orderPay.set_ValueOfColumn("C_Payment_ID", null);
+			orderPay.saveEx();
+		}
+		else if(payment.getC_Order_ID() > 0) {
+			TCS_MOrder order = new TCS_MOrder(Env.getCtx(), payment.getC_Order_ID(), payment.get_TrxName());
+			
+			order.set_ValueOfColumn("C_Payment_ID", null);
+			order.saveEx(payment.get_TrxName());
+		}
+		
+		return "";
+	}
+
 	private static String checkBankTransfer(MPayment payment) {
 		String msg = "";
 		if (payment.get_ValueAsInt("C_BankTransfer_ID") > 0)

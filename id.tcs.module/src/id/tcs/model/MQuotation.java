@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.BPartnerNoBillToAddressException;
 import org.adempiere.exceptions.BPartnerNoShipToAddressException;
 import org.adempiere.exceptions.FillMandatoryException;
@@ -108,7 +109,7 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 		return match;
 	}
 	
-	public String checkQuotationDependency() {
+	public void checkQuotationDependency() {
 		MQuotationLine quotationLines[] = getLines();
 		//StringBuilder sqlWhere = new StringBuilder("C_QuotationLine_ID=?");
 
@@ -139,7 +140,7 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 					orderID = rs.getInt(2);
 				}
 			}catch(Exception e){
-				return "Error: "+e;
+				throw new AdempiereException("Error: "+e);
 			}finally{
 				DB.close(rs, pstmt);
 				rs = null;
@@ -154,24 +155,22 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 			}
 
 			if(match){
-				return "Sales Order "+orderNo+" must be void first";
+				throw new AdempiereException("Sales Order "+orderNo+" must be void first");
 			}
 		}
 		
-		return "";
 
 	}
 	
-	public String checkLinkedOrder(){
+	public void checkLinkedOrder(){
 	
 
 		String sqlWhere="C_Quotation_ID="+getC_Quotation_ID()+" AND C_OrderLine_ID IS NOT NULL";
 		boolean match = new Query(getCtx(), X_M_MatchQuotation.Table_Name, sqlWhere, get_TrxName())
 						.match();
 
-		if (match) return "Cannot Reactivate / Void : Match Quotation Exist";
+		if (match) throw new AdempiereException("Cannot Reactivate / Void : Match Quotation Exist");
 
-		return "";
 	}
 
 	private String removeMatchQuotation() {
@@ -357,6 +356,7 @@ public class MQuotation extends X_C_Quotation implements DocAction, DocOptions {
 
 		// Before Reactivate  - From Validator
 		checkLinkedOrder();
+
 		
 		setProcessed(false);
 		setDocAction(DocAction.ACTION_Complete);
