@@ -254,6 +254,8 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				paymentFrom.setPayAmt(getPayAmtFrom());
 			else if(getTransferFeeType().equals("F") && get_ValueAsBoolean("isHasTransferFee"))
 				paymentFrom.setPayAmt(getPayAmtFrom().add(getChargeAmt()));
+			else
+				paymentFrom.setPayAmt(getPayAmtFrom());
 			
 			
 			if (funcCurrencyID!=getC_Currency_From_ID()) {
@@ -288,6 +290,8 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				paymentTo.setPayAmt(getPayAmtTo());
 			else if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee"))
 				paymentTo.setPayAmt(getPayAmtTo().add(getChargeAmt()));
+			else
+				paymentTo.setPayAmt(getPayAmtTo());
 			
 			if (funcCurrencyID!=getC_Currency_From_ID()) {
 				paymentTo.setC_ConversionType_ID(getC_ConversionType_ID());
