@@ -414,6 +414,8 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				alloclineAP.setAmount(getAmountFrom().negate());
 			else if(getTransferFeeType().equals("F") && get_ValueAsBoolean("isHasTransferFee"))
 				alloclineAP.setAmount(getPayAmtFrom().negate());
+			else 
+				alloclineAP.setAmount(getAmountFrom().negate());
 			
 			alloclineAP.saveEx();
 			
@@ -432,6 +434,8 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				alloclineAR.setAmount(getAmountTo());
 			else if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee"))
 				alloclineAR.setAmount(getPayAmtTo());
+			else
+				alloclineAR.setAmount(getAmountTo());
 		
 			alloclineAR.saveEx();
 			

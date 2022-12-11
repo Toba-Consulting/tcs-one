@@ -438,9 +438,9 @@ public class TCS_CreateFromOrder extends CreateFrom {
 			if (C_Project_ID > 0) {
 				pstmt.setInt(++count, C_Project_ID);
 			}
-			if (salesRepID > 0) {
-	        	pstmt.setInt(++count, salesRepID);
-	        }
+//			if (salesRepID > 0) {
+//	        	pstmt.setInt(++count, salesRepID);
+//	        }
 	        
 			rs = pstmt.executeQuery();
 			while (rs.next())
