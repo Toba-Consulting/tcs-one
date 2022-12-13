@@ -44,8 +44,9 @@ public class TCS_RMAValidator {
 
 	private static String ValidateBeforeReactivate(TCS_MRMA rma) {
 		
-		String whereClause = "M_RMA_ID=? AND QtyDelivered > 0";
+		String whereClause = "rline.M_RMA_ID=? AND rline.QtyDelivered > 0";
 		boolean match = new Query(rma.getCtx(), I_M_RMA.Table_Name, whereClause, rma.get_TrxName())
+							.addJoinClause("JOIN M_RMALine rline on rline.M_RMA_ID = M_RMA.M_RMA_ID")
 							.setOnlyActiveRecords(true)
 							.setParameters(new Object[] {rma.get_ID()})
 							.match();
