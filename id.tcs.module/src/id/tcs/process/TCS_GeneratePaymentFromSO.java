@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MOrder;
 import org.compiere.model.Query;
+import org.compiere.model.TCS_MOrder;
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
@@ -43,7 +44,7 @@ public class TCS_GeneratePaymentFromSO extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		MOrder order = new MOrder(getCtx(), p_C_Order_ID, get_TrxName());
+		TCS_MOrder order = new TCS_MOrder(getCtx(), p_C_Order_ID, get_TrxName());
 		
 		// Mixed Payment
 		if (order.getPaymentRule().equalsIgnoreCase("A")) {

@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 
 import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.MPriceList;
 import org.compiere.model.MRequisitionLine;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
@@ -47,14 +48,50 @@ public class TCS_OrderLineValidator {
 //		}
 
 		else if (event.getTopic().equals(IEventTopics.PO_AFTER_CHANGE)) {
+			if(!orderLine.get_ValueAsBoolean("IsBomDrop"))
+				msg += setDiscount(orderLine);
+			
 			if (!orderLine.getC_Order().isSOTrx()) {
 				if (orderLine.is_ValueChanged("QtyEntered") || orderLine.is_ValueChanged("QtyOrdered"))
 					msg += updateMatchPR(orderLine);
 			}
-			msg += setDiscount(orderLine);
+			if (orderLine.getC_Order().isSOTrx() && orderLine.get_ValueAsBoolean("IsBomDrop")) {
+				msg += updatePrices(orderLine);
+			}
+		}
+		else if (event.getTopic().equals(IEventTopics.PO_AFTER_NEW)) {
+			if (orderLine.getC_Order().isSOTrx() && orderLine.get_ValueAsBoolean("IsBomDrop")) {
+				msg += updatePrices(orderLine);
+			}
 		}
 
 		return msg;
+	}
+
+
+	private static String updatePrices(MOrderLine orderLine) {
+
+		String sql = "UPDATE c_orderline set priceentered = 0, priceactual = 0, pricelist = 0, linenetamt = 0, discount = 0 where c_orderline_id ="+orderLine.getC_OrderLine_ID();
+		DB.executeUpdate(sql, orderLine.get_TrxName());
+		
+		String sqlGetTotalLine = "Select sum(linenetamt) from c_orderline where c_order_id = ?";
+		BigDecimal totalLines = DB.getSQLValueBD(orderLine.get_TrxName(), sqlGetTotalLine, orderLine.getC_Order_ID());
+		
+		String sqlGetTax = "select sum(taxamt) from C_OrderTax where c_order_id = ?";
+		BigDecimal TaxAmt = DB.getSQLValueBD(orderLine.get_TrxName(), sqlGetTax, orderLine.getC_Order_ID());
+		
+		BigDecimal grandTotal = totalLines.add(TaxAmt);
+		
+		MPriceList pl = new MPriceList(Env.getCtx(), orderLine.getC_Order().getM_PriceList_ID(), orderLine.get_TrxName());
+		String sqlUpdateTotalLines = "";
+		
+		if(pl.get_ValueAsBoolean("IsTaxIncluded"))
+			sqlUpdateTotalLines = "Update c_order set totallines = " + totalLines + " , grandtotal = " + totalLines + " where c_order_id = " + orderLine.getC_Order_ID();
+		else
+			sqlUpdateTotalLines = "Update c_order set totallines = " + totalLines + " , grandtotal = " + grandTotal + " where c_order_id = " + orderLine.getC_Order_ID();
+		
+		DB.executeUpdate(sqlUpdateTotalLines, orderLine.get_TrxName());
+		return "";
 	}
 
 

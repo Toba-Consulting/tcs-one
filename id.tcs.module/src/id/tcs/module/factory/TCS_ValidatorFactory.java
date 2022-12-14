@@ -8,6 +8,7 @@ import org.compiere.model.I_AD_WF_Activity;
 import org.compiere.model.I_C_AllocationHdr;
 import org.compiere.model.I_C_BankStatement;
 import org.compiere.model.I_C_Invoice;
+import org.compiere.model.I_C_InvoiceLine;
 import org.compiere.model.I_C_Order;
 import org.compiere.model.I_C_OrderLine;
 import org.compiere.model.I_C_Payment;
@@ -15,6 +16,7 @@ import org.compiere.model.I_C_PaymentAllocate;
 import org.compiere.model.I_C_RfQ;
 import org.compiere.model.I_C_RfQLine;
 import org.compiere.model.I_M_InOut;
+import org.compiere.model.I_M_InOutLine;
 import org.compiere.model.I_M_Movement;
 import org.compiere.model.I_M_RMA;
 import org.compiere.model.I_M_Requisition;
@@ -27,7 +29,9 @@ import id.tcs.model.I_C_Quotation;
 import id.tcs.model.I_C_QuotationLine;
 import id.tcs.validator.TCS_BankStatementDocValidator;
 import id.tcs.validator.TCS_DDOrderValidator;
+import id.tcs.validator.TCS_InOutLineValidator;
 import id.tcs.validator.TCS_InOutValidator;
+import id.tcs.validator.TCS_InvoiceLineValidator;
 import id.tcs.validator.TCS_InvoiceValidator;
 import id.tcs.validator.TCS_MAllocationHdrValidator;
 import id.tcs.validator.TCS_MovementValidator;
@@ -103,12 +107,21 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, I_M_InOut.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, I_M_InOut.Table_Name);
 		
+		//Inout Line
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_M_InOutLine.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_M_InOutLine.Table_Name);
+
+		
 		//Invoice
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, I_C_Invoice.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, I_C_Invoice.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, I_C_Invoice.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, I_C_Invoice.Table_Name);
-		//registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, I_C_Invoice.Table_Name);		
+		//registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, I_C_Invoice.Table_Name);	
+		
+		//Invoice Line
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_C_InvoiceLine.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_C_InvoiceLine.Table_Name);
 		
 		//Payment
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, I_C_Payment.Table_Name);		
@@ -206,10 +219,20 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		else if(getPO(event).get_TableName().equals(I_M_InOut.Table_Name)) {
 			msg = TCS_InOutValidator.executeEvent(event, getPO(event));
 		}
+		
+		//InOut Line
+		else if(getPO(event).get_TableName().equals(I_M_InOutLine.Table_Name)) {
+			msg = TCS_InOutLineValidator.executeEvent(event, getPO(event));
+		}
 
 		//Invoice
 		else if(getPO(event).get_TableName().equals(I_C_Invoice.Table_Name)) {
 			msg = TCS_InvoiceValidator.executeEvent(event, getPO(event));
+		}
+		
+		//Invoice Line
+		else if(getPO(event).get_TableName().equals(I_C_InvoiceLine.Table_Name)) {
+			msg = TCS_InvoiceLineValidator.executeEvent(event, getPO(event));
 		}
 		
 		//Payment

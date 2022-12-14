@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.adempiere.base.IColumnCallout;
 import org.adempiere.base.IColumnCalloutFactory;
+import org.compiere.model.MOrderLine;
 import org.compiere.model.TCS_MInventoryLine;
 import org.eevolution.model.MDDOrderLine;
 import org.eevolution.model.MPPProductBOMLine;
@@ -31,6 +32,7 @@ import id.tcs.callout.TCS_CalloutAssetTransfer;
 import id.tcs.callout.TCS_CalloutDDOrderLine;
 import id.tcs.callout.TCS_CalloutInquiryLine;
 import id.tcs.callout.TCS_CalloutInventoryLine;
+import id.tcs.callout.TCS_CalloutOrderLine;
 import id.tcs.callout.TCS_CalloutPayment;
 import id.tcs.callout.TCS_CalloutQuotation;
 import id.tcs.callout.TCS_CalloutQuotationLine;
@@ -132,6 +134,9 @@ public class TCS_CalloutFactory implements IColumnCalloutFactory {
 		
 		if(tableName.equals(TCS_MInventoryLine.Table_Name))
 			list.add(new TCS_CalloutInventoryLine());
+		
+		if(tableName.equals(MOrderLine.Table_Name))
+			list.add(new TCS_CalloutOrderLine());
 		
 		
 		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];
