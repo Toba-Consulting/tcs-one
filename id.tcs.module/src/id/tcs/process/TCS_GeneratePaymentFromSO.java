@@ -77,7 +77,7 @@ public class TCS_GeneratePaymentFromSO extends SvrProcess {
 				payment.setDateTrx(order.getDateOrdered());
 				payment.setIsPrepayment(false);
 				payment.setIsReceipt(true);
-				payment.setC_DocType_ID(true);
+				payment.setC_DocType_ID(true, false);
 				payment.set_ValueOfColumn("C_OrderPayment_ID", orderPayment.getC_OrderPayment_ID());
 				payment.saveEx();
 
@@ -108,7 +108,9 @@ public class TCS_GeneratePaymentFromSO extends SvrProcess {
 			else if(order.getPaymentRule().equalsIgnoreCase("E"))
 				payment.setTenderType("T"); //Account 
 			else if(order.getPaymentRule().equalsIgnoreCase("K"))
-				payment.setTenderType("E"); //Credit/Debit
+				payment.setTenderType("E"); //Credit
+			else if(order.getPaymentRule().equalsIgnoreCase("L"))
+				payment.setTenderType("L"); //Debit
 			else if(order.getPaymentRule().equalsIgnoreCase("S"))
 				payment.setTenderType("K"); //Check
 			else
@@ -119,7 +121,7 @@ public class TCS_GeneratePaymentFromSO extends SvrProcess {
 			payment.setDateTrx(order.getDateOrdered());
 			payment.setIsPrepayment(false);
 			payment.setIsReceipt(true);
-			payment.setC_DocType_ID(true);
+			payment.setC_DocType_ID(true, false);
 			payment.saveEx();
 
 			payment.processIt(DocAction.ACTION_Complete);

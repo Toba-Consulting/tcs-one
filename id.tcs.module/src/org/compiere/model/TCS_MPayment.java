@@ -1141,6 +1141,42 @@ public class TCS_MPayment extends MPayment {
 		}
 	}	//	setC_DocType_ID
 	
+	public void setC_DocType_ID (boolean isReceipt, boolean isPrepayment)
+	{
+		setIsReceipt(isReceipt);
+		String sql = "SELECT C_DocType_ID FROM C_DocType WHERE IsActive='Y' AND AD_Client_ID=? AND DocBaseType=? AND isPrepayment = ? ORDER BY IsDefault DESC";
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try
+		{
+			pstmt = DB.prepareStatement(sql, get_TrxName());
+			pstmt.setInt(1, getAD_Client_ID());
+			if (isReceipt)
+				pstmt.setString(2, X_C_DocType.DOCBASETYPE_ARReceipt);
+			else
+				pstmt.setString(2, X_C_DocType.DOCBASETYPE_APPayment);
+			if (isPrepayment)
+				pstmt.setString(3, "Y");
+			else 
+				pstmt.setString(3, "N");
+			rs = pstmt.executeQuery();
+			if (rs.next())
+				setC_DocType_ID(rs.getInt(1));
+			else
+				log.warning ("setDocType - NOT found - isReceipt=" + isReceipt);
+		}
+		catch (SQLException e)
+		{
+			log.log(Level.SEVERE, sql, e);
+		}
+		finally
+		{
+			DB.close(rs, pstmt);
+			rs = null;
+			pstmt = null;
+		}
+	}	//	setC_DocType_ID
+	
 	protected void setDocumentNo()
 	{
 		//	Cash Transfer

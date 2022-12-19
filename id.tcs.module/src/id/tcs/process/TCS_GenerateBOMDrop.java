@@ -71,7 +71,7 @@ public class TCS_GenerateBOMDrop extends SvrProcess {
 					bomLine.setPriceActual(Env.ZERO);
 					bomLine.setPriceList(Env.ZERO);
 					bomLine.setLineNetAmt(Env.ZERO);
-					bomLine.set_ValueOfColumn("IsBomDrop", true);
+					bomLine.set_ValueOfColumn("IsBOMDrop", true);
 					bomLine.set_ValueOfColumn("IsPrinted", false);
 					bomLine.saveEx();
 					

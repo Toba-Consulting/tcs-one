@@ -27,12 +27,12 @@ public class TCS_InvoiceLineValidator {
 
 		if (event.getTopic().equals(IEventTopics.PO_AFTER_CHANGE)) {
 			
-			if (invoiceLine.getC_Invoice().isSOTrx() && inoutLine.get_ValueAsBoolean("IsBomDrop")) {
+			if (invoiceLine.getC_Invoice().isSOTrx() && inoutLine.get_ValueAsBoolean("IsBOMDrop")) {
 				msg += updatePrices(invoiceLine);
 			}
 		}
 		else if (event.getTopic().equals(IEventTopics.PO_AFTER_NEW)) {
-			if (invoiceLine.getC_Invoice().isSOTrx() && inoutLine.get_ValueAsBoolean("IsBomDrop")) {
+			if (invoiceLine.getC_Invoice().isSOTrx() && inoutLine.get_ValueAsBoolean("IsBOMDrop")) {
 				msg += updatePrices(invoiceLine);
 			}
 		}
@@ -43,7 +43,7 @@ public class TCS_InvoiceLineValidator {
 
 	private static String updatePrices(MInvoiceLine invoiceLine) {
 
-		String sql = "UPDATE c_invoiceline set priceentered = 0, priceactual = 0, pricelist = 0, linenetamt = 0, isbomdrop = 'Y', isprinted ='N' where c_invoiceline_id ="+invoiceLine.getC_InvoiceLine_ID();
+		String sql = "UPDATE c_invoiceline set priceentered = 0, priceactual = 0, pricelist = 0, linenetamt = 0, IsBOMDrop = 'Y', isprinted ='N' where c_invoiceline_id ="+invoiceLine.getC_InvoiceLine_ID();
 		DB.executeUpdate(sql, invoiceLine.get_TrxName());
 		
 		String sqlGetTotalLine = "Select sum(linenetamt) from c_invoiceline where c_invoice_id = ?";

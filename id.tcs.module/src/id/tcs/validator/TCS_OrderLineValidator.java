@@ -48,19 +48,19 @@ public class TCS_OrderLineValidator {
 //		}
 
 		else if (event.getTopic().equals(IEventTopics.PO_AFTER_CHANGE)) {
-			if(!orderLine.get_ValueAsBoolean("IsBomDrop"))
+			if(!orderLine.get_ValueAsBoolean("IsBOMDrop"))
 				msg += setDiscount(orderLine);
 			
 			if (!orderLine.getC_Order().isSOTrx()) {
 				if (orderLine.is_ValueChanged("QtyEntered") || orderLine.is_ValueChanged("QtyOrdered"))
 					msg += updateMatchPR(orderLine);
 			}
-			if (orderLine.getC_Order().isSOTrx() && orderLine.get_ValueAsBoolean("IsBomDrop")) {
+			if (orderLine.getC_Order().isSOTrx() && orderLine.get_ValueAsBoolean("IsBOMDrop")) {
 				msg += updatePrices(orderLine);
 			}
 		}
 		else if (event.getTopic().equals(IEventTopics.PO_AFTER_NEW)) {
-			if (orderLine.getC_Order().isSOTrx() && orderLine.get_ValueAsBoolean("IsBomDrop")) {
+			if (orderLine.getC_Order().isSOTrx() && orderLine.get_ValueAsBoolean("IsBOMDrop")) {
 				msg += updatePrices(orderLine);
 			}
 		}

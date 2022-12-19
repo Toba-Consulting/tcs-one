@@ -25,14 +25,14 @@ public class TCS_QuotationLineValidator {
 		MQuotationLine quotationLine = (MQuotationLine) po;
 		
 		if (event.getTopic().equals(IEventTopics.PO_AFTER_DELETE)){
-//			msgQuotation +=setTotalLines(quotationLine);
-//			msgQuotation += removeMatchQuotation(quotationLine);
+			msgQuotation +=setTotalLines(quotationLine);
+			msgQuotation += removeMatchQuotation(quotationLine);
 
 		}
 		if (event.getTopic().equals(IEventTopics.PO_AFTER_NEW) 
 				|| event.getTopic().equals(IEventTopics.PO_AFTER_CHANGE)){
-//			msgQuotation +=setTotalLines(quotationLine);
-//			msgQuotation +=updateMatchQty(quotationLine);
+			msgQuotation +=setTotalLines(quotationLine);
+			msgQuotation +=updateMatchQty(quotationLine);
 		}
 
 		
@@ -57,6 +57,8 @@ public class TCS_QuotationLineValidator {
 			price = DB.getSQLValueBDEx(quotation.get_TrxName(), sqlprice.toString());
 			
 			MQuotation quot = new MQuotation(quotationLine.getCtx(), quotationLine.getC_Quotation_ID(), quotationLine.get_TrxName());
+			if (price == null)
+				price = Env.ZERO;
 			quot.setTotalLines(price.setScale(0, RoundingMode.HALF_UP));
 			quot.saveEx();
 		}

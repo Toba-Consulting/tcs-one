@@ -26,12 +26,12 @@ public class TCS_InOutLineValidator {
 		
 		if (event.getTopic().equals(IEventTopics.PO_AFTER_CHANGE)) {
 			
-			if (inoutLine.getM_InOut().isSOTrx() && orderLine.get_ValueAsBoolean("IsBomDrop")) {
+			if (inoutLine.getM_InOut().isSOTrx() && orderLine.get_ValueAsBoolean("IsBOMDrop")) {
 				msg += updatePrices(inoutLine);
 			}
 		}
 		else if (event.getTopic().equals(IEventTopics.PO_AFTER_NEW)) {
-			if (inoutLine.getM_InOut().isSOTrx() && orderLine.get_ValueAsBoolean("IsBomDrop")) {
+			if (inoutLine.getM_InOut().isSOTrx() && orderLine.get_ValueAsBoolean("IsBOMDrop")) {
 				msg += updatePrices(inoutLine);
 			}
 		}
@@ -42,7 +42,7 @@ public class TCS_InOutLineValidator {
 
 	private static String updatePrices(MInOutLine inoutLine) {
 
-		String sql = "UPDATE M_inoutline set isbomdrop = 'Y', isprinted ='N' where m_inoutline_id ="+inoutLine.getM_InOutLine_ID();
+		String sql = "UPDATE M_inoutline set IsBOMDrop = 'Y', isprinted ='N' where m_inoutline_id ="+inoutLine.getM_InOutLine_ID();
 		DB.executeUpdate(sql, inoutLine.get_TrxName());
 		return "";
 	}

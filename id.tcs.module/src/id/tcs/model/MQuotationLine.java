@@ -116,6 +116,8 @@ public class MQuotationLine extends X_C_QuotationLine {
 			price = DB.getSQLValueBDEx(quotation.get_TrxName(), sqlprice.toString());
 			
 			MQuotation quot = new MQuotation(getCtx(), getC_Quotation_ID(),get_TrxName());
+			if (price == null)
+				price = Env.ZERO;
 			quot.setTotalLines(price.setScale(0, RoundingMode.HALF_UP));
 			quot.saveEx();
 		}
@@ -156,10 +158,10 @@ public class MQuotationLine extends X_C_QuotationLine {
 		}
 		
 		// After New/Change - From Validator
-		if(newRecord || !newRecord) {
-			setTotalLines();
-			updateMatchQty();
-		}
+//		if(newRecord || !newRecord) {
+//			setTotalLines();
+//			updateMatchQty();
+//		}
 		return calc.recalculateTax(provider, this, newRecord);
 	}//afterSave
 
@@ -280,7 +282,7 @@ public class MQuotationLine extends X_C_QuotationLine {
 		if (!success)
 			return success;
 		// After Delete - From Validator - setTotalLines()
-		setTotalLines();
+//		setTotalLines();
 		
 		// After Delete - From Validator - removeMatchQuotation()
 		removeMatchQuotation();

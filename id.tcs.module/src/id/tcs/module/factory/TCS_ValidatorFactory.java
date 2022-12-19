@@ -62,9 +62,9 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 //		registerTableEvent(IEventTopics.DOC_AFTER_VOID, I_C_Quotation.Table_Name);
 
 		//Quotation Line
-//		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_C_QuotationLine.Table_Name);
-//		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_C_QuotationLine.Table_Name);
-//		registerTableEvent(IEventTopics.PO_AFTER_DELETE, I_C_QuotationLine.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_C_QuotationLine.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_C_QuotationLine.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_DELETE, I_C_QuotationLine.Table_Name);
 		
 		//RfQ
 		registerTableEvent(IEventTopics.DOC_AFTER_VOID, I_C_RfQ.Table_Name);
