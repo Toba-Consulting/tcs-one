@@ -313,7 +313,7 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 				paytoCharge.setPayAmt(getPayAmtTo().add(getChargeAmt()));
 				paytoCharge.setAD_Org_ID(getC_BankAccount_From().getAD_Org_ID());
 				paytoCharge.setTenderType(MPayment.TENDERTYPE_Account);
-				paytoCharge.setC_BankAccount_ID(getC_BankAccount_From_ID());
+				paytoCharge.setC_BankAccount_ID(getC_BankAccount_To_ID());
 				paytoCharge.setC_BPartner_ID(getC_BPartner_ID());
 				paytoCharge.setC_DocType_ID(false, false); 
 				paytoCharge.setC_Currency_ID(getC_Currency_From_ID());
