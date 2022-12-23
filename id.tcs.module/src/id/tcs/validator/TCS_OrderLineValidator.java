@@ -63,6 +63,8 @@ public class TCS_OrderLineValidator {
 			if (orderLine.getC_Order().isSOTrx() && orderLine.get_ValueAsBoolean("IsBOMDrop")) {
 				msg += updatePrices(orderLine);
 			}
+			if (!orderLine.getC_Order().isSOTrx())
+				msg += updateMatchPR(orderLine);
 		}
 
 		return msg;
