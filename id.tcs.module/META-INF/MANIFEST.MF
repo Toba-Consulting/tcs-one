@@ -12,7 +12,8 @@ Require-Bundle: org.adempiere.plugin.utils;bundle-version="8.2.0",
  org.adempiere.ui;bundle-version="8.2.0",
  zk;bundle-version="9.5.0",
  zul;bundle-version="9.5.0",
- zcommon;bundle-version="9.5.0"
+ zcommon;bundle-version="9.5.0",
+ org.idempiere.promotion;bundle-version="2.0.0"
 Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
 Bundle-ActivationPolicy: lazy
 Import-Package: org.adempiere.webui.factory,
@@ -25,5 +26,6 @@ Export-Package: id.tcs.model;
    org.compiere.model,
    org.eevolution.model,
    org.compiere.process,
-   org.adempiere.model"
+   org.adempiere.model",
+ org.compiere.model
 Bundle-Vendor: Toba Technology

@@ -3,12 +3,12 @@ package id.taowi.process;
 import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
-import org.adempiere.model.PromotionRule;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
+import org.idempiere.model.PromotionRule;
 
 public class TCS_CalculatePromotion extends SvrProcess {
 
