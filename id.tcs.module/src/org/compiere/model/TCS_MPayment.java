@@ -715,10 +715,14 @@ public class TCS_MPayment extends MPayment {
 		MPaymentAllocate[] pAllocs = MPaymentAllocate.get(this);
 		
 		//	Consistency of Invoice / Document Type and IsReceipt
-		if (!verifyDocType(pAllocs))
-		{
-			m_processMsg = "@PaymentDocTypeInvoiceInconsistent@";
-			return DocAction.STATUS_Invalid;
+		if(getC_Invoice_ID() > 0) {
+			if(!getC_Invoice().getC_DocType().getDocBaseType().equals("ARC")) {
+				if (!verifyDocType(pAllocs))
+				{
+					m_processMsg = "@PaymentDocTypeInvoiceInconsistent@";
+					return DocAction.STATUS_Invalid;
+				}	
+			}
 		}
 
 		//	Payment Allocate is ignored if charge/invoice/order exists in header

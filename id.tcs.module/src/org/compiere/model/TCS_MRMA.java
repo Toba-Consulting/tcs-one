@@ -85,5 +85,67 @@ public class TCS_MRMA extends MRMA implements DocOptions {
 
 		return true;
 	}	//	reActivateIt
+	
+//	public String completeIt()
+//	{
+//		//	Re-Check
+//		if (!m_justPrepared)
+//		{
+//			String status = prepareIt();
+//			m_justPrepared = false;
+//			if (!DocAction.STATUS_InProgress.equals(status))
+//				return status;
+//		}
+//
+//		// Set the definite document number after completed (if needed)
+//		setDefiniteDocumentNo();
+//
+//		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_COMPLETE);
+//		if (m_processMsg != null)
+//			return DocAction.STATUS_Invalid;
+//
+//		//	Implicit Approval
+//		if (!isApproved())
+//			approveIt();
+//		if (log.isLoggable(Level.INFO)) log.info("completeIt - " + toString());
+//		//
+//		/*
+//		Flow for the creation of the credit memo document changed
+//        if (true)
+//		{
+//			m_processMsg = "Need to code creating the credit memo";
+//			return DocAction.STATUS_InProgress;
+//		}
+//        */
+//		
+//
+//		//		Counter Documents
+//		MRMA counter = createCounterDoc();
+//		if (counter != null)
+//			m_processMsg = "@CounterDoc@: RMA=" + counter.getDocumentNo();
+//
+//		//	User Validation
+//		String valid = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_COMPLETE);
+//		if (valid != null)
+//		{
+//			m_processMsg = valid;
+//			return DocAction.STATUS_Invalid;
+//		}
+//
+//		//		Waiting Payment - until we have a payment
+//		MDocType dt = new MDocType(getCtx(), getC_DocType_ID(), get_TrxName());
+//		if (dt.get_Value("DocSubTypeSOReturn").equals("RC") && get_ValueAsInt("C_Payment_ID") <= 0)
+//		{
+//			setProcessed(true);
+//			return DocAction.STATUS_WaitingPayment;
+//		}
+//		
+//
+//		
+//		//
+//		setProcessed(true);
+//		setDocAction(DOCACTION_Close);
+//		return DocAction.STATUS_Completed;
+//	}	//	completeIt
 
 }
