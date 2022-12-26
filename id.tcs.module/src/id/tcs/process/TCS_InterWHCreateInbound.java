@@ -109,7 +109,7 @@ public class TCS_InterWHCreateInbound extends SvrProcess {
 		inbound.setDocAction(DocAction.ACTION_Complete);
 		inbound.setDD_Order_ID(internalPO.getDD_Order_ID());
 		inbound.setC_Project_ID(internalPO.getC_Project_ID());
-		inbound.setC_BPartner_ID(outbound.getC_BPartner_ID());
+		inbound.setC_BPartner_ID(internalPO.getC_BPartner_ID());
 		inbound.setC_BPartner_Location_ID(outbound.getC_BPartner_Location_ID());
 		inbound.setM_Shipper_ID(outbound.getM_Shipper_ID());
 		inbound.setAD_User_ID(outbound.getAD_User_ID());
