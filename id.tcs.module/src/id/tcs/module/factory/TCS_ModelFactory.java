@@ -60,6 +60,7 @@ import id.tcs.model.TCS_MRfQResponseLineQty;
 import id.tcs.model.TCS_MRfQTopic;
 import id.tcs.model.TCS_MRfQTopicSubscriber;
 import id.tcs.model.TCS_MRfQTopicSubscriberOnly;
+import id.tcs.model.X_M_MatchPR;
 import id.tcs.model.X_M_MatchQuotation;
 
 
@@ -115,6 +116,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		mapTableModels.put(TCS_MDDOrder.Table_Name, "org.compiere.model.TCS_MDDOrder");
 		mapTableModels.put(X_M_MatchQuotation.Table_Name, "id.tcs.model.X_M_MatchQuotation");
 		mapTableModels.put(X_M_Periodic_Cost.Table_Name, "org.compiere.model.X_M_Periodic_Cost");
+		mapTableModels.put(X_M_MatchPR.Table_Name, "id.tcs.model.MMatchPR");
 		//mapTableModels.put(X_C_DocType.Table_Name, "org.compiere.model.X_C_DocType");
 		
 		mapTableModels.put(I_C_OrderPayment.Table_Name, "id.tcs.model.TCS_MOrderPayment");
