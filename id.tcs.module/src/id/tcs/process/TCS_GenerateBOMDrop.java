@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.I_M_Product_BOM;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
@@ -52,14 +53,22 @@ public class TCS_GenerateBOMDrop extends SvrProcess {
 						.setParameters(new Object[] {BOMProd.getM_Product_ID()})
 						.list();
 				
+				if(prodBoms.size() <= 0) 
+					throw new AdempiereException("No BOM Product to be Generates");
+				
+				
+				String sqlTax = "Select c_tax_id from c_tax where istaxexempt = 'Y' and ad_client_id=1000000";
+				int C_Tax_ID = DB.getSQLValue(get_TrxName(), sqlTax);
+				
+				if(C_Tax_ID <= 0)
+					throw new AdempiereException("Could not find tax");
+				
 				for (MProductBOM prodBom : prodBoms) {
 					MOrderLine bomLine = new MOrderLine(getCtx(), 0, get_TrxName());
 					// base product
 					MProduct prod = new MProduct(getCtx(), prodBom.getM_ProductBOM_ID(), get_TrxName());
 					BigDecimal newQty = prodBom.getBOMQty().multiply(oLine.getQtyEntered());
 					
-					String sqlTax = "Select c_tax_id from c_tax where istaxexempt = 'Y' and ad_client_id=1000000";
-					int C_Tax_ID = DB.getSQLValue(get_TrxName(), sqlTax);
 					
 					bomLine.setC_Order_ID(p_C_Order_ID);
 					bomLine.setM_Product_ID(prodBom.getM_ProductBOM_ID());
