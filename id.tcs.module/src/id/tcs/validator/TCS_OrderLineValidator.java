@@ -79,7 +79,7 @@ public class TCS_OrderLineValidator {
 		String sqlGetTotalLine = "Select sum(linenetamt) from c_orderline where c_order_id = ?";
 		BigDecimal totalLines = DB.getSQLValueBD(orderLine.get_TrxName(), sqlGetTotalLine, orderLine.getC_Order_ID());
 		
-		String sqlGetTax = "select sum(taxamt) from C_OrderTax where c_order_id = ?";
+		String sqlGetTax = "select coalesce(sum(taxamt),0) from C_OrderTax where c_order_id = ?";
 		BigDecimal TaxAmt = DB.getSQLValueBD(orderLine.get_TrxName(), sqlGetTax, orderLine.getC_Order_ID());
 		
 		BigDecimal grandTotal = totalLines.add(TaxAmt);

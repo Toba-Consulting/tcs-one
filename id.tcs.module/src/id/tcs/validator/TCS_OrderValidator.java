@@ -138,9 +138,6 @@ public class TCS_OrderValidator {
 			if(M_RequisitionLine_ID <= 0)
 				continue;
 			MRequisitionLine requisitionLine = new MRequisitionLine(Env.getCtx(), M_RequisitionLine_ID, null);	
-			System.out.println(M_RequisitionLine_ID);
-			System.out.println(requisitionLine.get_Value("QtyRequired"));
-			System.out.println(orderLine.getQtyOrdered());
 			requisitionLine.set_ValueOfColumn("QtyRequired", ((BigDecimal) requisitionLine.get_Value("QtyRequired")).subtract(orderLine.getQtyOrdered()));
 			requisitionLine.set_ValueOfColumn("QtyOrdered", requisitionLine.getQtyOrdered().add(orderLine.getQtyOrdered()));
 			requisitionLine.saveEx();
