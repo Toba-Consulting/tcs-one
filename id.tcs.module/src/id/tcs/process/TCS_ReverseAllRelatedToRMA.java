@@ -14,15 +14,16 @@ import org.compiere.model.MPayment;
 import org.compiere.model.MProduct;
 import org.compiere.model.MProductBOM;
 import org.compiere.model.Query;
+import org.compiere.model.TCS_MRMA;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 
-public class TCS_ReverseAllRelatedToOrder extends SvrProcess {
+public class TCS_ReverseAllRelatedToRMA extends SvrProcess {
 
-	int p_C_Order_ID = 0;
+	int p_M_RMA_ID = 0;
 	
 	@Override
 	protected void prepare() {
@@ -37,14 +38,14 @@ public class TCS_ReverseAllRelatedToOrder extends SvrProcess {
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
 
-		p_C_Order_ID = getRecord_ID();
+		p_M_RMA_ID = getRecord_ID();
 	}
 
 	@Override
 	protected String doIt() throws Exception {
-		MOrder order = new MOrder(getCtx(), p_C_Order_ID, get_TrxName());
+		TCS_MRMA rma = new TCS_MRMA(getCtx(), p_M_RMA_ID, get_TrxName());
 		
-		String sqlInout = "Select m_inout_id from m_inout where docstatus ='CO' and c_order_id = " + p_C_Order_ID;
+		String sqlInout = "Select m_inout_id from m_inout where docstatus ='CO' and m_rma_id = " + p_M_RMA_ID;
 		int M_Inout_ID = DB.getSQLValue(get_TrxName(), sqlInout);
 		MInOut inout = new MInOut(getCtx(), M_Inout_ID, get_TrxName());
 		
