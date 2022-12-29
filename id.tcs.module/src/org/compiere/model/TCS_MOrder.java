@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
+import org.compiere.util.DB;
+import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Trx;
 import org.compiere.util.Util;
@@ -65,6 +67,12 @@ public class TCS_MOrder extends MOrder implements DocOptions {
 		return index;
 
 	}
+	
+	public MOrderLine[] getLines()
+	{
+		return getLines(true, null);
+	}	//	getLines
+	
 	
 	public MInvoice[] getInvoices()
 	{

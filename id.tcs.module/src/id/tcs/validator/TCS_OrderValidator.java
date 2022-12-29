@@ -1,6 +1,7 @@
 package id.tcs.validator;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -21,6 +22,7 @@ import org.compiere.model.TCS_MOrder;
 import org.compiere.process.DocAction;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Trx;
 import org.osgi.service.event.Event;
 
 import id.tcs.model.MMatchPR;
@@ -32,7 +34,7 @@ public class TCS_OrderValidator {
 
 	public static String executeEvent(Event event, PO po) {
 		String msg = "";
-		MOrder order = (MOrder) po;
+		TCS_MOrder order = (TCS_MOrder) po;
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
 			msg += checkMatchPO(order);
 			//			msg += checkLinkedPayment(order);
@@ -78,14 +80,14 @@ public class TCS_OrderValidator {
 		return msg;
 	}
 
-	private static String removePayment(MOrder order) {
+	private static String removePayment(TCS_MOrder order) {
 		order.set_ValueOfColumn("C_Payment_ID", null);
 		order.saveEx();
 		
 		return "";
 	}
 
-	private static String updateRequisitionQtyOrdered(MOrder order) {
+	private static String updateRequisitionQtyOrdered(TCS_MOrder order) {
 		MOrderLine[] orderLines = order.getLines();
 		for (MOrderLine oLine : orderLines) {
 			MMatchPR matchPR = new Query(Env.getCtx(), MMatchPR.Table_Name, "C_OrderLine_ID=?", null)
@@ -105,14 +107,14 @@ public class TCS_OrderValidator {
 		return "";
 	}
 
-	private static String generateRequisition(MOrder order) {
+	private static String generateRequisition(TCS_MOrder order) {
 		if(!order.isSOTrx())
 			updateRequisition(order);
 
 		return "";
 	}
 
-	private static String updateRequisition(MOrder order){
+	private static String updateRequisition(TCS_MOrder order){
 		String whereClause = "DocStatus!='CO' AND M_Requisition_ID IN (SELECT DISTINCT M_Requisition_ID "
 				+ "FROM M_RequisitionLine mrl "
 				+ "JOIN C_OrderLine col ON col.M_RequisitionLine_ID=mrl.M_RequisitionLine_ID "
@@ -155,7 +157,7 @@ public class TCS_OrderValidator {
 		return "";
 	}
 
-	private static String removeRequisition(MOrder order){
+	private static String removeRequisition(TCS_MOrder order){
 		if (order.getDocStatus().equals("CO")) {
 			for (MOrderLine orderLine : order.getLines()) {
 				int M_RequisitionLine_ID = orderLine.get_ValueAsInt("M_RequisitionLine_ID");
@@ -179,7 +181,7 @@ public class TCS_OrderValidator {
 		 */	
 	}
 
-	public static String unreserveQty(MOrder order){
+	public static String unreserveQty(TCS_MOrder order){
 		if (!reserveStock(order)) {
 			return "Cannot unreserve stock, Failed to update reservations";
 		}
@@ -187,7 +189,7 @@ public class TCS_OrderValidator {
 		return "";
 	}
 
-	public static String checkMatchPO(MOrder order){
+	public static String checkMatchPO(TCS_MOrder order){
 		int [] temp = new Query(order.getCtx(), MOrderLine.Table_Name, "C_Order_ID="+order.getC_Order_ID(), order.get_TrxName())
 				.getIDs();
 		if (temp==null || temp.length==0) {
@@ -211,7 +213,7 @@ public class TCS_OrderValidator {
 		return "";
 	}
 
-	public static String checkLinkedPayment(MOrder order){
+	public static String checkLinkedPayment(TCS_MOrder order){
 		String sqlWhere="C_Order_ID="+order.getC_Order_ID()+" AND DocStatus IN ('CO','CL','IP')";
 		boolean match = new Query(order.getCtx(), MPayment.Table_Name, sqlWhere, order.get_TrxName())
 				.match();
@@ -220,7 +222,7 @@ public class TCS_OrderValidator {
 		return "";
 	}
 
-	public static String checkActiveLinkedInOut(MOrder order){
+	public static String checkActiveLinkedInOut(TCS_MOrder order){
 		int [] temp = new Query(order.getCtx(), MOrderLine.Table_Name, "C_Order_ID="+order.getC_Order_ID(), order.get_TrxName())
 				.getIDs();
 		if (temp==null || temp.length==0) {
@@ -241,7 +243,7 @@ public class TCS_OrderValidator {
 		}
 		return "";
 	}
-	private static String removeMatchQuotation(MOrder order) {
+	private static String removeMatchQuotation(TCS_MOrder order) {
 		StringBuilder sql = new StringBuilder("DELETE FROM ").append(X_M_MatchQuotation.Table_Name)
 				.append(" WHERE C_Order_ID=?");
 		DB.executeUpdateEx(sql.toString(), new Object[] {order.get_ID()}, order.get_TrxName());
@@ -249,7 +251,7 @@ public class TCS_OrderValidator {
 		return "";
 	}
 
-	private static boolean reserveStock (MOrder order)
+	private static boolean reserveStock (TCS_MOrder order)
 	{
 		MDocType dt = MDocType.get(order.getCtx(), order.getC_DocType_ID());
 		MOrderLine [] lines = order.getLines();
@@ -336,14 +338,24 @@ public class TCS_OrderValidator {
 	 * @param order
 	 * @return
 	 */
-	private static String removeMatchPR(MOrder order) {
+	private static String removeMatchPR(TCS_MOrder order) {
 		for (MOrderLine orderLine : order.getLines()) {
 			int M_RequisitionLine_ID = orderLine.get_ValueAsInt("M_RequisitionLine_ID");
 			if(M_RequisitionLine_ID <= 0)
 				continue;
-			MRequisitionLine requisitionLine = new MRequisitionLine(Env.getCtx(), M_RequisitionLine_ID, null);
+			MRequisitionLine requisitionLine = new MRequisitionLine(Env.getCtx(), M_RequisitionLine_ID, order.get_TrxName());
 			requisitionLine.set_ValueOfColumn("QtyOrdered",requisitionLine.getQtyOrdered().subtract(orderLine.getQtyOrdered()));
-			requisitionLine.saveEx();	
+			requisitionLine.save();
+			
+			Trx trx = Trx.get(order.get_TrxName(), false);
+
+			try {
+				trx.commit(true);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		StringBuilder sql = new StringBuilder("DELETE FROM ").append(X_M_MatchPR.Table_Name)
 				.append(" WHERE C_Order_ID=?");

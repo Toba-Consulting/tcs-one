@@ -16,6 +16,8 @@
  *****************************************************************************/
 package id.tcs.process;
 
+import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +41,11 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.Trx;
+
+import id.tcs.model.X_M_MatchPR;
 
 /**
  * 	Create PO from Requisition 
@@ -271,6 +277,15 @@ public class TCS_RequisitionPOCreate extends SvrProcess
 			DB.close(rs); rs = null;
 		}
 		closeOrder();
+		
+		Trx trx = Trx.get(get_TrxName(), false);
+
+		try {
+			trx.commit(true);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return "";
 	}	//	doit
 	
@@ -314,10 +329,10 @@ public class TCS_RequisitionPOCreate extends SvrProcess
 		}
 
 		//	Update Order Line
-		m_orderLine.setQty(m_orderLine.getQtyOrdered().add(rLine.getQty()));
 		//	Update Requisition Line
 		rLine.setC_OrderLine_ID(m_orderLine.getC_OrderLine_ID());
 		rLine.saveEx();
+		
 	}	//	process
 	
 	/**
@@ -480,7 +495,10 @@ public class TCS_RequisitionPOCreate extends SvrProcess
 		//	Prepare Save
 		m_M_Product_ID = rLine.getM_Product_ID();
 		m_M_AttributeSetInstance_ID = rLine.getM_AttributeSetInstance_ID();
+		m_orderLine.setQty(m_orderLine.getQtyOrdered().add(rLine.getQty()));
 		m_orderLine.saveEx();
+		
+
 	}	//	newLine
 
 	/**
