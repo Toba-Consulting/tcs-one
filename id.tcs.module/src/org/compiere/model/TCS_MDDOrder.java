@@ -142,7 +142,7 @@ public class TCS_MDDOrder extends MDDOrder implements DocOptions{
 	{
 		TCS_MDDOrder to = new TCS_MDDOrder (from.getCtx(), 0, trxName);
 		to.set_TrxName(trxName);
-		PO.copyValues(from, to, from.getAD_Client_ID(), from.getAD_Org_ID());
+		PO.copyValues(from, to, from.getAD_Client_ID(), from.getC_BPartner().getAD_OrgBP_ID());
 		to.set_ValueNoCheck ("C_Order_ID", null);
 		to.set_ValueNoCheck ("DocumentNo", null);
 		to.setC_DocType_ID(C_DocType_ID);
