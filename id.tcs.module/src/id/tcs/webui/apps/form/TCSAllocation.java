@@ -360,6 +360,7 @@ public class TCSAllocation
 				line.add(rs.getTimestamp(12));					//   11/13-dateacct
 				
 				line.add(rs.getString(13));						//	 Description
+				line.add(rs.getString(14));
 				//line.add(rs.getBigDecimal(9));		
 				//	Add when open <> 0 (i.e. not if no conversion rate)
 				if (Env.ZERO.compareTo(open) != 0)
