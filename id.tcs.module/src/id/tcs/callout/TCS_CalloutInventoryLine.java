@@ -28,10 +28,28 @@ public class TCS_CalloutInventoryLine extends CalloutEngine implements IColumnCa
 		if (mField.getColumnName().equals("C_UOM_ID")){
 			return QtyUOM(ctx, WindowNo, mTab, mField, value) ;
 		}
+		if (mField.getColumnName().equals("M_Product_ID")){
+			return setUOM(ctx, WindowNo, mTab, mField, value) ;
+		}
 		return "";
 	}
 	
 	
+	private String setUOM(Properties ctx, int windowNo, GridTab mTab, GridField mField, Object value) {
+		String msg="";
+		if (value==null){
+			return msg;
+		}
+		
+		int M_Product_ID = (int)value;
+		MProduct prod = new MProduct(ctx, M_Product_ID, null);
+		
+		mTab.setValue("C_UOM_ID", prod.getC_UOM_ID());
+		
+		return "";
+	}
+
+
 	private String setQtyUOMConversion(Properties ctx, int windowNo, GridTab mTab,
 			GridField mField, Object value) {
 		
