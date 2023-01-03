@@ -307,43 +307,45 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			//paymentTo
 			
 			int C_PaymentCharge_ID = 0;
-			if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee")) {
-				TCS_MPayment paytoCharge = new TCS_MPayment(getCtx(), 0, get_TrxName());
-				
-				paytoCharge.setPayAmt(getPayAmtTo().add(getChargeAmt()));
-				paytoCharge.setAD_Org_ID(getC_BankAccount_From().getAD_Org_ID());
-				paytoCharge.setTenderType(MPayment.TENDERTYPE_Account);
-				paytoCharge.setC_BankAccount_ID(getC_BankAccount_To_ID());
-				paytoCharge.setC_BPartner_ID(getC_BPartner_ID());
-				paytoCharge.setC_DocType_ID(false, false); 
-				paytoCharge.setC_Currency_ID(getC_Currency_From_ID());
-				paytoCharge.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
-				if(getDescription() == null) {
-					paytoCharge.setDescription("Generated From Bank Transfer " + getDocumentNo());								
+			if(get_ValueAsBoolean("isHasTransferFee")) {
+				if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee")) {
+					TCS_MPayment paytoCharge = new TCS_MPayment(getCtx(), 0, get_TrxName());
+					
+					paytoCharge.setPayAmt(getPayAmtTo().add(getChargeAmt()));
+					paytoCharge.setAD_Org_ID(getC_BankAccount_From().getAD_Org_ID());
+					paytoCharge.setTenderType(MPayment.TENDERTYPE_Account);
+					paytoCharge.setC_BankAccount_ID(getC_BankAccount_To_ID());
+					paytoCharge.setC_BPartner_ID(getC_BPartner_ID());
+					paytoCharge.setC_DocType_ID(false, false); 
+					paytoCharge.setC_Currency_ID(getC_Currency_From_ID());
+					paytoCharge.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
+					if(getDescription() == null) {
+						paytoCharge.setDescription("Generated From Bank Transfer " + getDocumentNo());								
+					}
+					else {
+						paytoCharge.setDescription(getDescription() + " | Generated From Bank Transfer " + getDocumentNo());
+					}
+					paytoCharge.setDateAcct(getDateAcct());
+					paytoCharge.setDateTrx(getDateAcct()); 
+					
+					paytoCharge.setPayAmt(getChargeAmt());
+					
+					
+					if (funcCurrencyID!=getC_Currency_From_ID()) {
+						paytoCharge.setC_ConversionType_ID(getC_ConversionType_ID());
+					}
+					
+					if(!paytoCharge.processIt(TCS_MPayment.DOCACTION_Complete)) {
+						log.warning("Payment Process Failed: " + paytoCharge+ " - " + paytoCharge.getProcessMsg());
+						throw new IllegalStateException("Payment Process Failed: " + paytoCharge + " - " + paytoCharge.getProcessMsg());
+					}
+					
+					paytoCharge.saveEx();
+					
+					set_Value("C_Payment_Charge_ID",paytoCharge.getC_Payment_ID());
+					saveEx();
+					C_PaymentCharge_ID = paytoCharge.getC_Payment_ID();
 				}
-				else {
-					paytoCharge.setDescription(getDescription() + " | Generated From Bank Transfer " + getDocumentNo());
-				}
-				paytoCharge.setDateAcct(getDateAcct());
-				paytoCharge.setDateTrx(getDateAcct()); 
-				
-				paytoCharge.setPayAmt(getChargeAmt());
-				
-				
-				if (funcCurrencyID!=getC_Currency_From_ID()) {
-					paytoCharge.setC_ConversionType_ID(getC_ConversionType_ID());
-				}
-				
-				if(!paytoCharge.processIt(TCS_MPayment.DOCACTION_Complete)) {
-					log.warning("Payment Process Failed: " + paytoCharge+ " - " + paytoCharge.getProcessMsg());
-					throw new IllegalStateException("Payment Process Failed: " + paytoCharge + " - " + paytoCharge.getProcessMsg());
-				}
-				
-				paytoCharge.saveEx();
-				
-				set_Value("C_Payment_Charge_ID",paytoCharge.getC_Payment_ID());
-				saveEx();
-				C_PaymentCharge_ID = paytoCharge.getC_Payment_ID();
 			}
 				
 			
@@ -481,28 +483,28 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 		
 			alloclineAR.saveEx();
 			
-			if(isHasTransferFee() && getTransferFeeType().equals("F")){
-				MAllocationLine alloclineCharge= new MAllocationLine(allocHdr);
-				
-				alloclineCharge.setAD_Org_ID(allocHdr.getAD_Org_ID());
-				alloclineCharge.setC_BPartner_ID(getC_BPartner_ID());
-				alloclineCharge.setAmount(getChargeAmt());
-				alloclineCharge.setC_Charge_ID(getC_Charge_ID());
-				
-				alloclineCharge.saveEx();
-				
-				
+			if(isHasTransferFee()){
 				if(getTransferFeeType().equals("F") && get_ValueAsBoolean("isHasTransferFee")) {
+					MAllocationLine alloclineCharge= new MAllocationLine(allocHdr);
+					
+					alloclineCharge.setAD_Org_ID(allocHdr.getAD_Org_ID());
+					alloclineCharge.setC_BPartner_ID(getC_BPartner_ID());
+					alloclineCharge.setAmount(getChargeAmt());
+					alloclineCharge.setC_Charge_ID(getC_Charge_ID());
+					
+					alloclineCharge.saveEx();
+					
+					
 					MAllocationLine alloclineChargePay= new MAllocationLine(allocHdr);
 					alloclineChargePay.setAD_Org_ID(allocHdr.getAD_Org_ID());
 					alloclineChargePay.setC_BPartner_ID(getC_BPartner_ID());
 					alloclineChargePay.setAmount(getChargeAmt().negate());
 					alloclineChargePay.setC_Payment_ID(paymentFrom.getC_Payment_ID());
-				
-//				else if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee")) {
-//					alloclineChargePay.setAmount(getChargeAmt());
-//					alloclineChargePay.setC_Payment_ID(paymentTo.getC_Payment_ID());
-//				}
+					
+//					else if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee")) {
+//						alloclineChargePay.setAmount(getChargeAmt());
+//						alloclineChargePay.setC_Payment_ID(paymentTo.getC_Payment_ID());
+//					}
 					alloclineChargePay.saveEx();
 				}
 			}				
@@ -527,45 +529,44 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			
 			allocHdr.processIt(DocAction.ACTION_Complete);
 
-			if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee")) {
-				MAllocationHdr allocHdrCharge = new MAllocationHdr(getCtx(), false, getDateAcct(), getC_Currency_ID(),"", get_TrxName());
-				allocHdrCharge.setAD_Org_ID(getAD_Org_ID());
-				allocHdrCharge.setDateAcct(getDateAcct());
-				allocHdrCharge.setDateTrx(getDateAcct());
-				allocHdrCharge.setC_Currency_ID(getC_Currency_ID());
-				allocHdrCharge.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
+			if(get_ValueAsBoolean("isHasTransferFee")) {
+				if(getTransferFeeType().equals("T") && get_ValueAsBoolean("isHasTransferFee")) {
+					MAllocationHdr allocHdrCharge = new MAllocationHdr(getCtx(), false, getDateAcct(), getC_Currency_ID(),"", get_TrxName());
+					allocHdrCharge.setAD_Org_ID(getAD_Org_ID());
+					allocHdrCharge.setDateAcct(getDateAcct());
+					allocHdrCharge.setDateTrx(getDateAcct());
+					allocHdrCharge.setC_Currency_ID(getC_Currency_ID());
+					allocHdrCharge.set_ValueOfColumn("C_BankTransfer_ID", getC_BankTransfer_ID());
 
-				if(getDescription() == null) {
-					allocHdrCharge.setDescription("Generated From Bank Transfer " + getDocumentNo());								
-				}
-				else {
-					allocHdrCharge.setDescription(getDescription() + " | Generated From Bank Transfer " + getDocumentNo());
-				}
-				allocHdrCharge.saveEx();
-				
-				MAllocationLine allocPaytoCharge= new MAllocationLine(allocHdrCharge);
-				
-				allocPaytoCharge.setAD_Org_ID(allocHdrCharge.getAD_Org_ID());
-				allocPaytoCharge.setC_BPartner_ID(getC_BPartner_ID());
-				allocPaytoCharge.setAmount(getChargeAmt());
-				allocPaytoCharge.setC_Charge_ID(getC_Charge_ID());
-				
-				allocPaytoCharge.saveEx();
+					if(getDescription() == null) {
+						allocHdrCharge.setDescription("Generated From Bank Transfer " + getDocumentNo());								
+					}
+					else {
+						allocHdrCharge.setDescription(getDescription() + " | Generated From Bank Transfer " + getDocumentNo());
+					}
+					allocHdrCharge.saveEx();
+					
+					MAllocationLine allocPaytoCharge= new MAllocationLine(allocHdrCharge);
+					
+					allocPaytoCharge.setAD_Org_ID(allocHdrCharge.getAD_Org_ID());
+					allocPaytoCharge.setC_BPartner_ID(getC_BPartner_ID());
+					allocPaytoCharge.setAmount(getChargeAmt());
+					allocPaytoCharge.setC_Charge_ID(getC_Charge_ID());
+					
+					allocPaytoCharge.saveEx();
 
-				MAllocationLine allocChargePay= new MAllocationLine(allocHdrCharge);
-				
-				allocChargePay.setAD_Org_ID(allocHdrCharge.getAD_Org_ID());
-				allocChargePay.setC_BPartner_ID(getC_BPartner_ID());
-				allocChargePay.setAmount(getChargeAmt().negate());
-				allocChargePay.setC_Payment_ID(C_PaymentCharge_ID);
-				
-				allocChargePay.saveEx();
-				
-				System.out.println(allocPaytoCharge.getC_AllocationLine_ID());
-				System.out.println(allocPaytoCharge.getC_AllocationHdr_ID());
-				
-				allocHdrCharge.processIt(DocAction.ACTION_Complete);
-				
+					MAllocationLine allocChargePay= new MAllocationLine(allocHdrCharge);
+					
+					allocChargePay.setAD_Org_ID(allocHdrCharge.getAD_Org_ID());
+					allocChargePay.setC_BPartner_ID(getC_BPartner_ID());
+					allocChargePay.setAmount(getChargeAmt().negate());
+					allocChargePay.setC_Payment_ID(C_PaymentCharge_ID);
+					
+					allocChargePay.saveEx();
+					
+					allocHdrCharge.processIt(DocAction.ACTION_Complete);
+	
+				}				
 			}
 						
 			
