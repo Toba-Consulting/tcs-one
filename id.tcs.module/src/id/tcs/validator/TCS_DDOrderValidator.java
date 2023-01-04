@@ -9,6 +9,7 @@ import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.model.TCS_MDDOrder;
 import org.compiere.process.DocAction;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.eevolution.model.MDDOrder;
 import org.eevolution.model.MDDOrderLine;
@@ -77,6 +78,13 @@ public class TCS_DDOrderValidator {
 			TCS_MDDOrder internalPO = new TCS_MDDOrder(Env.getCtx(), (int) ddOrder.get_Value("Ref_InternalOrder_ID"), ddOrder.get_TrxName());
 			internalPO.set_ValueOfColumn("Ref_InternalOrder_ID", null);
 			internalPO.saveEx(ddOrder.get_TrxName());
+			
+			
+			ddOrder.set_ValueOfColumn("Ref_InternalOrder_ID", null);
+			ddOrder.saveEx(ddOrder.get_TrxName());
+			
+			String sqlUpdateLine = "UPDATE DD_OrderLine SET ref_internalorderline_id=null WHERE DD_Order_ID = ?";
+			DB.getSQLValue(ddOrder.get_TrxName(), sqlUpdateLine, ddOrder.getDD_Order_ID());
 		}
 			
 		return "";

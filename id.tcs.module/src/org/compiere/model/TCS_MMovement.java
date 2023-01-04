@@ -612,6 +612,7 @@ public class TCS_MMovement extends MMovement implements DocAction
 				log.severe(e.getMessage());
 				errors.append(Msg.getElement(getCtx(), "Line")).append(" ").append(line.getLine()).append(": ");
 				errors.append(e.getMessage()).append("\n");
+				break;
 			}
 			if(get_ValueAsBoolean("IsInbound") && !isReversal())
 			{
@@ -926,6 +927,8 @@ public class TCS_MMovement extends MMovement implements DocAction
 			rLine.setScrappedQty(Env.ZERO);
 			rLine.setConfirmedQty(Env.ZERO);
 			rLine.setProcessed(false);
+			rLine.set_ValueNoCheck("DD_OrderLine_ID", null);
+			rLine.set_ValueNoCheck("M_InternalPOLine_ID", null);
 			if (!rLine.save())
 			{
 				m_processMsg = "Could not create Movement Reversal Line for @Line@ " + rLine.getLine() + ", @M_Product_ID@=" + rLine.getProduct().getValue();

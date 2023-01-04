@@ -1,13 +1,25 @@
 package id.tcs.validator;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 import org.adempiere.base.event.IEventTopics;
+import org.adempiere.exceptions.AdempiereException;
+import org.adempiere.exceptions.NegativeInventoryDisallowedException;
+import org.compiere.model.MInOutLine;
+import org.compiere.model.MInvoice;
+import org.compiere.model.MLocator;
 import org.compiere.model.MMovement;
 import org.compiere.model.MMovementLine;
+import org.compiere.model.MMovementLineMA;
+import org.compiere.model.MStorageOnHand;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.model.TCS_MDDOrder;
+import org.compiere.model.TCS_MOrder;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
+import org.compiere.util.Util;
 import org.eevolution.model.MDDOrderLine;
 import org.osgi.service.event.Event;
 
@@ -20,13 +32,16 @@ public class TCS_MovementValidator {
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
 			msg += checkUsedDDOrderLineQty(move);
 			msg += updateQtyOutBoundInBound(move);
+//			msg += checkQtyOnhand(move);
 		} 
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL) ||
 				event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT)) {
 			msg += checkOutboundHasNoActiveInbound(move);
 		}
-		
-		
+		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_REVERSEACCRUAL) ||
+				event.getTopic().equals(IEventTopics.DOC_AFTER_REVERSECORRECT)) {
+			msg += updateReferences(move);
+		}
 		if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSEACCRUAL) 
 				|| event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT)) {
 			msg += beforeReverse(move);
@@ -35,6 +50,49 @@ public class TCS_MovementValidator {
 		return msg;
 	}
 	
+	private static String updateReferences(MMovement move) {	
+		TCS_MDDOrder ddorder = new TCS_MDDOrder(move.getCtx(), move.getDD_Order_ID(), move.get_TrxName());
+	
+		String sqlUpdateMovement = "UPDATE M_Movement set dd_order_id = null where m_movement_id = ?";
+		String sqlUpdateMovementLine = "UPDATE M_MovementLine set M_OutboundLine_ID=null, M_InternalPOLine_ID = null, dd_orderline_id = null where m_movement_id = ?";
+		
+		// Update Movement
+		DB.executeUpdate(sqlUpdateMovement, move.getM_Movement_ID(), move.get_TrxName());
+		// Update Movement Line
+		DB.executeUpdate(sqlUpdateMovementLine, move.getM_Movement_ID(), move.get_TrxName());
+		
+		ddorder.setDescription(ddorder.getDocumentNo());
+		ddorder.saveEx();
+		
+		return "";
+	}
+	
+	private static String checkQtyOnhand(MMovement move) {
+		MMovementLine lines[] = move.getLines(true);
+		for(MMovementLine line : lines) {
+//			MMovementLineMA mas[] = MMovementLineMA.get(line.getCtx(),
+//					line.getM_MovementLine_ID(), line.get_TrxName());
+//			for (int j = 0; j < mas.length; j++)
+//			{
+//				MMovementLineMA ma = mas[j];
+				//
+				MLocator locator = new MLocator (line.getCtx(), line.getM_Locator_ID(), line.get_TrxName());
+				Timestamp dateMPolicy = move.getMovementDate();
+				if (dateMPolicy != null)
+					dateMPolicy = Util.removeTime(dateMPolicy);
+
+				//	Get Storage
+				MStorageOnHand storage = MStorageOnHand.getCreate (line.getCtx(), locator.getM_Locator_ID(), line.getM_Product_ID(), 0, dateMPolicy, line.get_TrxName(), true, 120);
+				BigDecimal newOnhandQty = storage.getQtyOnHand().subtract(line.getMovementQty()); 
+				if(newOnhandQty.compareTo(Env.ZERO) <= 0) {
+					throw new AdempiereException("Negative Inventory for Product: " + storage.getM_Product().getName());
+				}
+//			}
+		}
+			
+		return "";
+	}
+
 	private static String beforeReverse(MMovement movement) {
 		if(movement.get_ValueAsBoolean("IsInbound"))
 		{

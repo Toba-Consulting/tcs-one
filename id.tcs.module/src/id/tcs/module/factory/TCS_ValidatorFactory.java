@@ -106,6 +106,8 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		//InOut
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, I_M_InOut.Table_Name);		
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, I_M_InOut.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, I_M_InOut.Table_Name);		
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, I_M_InOut.Table_Name);
 		
 		//Inout Line
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_M_InOutLine.Table_Name);
@@ -145,6 +147,8 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, I_M_Movement.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, I_M_Movement.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, I_M_Movement.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSEACCRUAL, I_M_Movement.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_REVERSECORRECT, I_M_Movement.Table_Name);
 		
 		//DD_Order
 		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, I_DD_Order.Table_Name);
