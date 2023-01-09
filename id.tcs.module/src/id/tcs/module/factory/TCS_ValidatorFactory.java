@@ -87,6 +87,7 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_BEFORE_REACTIVATE, I_C_Order.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSEACCRUAL, I_C_Order.Table_Name);
 		registerTableEvent(IEventTopics.DOC_BEFORE_REVERSECORRECT, I_C_Order.Table_Name);
+		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, I_C_Order.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_VOID, I_C_Order.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_REACTIVATE, I_C_Order.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_CLOSE, I_C_Order.Table_Name);

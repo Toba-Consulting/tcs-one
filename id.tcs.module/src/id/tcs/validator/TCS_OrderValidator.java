@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.adempiere.base.event.IEventTopics;
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOutLine;
+import org.compiere.model.MLocator;
 import org.compiere.model.MMatchPO;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
@@ -15,7 +17,9 @@ import org.compiere.model.MPayment;
 import org.compiere.model.MProduct;
 import org.compiere.model.MRequisition;
 import org.compiere.model.MRequisitionLine;
+import org.compiere.model.MStorageOnHand;
 import org.compiere.model.MStorageReservation;
+import org.compiere.model.MWarehouse;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.model.TCS_MOrder;
@@ -52,7 +56,12 @@ public class TCS_OrderValidator {
 			if (!order.isSOTrx())
 				msg += removeRequisition(order);
 		}
-
+		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
+			if (order.isSOTrx()) {
+				msg += checkBOMDrop(order);
+				msg += validateOnhand(order);
+			}
+		}
 		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_REACTIVATE)) {
 			if (order.isSOTrx()) {
 				msg += unreserveQty(order);
@@ -78,6 +87,58 @@ public class TCS_OrderValidator {
 		} 
 
 		return msg;
+	}
+
+	private static String validateOnhand(TCS_MOrder order) {
+		MOrderLine[] olines = order.getLines(true, null);
+		for(MOrderLine oline : olines) {
+			if(oline.get_ValueAsBoolean("IsBOMDrop")) {
+				String whereQtyOrdered = "M_Product_ID = ? and c_order_id = ?";
+				BigDecimal sumQtyOrdered = new Query(Env.getCtx(), MOrderLine.Table_Name, whereQtyOrdered, order.get_TrxName())
+						.setParameters(new Object[] {oline.getM_Product_ID(), order.getC_Order_ID()})
+						.sum("QtyOrdered");
+				
+				BigDecimal newQty = sumQtyOrdered;
+
+				MWarehouse wh = new MWarehouse(Env.getCtx(), order.getM_Warehouse_ID(), order.get_TrxName());
+				MLocator locator = new MLocator (Env.getCtx(), wh.getDefaultLocator().get_ID(), order.get_TrxName());
+				
+				String whereOnhand = "M_Product_ID = ? and m_locator_id = ? and datematerialpolicy <= ?";
+				BigDecimal sumQtyOnHand = new Query(Env.getCtx(), MStorageOnHand.Table_Name, whereOnhand, order.get_TrxName())
+						.setParameters(new Object[] {oline.getM_Product_ID(), locator.getM_Locator_ID(), order.getDateOrdered()})
+						.sum("QtyOnHand");
+				
+				if(newQty.compareTo(sumQtyOnHand) > 0) {
+					BigDecimal diff = newQty.subtract(sumQtyOnHand);
+					throw new AdempiereException("Negative Inventory, Product: " + oline.getM_Product().getName() + 
+							" , Current Onhand: " + sumQtyOnHand + " , SO Quantity: " + newQty +
+							", Shortage of: " + diff);
+				}
+				
+			}
+		}
+		return "";
+	}
+
+	private static String checkBOMDrop(TCS_MOrder order) {
+		String whereClause = " isBOM='Y' and c_order_id = " + order.getC_Order_ID();
+		List<MOrderLine> oLines = new Query(order.getCtx(), MOrderLine.Table_Name, whereClause, order.get_TrxName()).list();
+		
+		for(MOrderLine oLine : oLines) {
+			if(!oLine.get_ValueAsBoolean("IsGeneratedBOMDrop"))
+				throw new AdempiereException("BOM Line must generates BOM Drop First before Complete.");
+		}
+		
+		return "";
+	}
+
+	private static String deleteCostDetail(TCS_MOrder order) {
+		MOrderLine lines[] = order.getLines(true, null);
+		for(MOrderLine line : lines) {
+			String sqlDelete = "Delete from m_costdetail where c_orderline_id = " + line.getC_OrderLine_ID();
+			DB.executeUpdate(sqlDelete, order.get_TrxName());
+		}
+		return "";
 	}
 
 	private static String removePayment(TCS_MOrder order) {

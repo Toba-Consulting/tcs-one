@@ -29,8 +29,9 @@ public class TCS_OrderLineValidator {
 				//Delete related Match PR before delete PO Line
 				msg += removeMatchPR(orderLine);
 			}
+			msg += updateLineReferences(orderLine);
+			
 		}
-
 		else if (event.getTopic().equals(IEventTopics.PO_BEFORE_CHANGE)) {
 			if (!orderLine.getC_Order().isSOTrx()) {
 				msg += ValidateMatchPR(orderLine);
@@ -68,6 +69,16 @@ public class TCS_OrderLineValidator {
 		}
 
 		return msg;
+	}
+
+
+	private static String updateLineReferences(MOrderLine orderLine) {
+		if(orderLine.get_ValueAsBoolean("IsBOMDrop")) {
+			MOrderLine ol = new MOrderLine(Env.getCtx(), orderLine.get_ValueAsInt("BOMDrop_Line_ID"), orderLine.get_TrxName());
+			ol.set_ValueNoCheck("IsGeneratedBOMDrop", false);
+			ol.saveEx();
+		}
+		return "";
 	}
 
 

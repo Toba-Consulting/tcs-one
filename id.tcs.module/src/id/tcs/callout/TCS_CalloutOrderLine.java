@@ -8,6 +8,7 @@ import org.adempiere.base.IColumnCallout;
 import org.compiere.model.CalloutEngine;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
+import org.compiere.model.MProduct;
 import org.compiere.model.MRMALine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -20,10 +21,22 @@ public class TCS_CalloutOrderLine extends CalloutEngine implements IColumnCallou
 		if (mField.getColumnName().equals("PriceList")){
 			return setDiscount(ctx, WindowNo, mTab, mField, value) ;
 		}
+		else if (mField.getColumnName().equals("M_Product_ID")){
+			return setBOM(ctx, WindowNo, mTab, mField, value) ;
+		}
 		return "";
 	}
 	
 	
+	private String setBOM(Properties ctx, int windowNo, GridTab mTab, GridField mField, Object value) {
+		int M_Product_ID =  (int) value;
+		MProduct prod = new MProduct(ctx, M_Product_ID, null);
+		mTab.setValue("IsBOM", prod.get_Value("IsBOM"));
+		
+		return "";
+	}
+
+
 	private String setDiscount(Properties ctx, int windowNo, GridTab mTab, GridField mField, Object value) {
 		BigDecimal pricelist =  (BigDecimal) value;
 		BigDecimal discount = pricelist.subtract((BigDecimal) mTab.getValue("PriceActual"))

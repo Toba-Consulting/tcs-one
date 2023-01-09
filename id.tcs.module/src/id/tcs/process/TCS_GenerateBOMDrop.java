@@ -10,7 +10,9 @@ import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MProduct;
 import org.compiere.model.MProductBOM;
+import org.compiere.model.MStorageOnHand;
 import org.compiere.model.Query;
+import org.compiere.model.TCS_MOrder;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
@@ -39,9 +41,13 @@ public class TCS_GenerateBOMDrop extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		MOrder order = new MOrder(getCtx(), p_C_Order_ID, get_TrxName());
+		TCS_MOrder order = new TCS_MOrder(getCtx(), p_C_Order_ID, get_TrxName());
+		
+		
+		deleteBOMDrop(order);
 		
 		MOrderLine[] oLines = order.getLines();
+		
 		
 		for(MOrderLine oLine : oLines) {
 			if(oLine.getM_Product().isBOM()) {
@@ -82,15 +88,27 @@ public class TCS_GenerateBOMDrop extends SvrProcess {
 					bomLine.setLineNetAmt(Env.ZERO);
 					bomLine.set_ValueOfColumn("IsBOMDrop", true);
 					bomLine.set_ValueOfColumn("IsPrinted", false);
+					bomLine.set_ValueOfColumn("BOMDrop_Line_ID", oLine.get_Value("C_OrderLine_ID"));
 					bomLine.saveEx();
 					
 				}
-	
+				oLine.set_ValueOfColumn("isGeneratedBOMDrop", true);
+				oLine.saveEx();
 			}
+
 		}
 		
 		return "";
 
+	}
+	
+	protected void deleteBOMDrop(TCS_MOrder order) {
+		String sqlDelete = "delete from c_orderline where isbomdrop = 'Y' and c_order_id = " +order.getC_Order_ID();
+		String sqlUpdate = "update c_orderline set isGeneratedBOMDrop = 'N' where c_order_id = " +order.getC_Order_ID();
+		
+		DB.executeUpdate(sqlDelete);
+		DB.executeUpdate(sqlUpdate);
+		
 	}
 
 }
