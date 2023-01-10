@@ -257,12 +257,14 @@ public class TCS_MDDOrder extends MDDOrder implements DocOptions{
 		counter.setSalesRep_ID(getSalesRep_ID());
 		counter.saveEx(get_TrxName());
 		
+		MWarehouse wh = new MWarehouse(getCtx(), counterOrgInfo.getM_Warehouse_ID(), get_TrxName());
 		//	Update copied lines
 		MDDOrderLine[] counterLines = counter.getLines(true, null);
 		for (int i = 0; i < counterLines.length; i++)
 		{
 			MDDOrderLine counterLine = counterLines[i];
 			counterLine.setOrder(counter);	//	copies header values (BP, etc.)
+			counterLine.setM_Locator_ID(wh.getDefaultLocator().getM_Locator_ID());
 			counterLine.saveEx(get_TrxName());
 		}
 		if (log.isLoggable(Level.FINE)) log.fine(counter.toString());

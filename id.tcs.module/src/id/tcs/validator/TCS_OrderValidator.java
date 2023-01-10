@@ -64,9 +64,9 @@ public class TCS_OrderValidator {
 		}
 		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_REACTIVATE)) {
 			if (order.isSOTrx()) {
-				msg += unreserveQty(order);
 				msg += removePayment(order);
 			}
+			msg += unreserveQty(order);
 		} 
 
 		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_VOID)) {

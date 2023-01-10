@@ -10,8 +10,10 @@ import org.compiere.model.MBPartner;
 import org.compiere.model.MDocType;
 import org.compiere.model.MLocator;
 import org.compiere.model.MMovementLine;
+import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrg;
 import org.compiere.model.MOrgInfo;
+import org.compiere.model.MStorageOnHand;
 import org.compiere.model.MUOMConversion;
 import org.compiere.model.MWarehouse;
 import org.compiere.model.Query;
@@ -19,7 +21,9 @@ import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.Util;
 import org.eevolution.model.MDDOrder;
 import org.eevolution.model.MDDOrderLine;
 
@@ -143,7 +147,33 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 					line.getC_UOM_ID(), line.getQtyOrdered());
 			if (MovementQty == null)
 				MovementQty = line.getQtyOrdered();
+
+			// Validate Negative
+			MLocator locator = new MLocator (line.getCtx(), whFrom.getDefaultLocator().get_ID(), line.get_TrxName());
+			Timestamp dateMPolicy = p_MovementDate;
+//
+			if (dateMPolicy != null)
+				dateMPolicy = Util.removeTime(dateMPolicy);
+//			//	Get Storage
+			String whereMovementQty = "M_Product_ID = ? and DD_Order_ID = ?";
+			BigDecimal sumMovementQty = new Query(Env.getCtx(), MDDOrderLine.Table_Name, whereMovementQty, line.get_TrxName())
+					.setParameters(new Object[] {line.getM_Product_ID(), line.getDD_Order_ID()})
+					.sum("QtyOrdered");
 			
+			BigDecimal newQty = sumMovementQty;
+			
+			String whereOnhand = "M_Product_ID = ? and m_locator_id = ? and datematerialpolicy <= ?";
+			BigDecimal sumQtyOnHand = new Query(Env.getCtx(), MStorageOnHand.Table_Name, whereOnhand, line.get_TrxName())
+					.setParameters(new Object[] {line.getM_Product_ID(), locator.getM_Locator_ID(), p_MovementDate})
+					.sum("QtyOnHand");
+			
+			if(newQty.compareTo(sumQtyOnHand) > 0) {
+				BigDecimal diff = newQty.subtract(sumQtyOnHand);
+				throw new AdempiereException("Negative Inventory, Product: " + line.getM_Product().getName() + 
+						" , Current Onhand: " + sumQtyOnHand + " , Internal PO Quantity: " + newQty +
+						", Shortage of: " + diff);
+			}
+							
 			if (outboundQty.compareTo(line.getQtyEntered())<0) {
 				BigDecimal newMovementQty = line.getQtyEntered()
 						.subtract(outboundQty);
