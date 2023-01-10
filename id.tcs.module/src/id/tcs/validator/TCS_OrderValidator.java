@@ -94,28 +94,30 @@ public class TCS_OrderValidator {
 		for(MOrderLine oline : olines) {
 			MProduct prod = new MProduct(Env.getCtx(), oline.getM_Product_ID(), order.get_TrxName());
 			if(prod.getProductType().equals("I") && prod.get_ValueAsBoolean("IsStocked")) {
-				String whereQtyOrdered = "M_Product_ID = ? and c_order_id = ?";
-				BigDecimal sumQtyOrdered = new Query(Env.getCtx(), MOrderLine.Table_Name, whereQtyOrdered, order.get_TrxName())
-						.setParameters(new Object[] {oline.getM_Product_ID(), order.getC_Order_ID()})
-						.sum("QtyOrdered");
-				
-				BigDecimal newQty = sumQtyOrdered;
-
 				MWarehouse wh = new MWarehouse(Env.getCtx(), order.getM_Warehouse_ID(), order.get_TrxName());
 				MLocator locator = new MLocator (Env.getCtx(), wh.getDefaultLocator().get_ID(), order.get_TrxName());
-				
-				String whereOnhand = "M_Product_ID = ? and m_locator_id = ? and datematerialpolicy <= ?";
-				BigDecimal sumQtyOnHand = new Query(Env.getCtx(), MStorageOnHand.Table_Name, whereOnhand, order.get_TrxName())
-						.setParameters(new Object[] {oline.getM_Product_ID(), locator.getM_Locator_ID(), order.getDateOrdered()})
-						.sum("QtyOnHand");
-				
-				if(newQty.compareTo(sumQtyOnHand) > 0) {
-					BigDecimal diff = newQty.subtract(sumQtyOnHand);
-					throw new AdempiereException("Negative Inventory, Product: " + oline.getM_Product().getName() + 
-							" , Current Onhand: " + sumQtyOnHand + " , SO Quantity: " + newQty +
-							", Shortage of: " + diff);
-				}
-				
+				if(wh.get_ValueAsBoolean("IsDisallowNegativeInv")) {
+
+					String whereQtyOrdered = "M_Product_ID = ? and c_order_id = ?";
+					BigDecimal sumQtyOrdered = new Query(Env.getCtx(), MOrderLine.Table_Name, whereQtyOrdered, order.get_TrxName())
+							.setParameters(new Object[] {oline.getM_Product_ID(), order.getC_Order_ID()})
+							.sum("QtyOrdered");
+					
+					BigDecimal newQty = sumQtyOrdered;
+	
+	
+					String whereOnhand = "M_Product_ID = ? and m_locator_id = ? and datematerialpolicy <= ?";
+					BigDecimal sumQtyOnHand = new Query(Env.getCtx(), MStorageOnHand.Table_Name, whereOnhand, order.get_TrxName())
+							.setParameters(new Object[] {oline.getM_Product_ID(), locator.getM_Locator_ID(), order.getDateOrdered()})
+							.sum("QtyOnHand");
+					
+					if(newQty.compareTo(sumQtyOnHand) > 0) {
+						BigDecimal diff = newQty.subtract(sumQtyOnHand);
+						throw new AdempiereException("Negative Inventory, Product: " + oline.getM_Product().getName() + 
+								" , Current Onhand: " + sumQtyOnHand + " , SO Quantity: " + newQty +
+								", Shortage of: " + diff);
+					}
+				}				
 			}
 		}
 		return "";

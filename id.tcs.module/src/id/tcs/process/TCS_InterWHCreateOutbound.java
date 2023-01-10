@@ -155,25 +155,28 @@ public class TCS_InterWHCreateOutbound extends SvrProcess {
 			if (dateMPolicy != null)
 				dateMPolicy = Util.removeTime(dateMPolicy);
 //			//	Get Storage
-			String whereMovementQty = "M_Product_ID = ? and DD_Order_ID = ?";
-			BigDecimal sumMovementQty = new Query(Env.getCtx(), MDDOrderLine.Table_Name, whereMovementQty, line.get_TrxName())
-					.setParameters(new Object[] {line.getM_Product_ID(), line.getDD_Order_ID()})
-					.sum("QtyOrdered");
+			if(whFrom.get_ValueAsBoolean("IsDisallowNegativeInv")) {
+				String whereMovementQty = "M_Product_ID = ? and DD_Order_ID = ?";
+				BigDecimal sumMovementQty = new Query(Env.getCtx(), MDDOrderLine.Table_Name, whereMovementQty, line.get_TrxName())
+						.setParameters(new Object[] {line.getM_Product_ID(), line.getDD_Order_ID()})
+						.sum("QtyOrdered");
+				
+				BigDecimal newQty = sumMovementQty;
+				
+				String whereOnhand = "M_Product_ID = ? and m_locator_id = ? and datematerialpolicy <= ?";
+				BigDecimal sumQtyOnHand = new Query(Env.getCtx(), MStorageOnHand.Table_Name, whereOnhand, line.get_TrxName())
+						.setParameters(new Object[] {line.getM_Product_ID(), locator.getM_Locator_ID(), p_MovementDate})
+						.sum("QtyOnHand");
+				
+				if(newQty.compareTo(sumQtyOnHand) > 0) {
+					BigDecimal diff = newQty.subtract(sumQtyOnHand);
+					throw new AdempiereException("Negative Inventory, Product: " + line.getM_Product().getName() + 
+							" , Current Onhand: " + sumQtyOnHand + " , Internal PO Quantity: " + newQty +
+							", Shortage of: " + diff);
+				}
+	
+			}							
 			
-			BigDecimal newQty = sumMovementQty;
-			
-			String whereOnhand = "M_Product_ID = ? and m_locator_id = ? and datematerialpolicy <= ?";
-			BigDecimal sumQtyOnHand = new Query(Env.getCtx(), MStorageOnHand.Table_Name, whereOnhand, line.get_TrxName())
-					.setParameters(new Object[] {line.getM_Product_ID(), locator.getM_Locator_ID(), p_MovementDate})
-					.sum("QtyOnHand");
-			
-			if(newQty.compareTo(sumQtyOnHand) > 0) {
-				BigDecimal diff = newQty.subtract(sumQtyOnHand);
-				throw new AdempiereException("Negative Inventory, Product: " + line.getM_Product().getName() + 
-						" , Current Onhand: " + sumQtyOnHand + " , Internal PO Quantity: " + newQty +
-						", Shortage of: " + diff);
-			}
-							
 			if (outboundQty.compareTo(line.getQtyEntered())<0) {
 				BigDecimal newMovementQty = line.getQtyEntered()
 						.subtract(outboundQty);
