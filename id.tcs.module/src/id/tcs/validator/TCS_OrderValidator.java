@@ -92,7 +92,8 @@ public class TCS_OrderValidator {
 	private static String validateOnhand(TCS_MOrder order) {
 		MOrderLine[] olines = order.getLines(true, null);
 		for(MOrderLine oline : olines) {
-			if(oline.get_ValueAsBoolean("IsBOMDrop")) {
+			MProduct prod = new MProduct(Env.getCtx(), oline.getM_Product_ID(), order.get_TrxName());
+			if(prod.getProductType().equals("I") && prod.get_ValueAsBoolean("IsStocked")) {
 				String whereQtyOrdered = "M_Product_ID = ? and c_order_id = ?";
 				BigDecimal sumQtyOrdered = new Query(Env.getCtx(), MOrderLine.Table_Name, whereQtyOrdered, order.get_TrxName())
 						.setParameters(new Object[] {oline.getM_Product_ID(), order.getC_Order_ID()})
