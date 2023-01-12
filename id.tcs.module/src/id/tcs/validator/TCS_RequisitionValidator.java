@@ -10,6 +10,7 @@ import org.compiere.model.MUOM;
 import org.compiere.model.MUOMConversion;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
 
@@ -33,7 +34,26 @@ public class TCS_RequisitionValidator {
 			//Fix Qty in Requisition Line - it's err after close code in core
 			msg += fixQtyRequisitionLine(req);
 		}
+		
+
+		else if ((event.getTopic().equals(IEventTopics.DOC_AFTER_VOID))) {
+			msg += updateReferences(req);
+		}
 		return msg;
+	}
+
+	private static String updateReferences(MRequisition req) {
+		String sqlUpdate = "update m_replenishment set m_requisition_id = null where m_requisition_id =" +req.getM_Requisition_ID();
+		DB.executeUpdate(sqlUpdate, req.get_TrxName());
+		
+		String sqlUpdateReqLine = "update m_requisitionline set qtyentered = 0 where m_requisition_id =" +req.getM_Requisition_ID();
+		DB.executeUpdate(sqlUpdateReqLine, req.get_TrxName());
+		
+		
+		req.setProcessed(true);
+		req.saveEx();
+		
+		return "";
 	}
 
 	private static String fixQtyRequisitionLine(MRequisition req) {

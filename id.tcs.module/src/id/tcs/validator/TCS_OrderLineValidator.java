@@ -2,6 +2,7 @@ package id.tcs.validator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.SQLException;
 
 import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.MOrderLine;
@@ -11,6 +12,7 @@ import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Trx;
 import org.osgi.service.event.Event;
 
 import id.tcs.model.MMatchPR;
@@ -26,6 +28,8 @@ public class TCS_OrderLineValidator {
 			if (orderLine.getC_Order().isSOTrx()) {
 				msg += removeMatchQuotation(orderLine);
 			} else {
+				// Update Qty Ordered on Requisition Line first before delete match pr
+				msg += updateQtyOrderedRequisition(orderLine);
 				//Delete related Match PR before delete PO Line
 				msg += removeMatchPR(orderLine);
 			}
@@ -71,7 +75,22 @@ public class TCS_OrderLineValidator {
 		return msg;
 	}
 
+	private static String updateQtyOrderedRequisition(MOrderLine orderLine) {
 
+		String whereClause = " C_OrderLine_ID = " + orderLine.getC_OrderLine_ID();
+		MMatchPR matchpr = new Query(Env.getCtx(), MMatchPR.Table_Name, whereClause, orderLine.get_TrxName()).first();
+		if(matchpr.getM_RequisitionLine_ID() > 0 ) {
+			MRequisitionLine rline = new MRequisitionLine(Env.getCtx(), matchpr.getM_RequisitionLine_ID(), orderLine.get_TrxName());
+			BigDecimal qtyOrdered = (BigDecimal) rline.get_Value("QtyOrdered");
+			BigDecimal newQtyOrdered = qtyOrdered.subtract(orderLine.getQtyOrdered());
+			rline.set_ValueNoCheck("QtyOrdered", newQtyOrdered);
+			rline.saveEx();
+			
+		}
+		
+		return "";
+	}
+	
 	private static String updateLineReferences(MOrderLine orderLine) {
 		if(orderLine.get_ValueAsBoolean("IsBOMDrop")) {
 			MOrderLine ol = new MOrderLine(Env.getCtx(), orderLine.get_ValueAsInt("BOMDrop_Line_ID"), orderLine.get_TrxName());
@@ -136,10 +155,10 @@ public class TCS_OrderLineValidator {
 					.sum(MMatchPR.COLUMNNAME_QtyOrdered);
 
 			MRequisitionLine reqLine = new MRequisitionLine(orderLine.getCtx(), orderLine.get_ValueAsInt("M_RequisitionLine_ID"), orderLine.get_TrxName());
+			BigDecimal oldQty = (BigDecimal) reqLine.get_Value("QtyEntered");
+			BigDecimal finalQtyOrdered = orderLine.getQtyOrdered().add(reqLine.getQtyOrdered());
 
-			BigDecimal finalQtyOrdered = orderLine.getQtyOrdered().add(sumMatchedQty);
-
-			if (finalQtyOrdered.compareTo(reqLine.getQty()) > 0)
+			if (finalQtyOrdered.compareTo(oldQty) > 0)
 				return "Line " +orderLine.getLine() + ", QtyOrdered = "+orderLine.getQtyOrdered() + ", Previously Matched Qty = " + sumMatchedQty 
 						+ ", Total Requisition Qty = " + reqLine.getQty() + " - Total Qty Ordered > Qty on Requisition";
 		}
@@ -162,23 +181,27 @@ public class TCS_OrderLineValidator {
 		}
 		
 		BigDecimal diffQty = matchPR.getQtyOrdered().subtract(orderLine.getQtyDelivered());
-		matchPR.setQtyOrdered(orderLine.getQtyDelivered());
+		matchPR.setQtyOrdered(orderLine.getQtyOrdered());
 		matchPR.saveEx();
 
-		MRequisitionLine reqLine = new MRequisitionLine(orderLine.getCtx(), reqLineID, orderLine.get_TrxName());
-		BigDecimal QtyOrdered = reqLine.get_Value("QtyOrdered") != null ? (BigDecimal)reqLine.get_Value("QtyOrdered") : BigDecimal.ZERO;			
-		BigDecimal newQtyOrdered = QtyOrdered.add(orderLine.getQtyOrdered());
+		String whereSumQtyOrdered = "M_requisitionline_id = ? and c_orderline_id <> ?";
+		BigDecimal sumQtyOrdered = new Query(Env.getCtx(), MMatchPR.Table_Name, whereSumQtyOrdered, orderLine.get_TrxName())
+				.setParameters(new Object[] {matchPR.getM_RequisitionLine_ID() , orderLine.getC_OrderLine_ID()})
+				.sum("QtyOrdered");
+
+		MRequisitionLine reqLine = new MRequisitionLine(orderLine.getCtx(), matchPR.getM_RequisitionLine_ID(), orderLine.get_TrxName());
+//		BigDecimal QtyOrdered = reqLine.get_Value("QtyOrdered") != null ? (BigDecimal)reqLine.get_Value("QtyOrdered") : BigDecimal.ZERO;			
+		BigDecimal newQtyOrdered = sumQtyOrdered.add(orderLine.getQtyEntered());
 
 		reqLine.set_CustomColumn("QtyOrdered", newQtyOrdered);
-		reqLine.saveEx();
+		reqLine.saveEx(reqLine.get_TrxName());
 
 
 
-		MRequisitionLine rLine = new MRequisitionLine(Env.getCtx(), matchPR.getM_RequisitionLine_ID(), null);
-		BigDecimal reqLineQtyOrdered = (BigDecimal) rLine.get_Value("QtyOrdered");
-		rLine.set_CustomColumn("QtyOrdered", reqLineQtyOrdered.subtract(diffQty));
-		rLine.saveEx();
-
+//		MRequisitionLine rLine = new MRequisitionLine(Env.getCtx(), matchPR.getM_RequisitionLine_ID(), null);
+//		BigDecimal reqLineQtyOrdered = (BigDecimal) rLine.get_Value("QtyOrdered");
+//		rLine.set_CustomColumn("QtyOrdered", reqLineQtyOrdered.subtract(diffQty));
+//		rLine.save();
 
 
 		return "";
@@ -196,7 +219,7 @@ public class TCS_OrderLineValidator {
 		StringBuilder sql = new StringBuilder("DELETE FROM ").append(X_M_MatchPR.Table_Name)
 				.append(" WHERE C_OrderLine_ID=?");
 		DB.executeUpdateEx(sql.toString(), new Object[] {orderLine.get_ID()}, orderLine.get_TrxName());
-
+		
 		return "";
 	}
 

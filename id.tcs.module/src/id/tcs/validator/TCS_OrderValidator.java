@@ -59,7 +59,8 @@ public class TCS_OrderValidator {
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
 			if (order.isSOTrx()) {
 				msg += checkBOMDrop(order);
-				msg += validateOnhand(order);
+				if(!order.getC_DocType().getDocSubTypeSO().equals("SO"))
+					msg += validateOnhand(order);
 			}
 		}
 		else if (event.getTopic().equals(IEventTopics.DOC_AFTER_REACTIVATE)) {
