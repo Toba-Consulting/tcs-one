@@ -39,6 +39,9 @@ public class TCS_CalloutOrderLine extends CalloutEngine implements IColumnCallou
 
 	private String setDiscount(Properties ctx, int windowNo, GridTab mTab, GridField mField, Object value) {
 		BigDecimal pricelist =  (BigDecimal) value;
+		if(pricelist.compareTo(Env.ZERO) == 0)
+			pricelist = Env.ONE;
+		
 		BigDecimal discount = pricelist.subtract((BigDecimal) mTab.getValue("PriceActual"))
 				.multiply(Env.ONEHUNDRED)
 				.divide(pricelist, 2, RoundingMode.HALF_UP);
