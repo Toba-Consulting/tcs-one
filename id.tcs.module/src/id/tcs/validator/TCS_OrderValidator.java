@@ -59,6 +59,7 @@ public class TCS_OrderValidator {
 		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE)) {
 			if (order.isSOTrx()) {
 				msg += checkBOMDrop(order);
+				msg += validateLine(order);
 				if(!order.getC_DocType().getDocSubTypeSO().equals("SO"))
 					msg += validateOnhand(order);
 			}
@@ -88,6 +89,15 @@ public class TCS_OrderValidator {
 		} 
 
 		return msg;
+	}
+
+	private static String validateLine(TCS_MOrder order) {
+		MOrderLine[] olines = order.getLines(true, null);
+		for(MOrderLine oline : olines) {
+			if(oline.getC_Charge_ID() <= 0 && oline.getM_Product_ID() <= 0)
+				throw new AdempiereException("Line No: " + oline.getLine() + " - Product and Charge cannot be null");
+		}
+		return "";
 	}
 
 	private static String validateOnhand(TCS_MOrder order) {
