@@ -10,6 +10,7 @@ import org.compiere.model.MDocType;
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.MProduct;
 import org.compiere.model.Query;
 
 import id.tcs.model.I_M_MatchQuotation;
@@ -231,6 +232,10 @@ public class TCSQuotationToOrder extends SvrProcess{
 				orderLine.setPriceList(quoteLine.getPriceList());
 				orderLine.setLine(quoteLine.getLine());
 				orderLine.set_ValueOfColumn("commissioncustomer", quoteLine.get_Value("commissioncustomer"));
+				
+				// set isBOM value for BOM drop
+				MProduct prod = new MProduct(getCtx(), quoteLine.getM_Product_ID(), quoteLine.get_TrxName());
+				orderLine.set_ValueNoCheck("IsBOM", prod.get_Value("IsBOM"));
 				orderLine.saveEx();
 				
 				
