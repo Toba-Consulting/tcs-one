@@ -79,7 +79,7 @@ public class TCS_OrderLineValidator {
 
 		String whereClause = " C_OrderLine_ID = " + orderLine.getC_OrderLine_ID();
 		MMatchPR matchpr = new Query(Env.getCtx(), MMatchPR.Table_Name, whereClause, orderLine.get_TrxName()).first();
-		if(matchpr.getM_RequisitionLine_ID() > 0 ) {
+		if(matchpr != null ) {
 			MRequisitionLine rline = new MRequisitionLine(Env.getCtx(), matchpr.getM_RequisitionLine_ID(), orderLine.get_TrxName());
 			BigDecimal qtyOrdered = (BigDecimal) rline.get_Value("QtyOrdered");
 			BigDecimal newQtyOrdered = qtyOrdered.subtract(orderLine.getQtyOrdered());
