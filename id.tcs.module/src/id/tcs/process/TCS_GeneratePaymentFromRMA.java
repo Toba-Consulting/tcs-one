@@ -57,7 +57,7 @@ public class TCS_GeneratePaymentFromRMA extends SvrProcess {
 		String sqlAmount = "Select sum(linenetamt) from m_rmaline where m_rma_id = ?";
 		BigDecimal amt = DB.getSQLValueBD(get_TrxName(), sqlAmount, rma.getM_RMA_ID());
 		
-		String sqlInout = "select m_inout_id from m_inout where m_rma_id = " + rma.getM_RMA_ID(); 
+		String sqlInout = "select m_inout_id from m_inout where docstatus ='CO' and m_rma_id = " + rma.getM_RMA_ID(); 
 		int M_InOut_ID = DB.getSQLValue(get_TrxName(), sqlInout);
 		MInOut inout = new MInOut(getCtx(), M_InOut_ID, get_TrxName());
 		

@@ -13,6 +13,7 @@ import org.compiere.model.MOrderLine;
 import org.compiere.model.MPayment;
 import org.compiere.model.MProduct;
 import org.compiere.model.MProductBOM;
+import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
@@ -53,28 +54,35 @@ public class TCS_ReverseAllRelatedToOrder extends SvrProcess {
 		int C_Invoice_ID = DB.getSQLValue(get_TrxName(), sqlInvoice, M_Inout_ID);
 		MInvoice invoice = new MInvoice(getCtx(), C_Invoice_ID, get_TrxName());
 		
-		String sqlAllocation = "select distinct cah.c_allocationhdr_id from c_allocationhdr cah "
-				+ "join c_allocationline cal on cal.c_allocationhdr_id = cah.c_allocationhdr_id where cah.docstatus='CO' and cal.c_invoice_id = " + C_Invoice_ID;
-		int C_AllocationHdr_ID = DB.getSQLValue(get_TrxName(), sqlAllocation);
-		MAllocationHdr alloc = new MAllocationHdr(getCtx(), C_AllocationHdr_ID, get_TrxName());
+		String whereClause = "docstatus='CO' and cal.c_invoice_id = " + C_Invoice_ID;
 		
-		String sqlPayment = "select c_payment_id from c_allocationline cal "
-				+ "join c_allocationhdr cah on cal.c_allocationhdr_id = cah.c_allocationhdr_id where cah.docstatus='CO' and cah.c_allocationhdr_id = " + C_AllocationHdr_ID ;
-		int C_Payment_ID = DB.getSQLValue(get_TrxName(), sqlPayment);
+		List<MAllocationHdr> allocs = new Query(getCtx(), MAllocationHdr.Table_Name, whereClause, get_TrxName())
+				.addJoinClause(" join c_allocationline cal on cal.c_allocationhdr_id = C_AllocationHDR.c_allocationhdr_id")
+				.list();
+		
+		for(MAllocationHdr alloc : allocs) {
+			int C_AllocationHdr_ID = 0;
+			if(alloc != null)
+				C_AllocationHdr_ID = alloc.getC_AllocationHdr_ID();
+			
+			String sqlPayment = "select c_payment_id from c_allocationline cal "
+					+ "join c_allocationhdr cah on cal.c_allocationhdr_id = cah.c_allocationhdr_id where cah.docstatus='CO' and cah.c_allocationhdr_id = " + alloc.getC_AllocationHdr_ID() ;
+			int C_Payment_ID = DB.getSQLValue(get_TrxName(), sqlPayment);
+			
+			// allocation
+			if(C_AllocationHdr_ID > 0) {
+				alloc.processIt("RC");
+				alloc.saveEx(get_TrxName());		
+			}
+			//Payment
+			if(C_Payment_ID > 0) {
+				MPayment payment = new MPayment(getCtx(), C_Payment_ID, get_TrxName());
+				payment.processIt("RC");
+				payment.saveEx(get_TrxName());	
+			}	
+		}
 		
 		// Reverse all
-		// allocation
-		if(C_AllocationHdr_ID > 0) {
-			alloc.processIt("RC");
-			alloc.saveEx(get_TrxName());		
-		}
-		//Payment
-		if(C_Payment_ID > 0) {
-			MPayment payment = new MPayment(getCtx(), C_Payment_ID, get_TrxName());
-			payment.processIt("RC");
-			payment.saveEx(get_TrxName());
-			
-		}
 		//Invoice
 		invoice.processIt("RC");
 		invoice.saveEx(get_TrxName());

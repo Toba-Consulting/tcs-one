@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.I_M_RMA;
+import org.compiere.model.MInOutLine;
+import org.compiere.model.MOrderLine;
 import org.compiere.model.MRMALine;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
@@ -43,17 +45,25 @@ public class TCS_RMAValidator {
 	}
 
 	private static String ValidateBeforeReactivate(TCS_MRMA rma) {
-		
-		String whereClause = "rline.M_RMA_ID=? AND rline.QtyDelivered > 0";
-		boolean match = new Query(rma.getCtx(), I_M_RMA.Table_Name, whereClause, rma.get_TrxName())
-							.addJoinClause("JOIN M_RMALine rline on rline.M_RMA_ID = M_RMA.M_RMA_ID")
-							.setOnlyActiveRecords(true)
-							.setParameters(new Object[] {rma.get_ID()})
-							.match();
-		
-		if (match)
-			return "Cannot Reactivate, RMA has link to completed vendor/customer return";
-		
+
+		int [] temp = new Query(rma.getCtx(), MRMALine.Table_Name, "M_RMA_ID="+rma.getM_RMA_ID(), rma.get_TrxName())
+				.getIDs();
+		if (temp==null || temp.length==0) {
+			return "";
+		}
+		String IDs = "";
+		for (int i : temp) {
+			IDs+=i;
+			IDs+=", ";
+		}
+		IDs=IDs.substring(0, IDs.length()-2);
+		String sqlWhere = "M_RMALine_ID IN ("+IDs+") AND mi.DocStatus IN ('CO','CL','IP')";
+		boolean match = new Query(rma.getCtx(), MInOutLine.Table_Name, sqlWhere, rma.get_TrxName())
+				.addJoinClause("JOIN M_InOut mi on mi.M_InOut_ID=M_InOutLine.M_InOut_ID")
+				.match();
+		if (match) {
+			return "Cannot Reactivate RMA : Active InOut Exists For RMA Line";
+		}
 		return "";
 	}
 

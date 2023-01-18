@@ -372,6 +372,9 @@ public class TCS_CreateFromOrder extends CreateFrom {
                 orderLine.saveEx();
                 
                 //end of code
+                
+                reqLine.setC_OrderLine_ID(orderLine.getC_OrderLine_ID());
+                reqLine.saveEx();
             }
         }
         return true;
