@@ -7,6 +7,7 @@ import org.compiere.model.MPayment;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.model.TCS_MOrder;
+import org.compiere.model.TCS_MRMA;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
@@ -28,10 +29,21 @@ public class TCS_PaymentValidator {
 		else if ((event.getTopic().equals(IEventTopics.DOC_AFTER_REVERSEACCRUAL)) ||
 				(event.getTopic().equals(IEventTopics.DOC_AFTER_REVERSECORRECT))) {
 			msg += removeOrder(payment);
+			msg += removeRMARef(payment);
 		}
 		return msg;
 	}
 	
+	private static String removeRMARef(MPayment payment) {
+		if(payment.get_ValueAsInt("M_RMA_ID") > 0) {
+			TCS_MRMA rma = new TCS_MRMA(Env.getCtx(), payment.get_ValueAsInt("M_RMA_ID"), payment.get_TrxName());
+			rma.set_ValueOfColumn("IsPaid", false);
+			rma.set_ValueOfColumn("C_Payment_ID", null);
+			rma.saveEx();
+		}
+		return "";
+	}
+
 	private static String removeOrder(MPayment payment) {
 		if(payment.get_ValueAsInt("C_OrderPayment_ID") > 0) {
 			int orderPay_ID = payment.get_ValueAsInt("C_OrderPayment_ID");

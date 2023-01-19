@@ -95,10 +95,15 @@ public class TCS_GeneratePaymentFromRMA extends SvrProcess {
 		payment.setDateAcct((Timestamp) rma.get_Value("DateDoc"));
 		payment.setDateTrx((Timestamp) rma.get_Value("DateDoc"));
 		payment.setC_DocType_ID(C_DocType_ID);
+		payment.set_ValueOfColumn("M_RMA_ID", rma.getM_RMA_ID());
 		payment.setIsPrepayment(false);
 		payment.setIsReceipt(true);
 		payment.saveEx();
-		payment.processIt(DocAction.ACTION_Complete);
+		if(!payment.processIt(DocAction.ACTION_Complete)) 
+			throw new AdempiereException("Could not complte Payment");
+		else
+			rma.set_ValueOfColumn("IsPaid", true);
+
 		payment.saveEx();
 
 		invoice.setC_Payment_ID(payment.get_ID());
