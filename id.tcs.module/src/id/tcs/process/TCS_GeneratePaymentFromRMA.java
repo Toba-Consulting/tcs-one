@@ -100,7 +100,7 @@ public class TCS_GeneratePaymentFromRMA extends SvrProcess {
 		payment.setIsReceipt(true);
 		payment.saveEx();
 		if(!payment.processIt(DocAction.ACTION_Complete)) 
-			throw new AdempiereException("Could not complte Payment");
+			throw new AdempiereException("Could not complete Payment");
 		else
 			rma.set_ValueOfColumn("IsPaid", true);
 
