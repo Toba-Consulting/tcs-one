@@ -124,7 +124,7 @@ public class TCSBankRegister extends SvrProcess{
 				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo) " );
 		
 		sb.append("select bs.AD_Client_ID, bs.AD_Org_ID, bs.IsActive, bs.Created, bs.CreatedBy, bs.Updated, bs.UpdatedBy, bs.c_bankaccount_id, ")
-		.append("bsl.c_bankstatementline_id, bsl.dateacct, bsl.Description, ")
+		.append("bsl.c_bankstatementline_id, bsl.dateacct, cp.Description, ")
 		.append("CASE ")
 		.append("when bsl.stmtamt>0 ")
 		.append("then bsl.stmtamt ")
