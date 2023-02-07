@@ -149,7 +149,7 @@ public class TCSBankRegister extends SvrProcess{
 		.append("where bs.c_bankaccount_id="+p_C_BankAccount_ID) 
 		.append(" and bs.docstatus IN ('CO','CL') ") 
 		.append("and bsl.dateAcct between '"+p_DateFrom+"' and '"+p_DateTo+"'")
-		.append(" group by bs.ad_client_id, bs.ad_org_id, bs.isactive, bs.created, bs.createdby, bs.updated, bs.updatedby, bs.c_bankaccount_id,  bsl.c_bankstatementline_id, bsl.dateacct, bs.Description, cp.VoucherNo, cp.documentno, bp.value, bp.name ")
+		.append(" group by bs.ad_client_id, bs.ad_org_id, bs.isactive, bs.created, bs.createdby, bs.updated, bs.updatedby, bs.c_bankaccount_id,  bsl.c_bankstatementline_id, bsl.dateacct, cp.Description, cp.VoucherNo, cp.documentno, bp.value, bp.name ")
 		.append("order by bsl.dateacct, cp.VoucherNo, bsl.c_bankstatementline_id ");
 		
 		int no = DB.executeUpdateEx(sb.toString(), new Object[]{p_DateFrom, p_DateTo}, get_TrxName());
