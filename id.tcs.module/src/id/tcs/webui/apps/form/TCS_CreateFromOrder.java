@@ -412,7 +412,7 @@ public class TCS_CreateFromOrder extends CreateFrom {
 		
 		StringBuilder sql = new StringBuilder("SELECT DISTINCT r.M_Requisition_ID,").append(display)
 			.append(" FROM M_Requisition r ")
-			.append(" WHERE EXISTS (SELECT 1 FROM M_RequisitionLine l WHERE r.M_Requisition_ID=l.M_Requisition_ID")
+			.append(" WHERE EXISTS (SELECT 1 FROM M_RequisitionLine l WHERE r.M_Requisition_ID=l.M_Requisition_ID and l.QtyEntered-l.QtyOrdered!=0 ")
 			.append(" AND r.AD_Client_ID=? AND r.DocStatus=?)")
 			.append(" AND r.AD_Org_ID=? ");
 		//	.append(" AND (l.QtyRequisite - unprocessedpofrompr(m_requisitionline_ID)) > 0) ");
