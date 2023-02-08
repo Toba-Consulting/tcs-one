@@ -121,7 +121,7 @@ public class TCSBankRegister extends SvrProcess{
 		String bankAccountName = bankAcc.get_ValueAsString("name");
 		StringBuffer sb = new StringBuffer("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
-				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo) " );
+				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo, c_payment_id) " );
 		
 		sb.append("select bs.AD_Client_ID, bs.AD_Org_ID, bs.IsActive, bs.Created, bs.CreatedBy, bs.Updated, bs.UpdatedBy, bs.c_bankaccount_id, ")
 		.append("bsl.c_bankstatementline_id, bsl.dateacct, cp.Description, ")
@@ -140,7 +140,7 @@ public class TCSBankRegister extends SvrProcess{
 		.append(bankAccountName).append("', '").append(currencyName).append("', ")
 		.append("COALESCE((SELECT cp.documentno || ' - ' || bp.value || ' - ' || bp.name from C_Payment cp JOIN C_BPartner bp ON cp.C_BPartner_ID=bp.C_BPartner_ID ")
 		.append("WHERE cp.C_Payment_ID=bsl.C_Payment_ID), (SELECT name FROM C_Charge cc WHERE cc.C_Charge_ID=bsl.C_Charge_ID)), ")
-		.append("3, cp.VoucherNo, cp.documentno, bp.value, bp.name ,?,?") // add column voucher @phie // HBC 2529 Reference -> documentNo, bp_value, bp_name
+		.append("3, cp.VoucherNo, cp.documentno, bp.value, bp.name ,?,?, cp.c_payment_id") // add column voucher @phie // HBC 2529 Reference -> documentNo, bp_value, bp_name
 		.append(" from c_bankstatement bs ") 
 		//.append("join c_bankaccount ba on ba.c_bankaccount_id=bs.c_bankaccount_id ") 
 		.append("join c_bankstatementline bsl on bs.c_bankstatement_id=bsl.c_bankstatement_id ")
@@ -149,7 +149,7 @@ public class TCSBankRegister extends SvrProcess{
 		.append("where bs.c_bankaccount_id="+p_C_BankAccount_ID) 
 		.append(" and bs.docstatus IN ('CO','CL') ") 
 		.append("and bsl.dateAcct between '"+p_DateFrom+"' and '"+p_DateTo+"'")
-		.append(" group by bs.ad_client_id, bs.ad_org_id, bs.isactive, bs.created, bs.createdby, bs.updated, bs.updatedby, bs.c_bankaccount_id,  bsl.c_bankstatementline_id, bsl.dateacct, cp.Description, cp.VoucherNo, cp.documentno, bp.value, bp.name ")
+		.append(" group by bs.ad_client_id, bs.ad_org_id, bs.isactive, bs.created, bs.createdby, bs.updated, bs.updatedby, bs.c_bankaccount_id,  bsl.c_bankstatementline_id, bsl.dateacct, cp.Description, cp.VoucherNo, cp.documentno, bp.value, bp.name, cp.c_payment_id ")
 		.append("order by bsl.dateacct, cp.VoucherNo, bsl.c_bankstatementline_id ");
 		
 		int no = DB.executeUpdateEx(sb.toString(), new Object[]{p_DateFrom, p_DateTo}, get_TrxName());
@@ -183,7 +183,7 @@ public class TCSBankRegister extends SvrProcess{
 		String bankAccountName = bankAcc.get_ValueAsString("name");
 		StringBuffer sb = new StringBuffer("INSERT INTO T_TCSBankReport "
 				+ "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy, C_BankAccount_ID, C_BankStatementLine_ID, DateAcct, Description, "
-				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo) " );
+				+ "AmtSourceDR, AmtSourceCR, Balance, AD_PInstance_ID, T_TCSBankReport_UU, C_BankAccount_Name, C_Currency_Name, Reference, Sequence, VoucherNo, DocumentNo, C_BPartner_Value, C_BPartner_Name, DateFrom, DateTo, c_payment_id) " );
 				
 		sb.append("select cp.AD_Client_ID, cp.AD_Org_ID, cp.IsActive, cp.Created, cp.CreatedBy, cp.Updated, cp.UpdatedBy, cp.c_bankaccount_id, ")
 		.append("null, cp.dateacct, cp.Description, ")
@@ -212,7 +212,7 @@ public class TCSBankRegister extends SvrProcess{
 		.append(", null, '")
 		.append(bankAccountName).append("', '").append(currencyName).append("', ")
 		.append("cp.documentno ||' - '|| bp.value || ' - ' || bp.name, ")
-		.append("5, cp.VoucherNo, cp.documentno, bp.value, bp.name, ?,?") // add column voucher @phie
+		.append("5, cp.VoucherNo, cp.documentno, bp.value, bp.name, ?,?, cp.c_payment_id") // add column voucher @phie
 		.append(" from c_payment cp ") 
 		.append("join c_bpartner bp on bp.c_bpartner_id=cp.c_bpartner_id ")
 		//.append("join c_bankaccount ba on ba.c_bankaccount_id=cp.c_bankaccount_id ")
