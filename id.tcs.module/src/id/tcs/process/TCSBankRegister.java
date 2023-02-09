@@ -179,6 +179,13 @@ public class TCSBankRegister extends SvrProcess{
 	protected void createUnreconciledLines(BigDecimal balance){
 		
 		MBankAccount bankAcc = new MBankAccount(getCtx(), p_C_BankAccount_ID, get_TrxName());
+		String statementlineSql = "select c_bankstatementline_id from t_tcsbankreport where sequence = 3 order by c_bankstatementline_id desc";
+		int bankstatementlineid = DB.getSQLValue(get_TrxName(), statementlineSql);
+		String balanceSql = "select balance from t_tcsbankreport where c_bankstatementline_id = ?";
+		BigDecimal newBalance = DB.getSQLValueBD(get_TrxName(), balanceSql, bankstatementlineid);
+		if(newBalance != null) 
+				balance = newBalance;			
+		
 		String currencyName = bankAcc.getC_Currency().getISO_Code();
 		String bankAccountName = bankAcc.get_ValueAsString("name");
 		StringBuffer sb = new StringBuffer("INSERT INTO T_TCSBankReport "
