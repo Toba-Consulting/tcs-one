@@ -1061,7 +1061,7 @@ public class TCS_MPayment extends MPayment {
 			
 			// [ adempiere-Bugs-1885417 ] Validate BP on Payment Prepare or BeforeSave
 			// there is bp and (invoice or order)
-			if (getC_BPartner_ID() != 0 && (getC_Invoice_ID() != 0 || getC_Order_ID() != 0)) {
+			if (getC_BPartner_ID() != 0 && (getC_Invoice_ID() != 0 || getC_Order_ID() != 0) && getDocStatus().compareTo(STATUS_Reversed) != 0) {
 				if (getC_Invoice_ID() != 0) {
 					MInvoice inv = new MInvoice(getCtx(), getC_Invoice_ID(), get_TrxName());
 					if (inv.getC_BPartner_ID() != getC_BPartner_ID()) {
