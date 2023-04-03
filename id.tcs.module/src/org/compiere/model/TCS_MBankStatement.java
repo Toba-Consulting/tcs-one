@@ -78,7 +78,7 @@ public class TCS_MBankStatement extends MBankStatement implements DocOptions{
 			MBankStatementLine line = lines[i];
 			if (line.getC_Payment_ID() != 0)
 			{
-				MPayment payment = new MPayment (getCtx(), line.getC_Payment_ID(), get_TrxName());
+				TCS_MPayment payment = new TCS_MPayment (getCtx(), line.getC_Payment_ID(), get_TrxName());
 				payment.setIsReconciled(false);
 				payment.saveEx(get_TrxName());
 
@@ -114,6 +114,58 @@ public class TCS_MBankStatement extends MBankStatement implements DocOptions{
 
 		return true;
 	}	//	reActivateIt
+	
+	public String completeIt()
+	{
+		//	Re-Check
+		if (!m_justPrepared)
+		{
+			String status = prepareIt();
+			m_justPrepared = false;
+			if (!DocAction.STATUS_InProgress.equals(status))
+				return status;
+		}
+
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_COMPLETE);
+		if (m_processMsg != null)
+			return DocAction.STATUS_Invalid;
+		
+		//	Implicit Approval
+		if (!isApproved())
+			approveIt();
+		if (log.isLoggable(Level.INFO)) log.info("completeIt - " + toString());
+		
+		//	Set Payment reconciled
+		MBankStatementLine[] lines = getLines(false);
+		for (int i = 0; i < lines.length; i++)
+		{
+			MBankStatementLine line = lines[i];
+			if (line.getC_Payment_ID() != 0)
+			{
+				TCS_MPayment payment = new TCS_MPayment (getCtx(), line.getC_Payment_ID(), get_TrxName());
+				payment.setIsReconciled(true);
+				payment.saveEx(get_TrxName());
+			}
+		}
+		//	Update Bank Account
+		MBankAccount ba = getBankAccount();
+		ba.load(get_TrxName());
+		//BF 1933645
+		ba.setCurrentBalance(ba.getCurrentBalance().add(getStatementDifference()));
+		ba.saveEx(get_TrxName());
+		
+		//	User Validation
+		String valid = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_COMPLETE);
+		if (valid != null)
+		{
+			m_processMsg = valid;
+			return DocAction.STATUS_Invalid;
+		}
+		//
+		setProcessed(true);
+		setDocAction(DOCACTION_Close);
+		return DocAction.STATUS_Completed;
+	}	//	completeIt
 	
 	@Override
 	public int customizeValidActions(String docStatus, Object processing,
