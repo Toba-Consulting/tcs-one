@@ -20,6 +20,7 @@ import org.compiere.model.I_M_InOutLine;
 import org.compiere.model.I_M_Movement;
 import org.compiere.model.I_M_RMA;
 import org.compiere.model.I_M_Requisition;
+import org.compiere.model.MProductPO;
 import org.compiere.util.CLogger;
 import org.eevolution.model.I_DD_Order;
 import org.eevolution.model.I_PP_Product_BOMLine;
@@ -40,6 +41,7 @@ import id.tcs.validator.TCS_OrderValidator;
 import id.tcs.validator.TCS_PPProductBomLineValidator;
 import id.tcs.validator.TCS_PaymentAllocateValidator;
 import id.tcs.validator.TCS_PaymentValidator;
+import id.tcs.validator.TCS_ProductPOValidator;
 import id.tcs.validator.TCS_QuotationLineValidator;
 import id.tcs.validator.TCS_QuotationValidator;
 import id.tcs.validator.TCS_RFQLineValidator;
@@ -164,6 +166,11 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		//Product BOM Line
 		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_PP_Product_BOMLine.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_PP_Product_BOMLine.Table_Name);
+		
+		// Product PO
+		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, MProductPO.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, MProductPO.Table_Name);
+
 		log.info("PROJECT MANAGEMENT EVENT MANAGER // INITIALIZED");
 	}
 
@@ -279,6 +286,11 @@ public class TCS_ValidatorFactory extends AbstractEventHandler {
 		//Product BOM Line
 		else if(getPO(event).get_TableName().equals(I_PP_Product_BOMLine.Table_Name)) {
 			msg = TCS_PPProductBomLineValidator.executeEvent(event, getPO(event));
+		}
+		
+		//Product PO
+		else if(getPO(event).get_TableName().equals(MProductPO.Table_Name)) {
+			msg = TCS_ProductPOValidator.executeEvent(event, getPO(event));
 		}
 
 		if (msg.length() > 0)

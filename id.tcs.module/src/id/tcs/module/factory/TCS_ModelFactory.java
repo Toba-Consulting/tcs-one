@@ -34,6 +34,7 @@ import org.compiere.model.I_M_Movement;
 import org.compiere.model.I_M_RMA;
 import org.compiere.model.I_M_Requisition;
 import org.compiere.model.I_TCS_AllocateCharge;
+import org.compiere.model.MProductPO;
 import org.compiere.model.PO;
 import org.compiere.model.TCS_MDDOrder;
 import org.compiere.model.X_M_Periodic_Cost;
@@ -120,7 +121,7 @@ public class TCS_ModelFactory implements IModelFactory {
 		//mapTableModels.put(X_C_DocType.Table_Name, "org.compiere.model.X_C_DocType");
 		
 		mapTableModels.put(I_C_OrderPayment.Table_Name, "id.tcs.model.TCS_MOrderPayment");
-		
+		mapTableModels.put(MProductPO.Table_Name, "id.tcs.model.TCS_MProductPO");		
 	}
 	
 	@Override
