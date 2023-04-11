@@ -532,6 +532,7 @@ public class TCS_ImportProduct extends SvrProcess implements ImportProcess
 				int C_BPartner_ID = imp.getC_BPartner_ID();
 				Boolean IsPurchased = imp.get_ValueAsBoolean("IsPurchased");
 				Boolean IsSold = imp.get_ValueAsBoolean("IsSold");
+				Boolean IsBOM = imp.get_ValueAsBoolean("IsBOM");
 				boolean newProduct = M_Product_ID == 0;
 				if (log.isLoggable(Level.FINE)) log.fine("I_Product_ID=" + I_Product_ID + ", M_Product_ID=" + M_Product_ID 
 					+ ", C_BPartner_ID=" + C_BPartner_ID);
@@ -543,6 +544,7 @@ public class TCS_ImportProduct extends SvrProcess implements ImportProcess
 					product.setC_TaxCategory_ID(C_TaxCategory_ID);
 					product.set_ValueOfColumn("IsPurchased", IsPurchased);
 					product.set_ValueOfColumn("IsSold", IsSold);
+					product.set_ValueOfColumn("IsBOM", IsBOM);
 					ModelValidationEngine.get().fireImportValidate(this, imp, product, ImportValidator.TIMING_AFTER_IMPORT);
 					if (product.save())
 					{
