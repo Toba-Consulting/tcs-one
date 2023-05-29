@@ -207,8 +207,20 @@ public class TCS_StockCardSingleProduct extends SvrProcess{
                 }
                
                 Integer c_bpartner_id = rs.getInt(4);
-                if(c_bpartner_id==0)
-                    c_bpartner_id=null;
+                if(c_bpartner_id==0) {
+                	if (transaction.getM_MovementLine_ID() > 0){
+                		MMovementLine moveLineBp = (MMovementLine) transaction.getM_MovementLine();
+                		MMovement movBp = moveLineBp.getParent();
+                		if(movBp != null) {
+                			c_bpartner_id = movBp.getC_BPartner_ID();
+                		}
+                		else 
+                			c_bpartner_id = null;
+                	}
+                    else
+                    	 c_bpartner_id = null;
+                }
+                    
                
                 Object[] params = new Object[]{getAD_PInstance_ID(), getAD_Client_ID(), Env.getAD_Org_ID(getCtx()),
                         transaction.getMovementDate(), transaction.getMovementQty(), transaction.getMovementType(),
