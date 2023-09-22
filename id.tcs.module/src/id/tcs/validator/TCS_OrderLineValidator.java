@@ -137,7 +137,7 @@ public class TCS_OrderLineValidator {
 				.multiply(Env.ONEHUNDRED)
 				.divide(list, 2, RoundingMode.HALF_UP);
 
-		String sql = "UPDATE C_OrderLine set discount = " + discount + "where c_orderline_id = " + orderLine.get_ID();
+		String sql = "UPDATE C_OrderLine set discount = " + discount + " where c_orderline_id = " + orderLine.get_ID();
 		DB.executeUpdate(sql, orderLine.get_TrxName());
 		return "";
 	}
