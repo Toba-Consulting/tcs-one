@@ -42,7 +42,7 @@ public class TCS_InOutValidator {
 		}
 		inoutLineIDs = inoutLineIDs.substring(0, inoutLineIDs.length()-2);
 		
-		String sqlWhere = "M_MatchInv.M_InOutLine_ID IN ("+inoutLineIDs+") AND ci.DocStatus IN ('CO','CL','IP')";
+		String sqlWhere = "M_MatchInv.M_InOutLine_ID IN ("+inoutLineIDs+") AND ci.DocStatus IN ('CO','CL','IP','DR')";
 		boolean match = new Query(inout.getCtx(), MMatchInv.Table_Name, sqlWhere, inout.get_TrxName())
 						.addJoinClause("JOIN C_InvoiceLine cil on cil.C_InvoiceLine_ID=M_MatchInv.C_InvoiceLine_ID")
 						.addJoinClause("JOIN C_Invoice ci on ci.C_Invoice_ID=cil.C_Invoice_ID")
@@ -68,7 +68,7 @@ public class TCS_InOutValidator {
 		}
 		inoutLineIDs = inoutLineIDs.substring(0, inoutLineIDs.length()-2);
 		
-		String sqlWhere = "C_InvoiceLine.M_InOutLine_ID IN ("+inoutLineIDs+") AND ci.DocStatus IN ('CO','CL','IP')";
+		String sqlWhere = "C_InvoiceLine.M_InOutLine_ID IN ("+inoutLineIDs+") AND ci.DocStatus IN ('CO','CL','IP','DR')";
 		boolean match = new Query(inout.getCtx(), MInvoiceLine.Table_Name, sqlWhere, inout.get_TrxName())
 						.addJoinClause("JOIN C_Invoice ci on ci.C_Invoice_ID=C_InvoiceLine.C_Invoice_ID")
 						.match();

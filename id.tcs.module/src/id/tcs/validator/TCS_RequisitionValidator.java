@@ -4,15 +4,22 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.adempiere.base.event.IEventTopics;
+import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MInOutLine;
+import org.compiere.model.MMatchPO;
+import org.compiere.model.MOrderLine;
 import org.compiere.model.MRequisition;
 import org.compiere.model.MRequisitionLine;
 import org.compiere.model.MUOM;
 import org.compiere.model.MUOMConversion;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.model.TCS_MOrder;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
+
+import id.tcs.model.MMatchPR;
 
 public class TCS_RequisitionValidator {
 
@@ -24,6 +31,20 @@ public class TCS_RequisitionValidator {
 				(event.getTopic().equals(IEventTopics.DOC_BEFORE_REVERSECORRECT))) {
 			msg = checkPO(req);
 		}
+		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_REACTIVATE)) {
+			//Check MatchPR table for any link to M_RequisitionLine that have the Docstatus of 'CO','CL','IP','DR'
+			msg += checkMatchPR(req);
+			//			msg += checkLinkedPayment(order);
+			//Check C_Order table for any link to M_RequisitionLine that have the Docstatus of 'CO','CL','IP','DR'
+			msg += checkActiveLinkedOrder(req);
+		} 
+		else if (event.getTopic().equals(IEventTopics.DOC_BEFORE_VOID)) {
+			//Check MatchPR table for any link to M_RequisitionLine that have the Docstatus of 'CO','CL','IP','DR'
+			msg += checkMatchPR(req);
+			//			msg += checkLinkedPayment(order);
+			//Check C_Order table for any link to M_RequisitionLine that have the Docstatus of 'CO','CL','IP','DR'
+			msg += checkActiveLinkedOrder(req);
+		} 
 
 		else if ((event.getTopic().equals(IEventTopics.DOC_AFTER_PREPARE))) {
 			//check and adjust qtyrequired for all requisition line if required
@@ -40,6 +61,51 @@ public class TCS_RequisitionValidator {
 			msg += updateReferences(req);
 		}
 		return msg;
+	}
+
+	public static String checkActiveLinkedOrder(MRequisition req) {
+		int [] temp = new Query(req.getCtx(), MRequisitionLine.Table_Name, "M_Requisition_ID="+req.getM_Requisition_ID(), req.get_TrxName())
+				.getIDs();
+		if (temp==null || temp.length==0) {
+			return "";
+		}
+		String IDs = "";
+		for (int i : temp) {
+			IDs+=i;
+			IDs+=", ";
+		}
+		IDs=IDs.substring(0, IDs.length()-2);
+		String sqlWhere = "M_RequisitionLine_ID IN ("+IDs+") AND co.DocStatus IN ('CO','CL','IP','DR')";
+		boolean match = new Query(req.getCtx(), MOrderLine.Table_Name, sqlWhere, req.get_TrxName())
+				.addJoinClause("JOIN C_Order co on co.C_Order_ID=C_OrderLine.C_Order_ID")
+				.match();
+		if (match) {
+			throw new AdempiereException("Cannot Reactivate Requisition : Active Order Exists For Requisition Line");
+		}
+		return "";
+	}
+
+	public static String checkMatchPR(MRequisition req) {
+		int [] temp = new Query(req.getCtx(), MRequisitionLine.Table_Name, "M_Requisition_ID="+req.getM_Requisition_ID(), req.get_TrxName())
+				.getIDs();
+		if (temp==null || temp.length==0) {
+			return "";
+		}
+		String IDs = "";
+		for (int i : temp) {
+			IDs+=i;
+			IDs+=", ";
+		}
+		IDs=IDs.substring(0, IDs.length()-2);
+		String sqlWhere = "M_MatchPR.M_RequisitionLine_ID IN ("+IDs+") AND co.DocStatus IN ('CO','CL','IP','DR')";
+		boolean match = new Query(req.getCtx(), MMatchPR.Table_Name, sqlWhere, req.get_TrxName())
+				.addJoinClause("JOIN C_OrderLine col on col.C_OrderLine_ID=M_MatchPR.C_OrderLine_ID")
+				.addJoinClause("JOIN C_Order co on co.C_Order_ID=col.C_Order_ID")
+				.match();
+		if (match) {
+			throw new AdempiereException("Cannot Reverse Requisition: Existing Match PR Exists For Requisition Line");
+		}
+		return "";
 	}
 
 	private static String updateReferences(MRequisition req) {
@@ -129,7 +195,7 @@ public class TCS_RequisitionValidator {
 	public static String checkPO(MRequisition req){
 
 		boolean match = false;
-		String sqlWhere = "M_Requisition.M_Requisition_ID="+req.getM_Requisition_ID()+" AND co.DocStatus IN ('CO','CL') ";
+		String sqlWhere = "M_Requisition.M_Requisition_ID="+req.getM_Requisition_ID()+" AND co.DocStatus IN ('CO','CL','DR') ";
 		match = new Query(req.getCtx(), MRequisition.Table_Name, sqlWhere, req.get_TrxName())
 				.addJoinClause("JOIN M_RequisitionLine rl on rl.M_Requisition_ID=M_Requisition.M_Requisition_ID ")
 				.addJoinClause("JOIN C_OrderLine col on col.M_RequisitionLine_ID=rl.M_RequisitionLine_ID ")

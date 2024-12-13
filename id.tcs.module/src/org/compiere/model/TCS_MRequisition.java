@@ -65,6 +65,16 @@ public class TCS_MRequisition extends MRequisition implements DocOptions {
 	
 	@Override
 	public boolean voidIt() {
+		// Added code from core class MRequisition before void
+		if (log.isLoggable(Level.INFO)) log.info("voidIt - " + toString());
+		// Before Void
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_VOID);
+		if (m_processMsg != null)
+			return false;
+		
+		if (!closeIt())
+			return false;
+		//
 		
 		boolean match = false;
 		String sqlWhere = "M_Requisition.M_Requisition_ID="+getM_Requisition_ID()+" AND co.DocStatus IN ('CO','CL') ";
@@ -77,8 +87,16 @@ public class TCS_MRequisition extends MRequisition implements DocOptions {
 		if (match) 
 			throw new AdempiereException("Active Purchase Order Referencing This Requisition Exist");
 		
-		// After reActivat
-		return super.voidIt();
+		// After reActivate
+//		return super.voidIt();
+		
+		// Added code from core class MRequisition after void
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_VOID);
+		if (m_processMsg != null)
+			return false;
+
+		return true;
+		//
 	}
 	
 	@Override
@@ -134,4 +152,10 @@ public class TCS_MRequisition extends MRequisition implements DocOptions {
 		return match;
 	}
 	
+	@Override
+	public String getProcessMsg()
+	{
+		//Returning m_processMsg from this child class avoiding null value
+		return m_processMsg;
+	}
 }
