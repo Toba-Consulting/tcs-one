@@ -36,6 +36,7 @@ import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Trx;
 
+@org.adempiere.base.annotation.Process
 public class TCS_GenerateInvoiceFromInout extends SvrProcess {
 	
 	int p_M_InOut_ID = 0;

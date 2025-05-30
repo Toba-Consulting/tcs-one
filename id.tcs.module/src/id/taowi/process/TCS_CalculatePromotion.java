@@ -10,6 +10,7 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.idempiere.model.PromotionRule;
 
+@org.adempiere.base.annotation.Process 
 public class TCS_CalculatePromotion extends SvrProcess {
 
 	private int p_C_Order_ID = 0;

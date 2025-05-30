@@ -24,6 +24,8 @@ import org.compiere.model.*;
 /** Generated Model for TCS_BOM_Explosion_List
  *  @author iDempiere (generated) 
  *  @version Release 5.1 - $Id$ */
+
+@org.adempiere.base.Model(table="TCS_BOM_Explosion_List")
 public class X_TCS_BOM_Explosion_List extends PO implements I_TCS_BOM_Explosion_List, I_Persistent 
 {
 

@@ -20,6 +20,7 @@ import org.compiere.model.MTCS_AllocateCharge;
 import org.compiere.model.X_TCS_AllocateCharge;
 import org.compiere.model.X_T_MatchAllocation;
 
+@org.adempiere.base.annotation.Process
 public class TCS_CreateMatchAllocationByAllocation extends SvrProcess {
 
 	private int p_C_AllocationHdr_ID=0;

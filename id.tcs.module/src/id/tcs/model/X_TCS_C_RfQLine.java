@@ -33,6 +33,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for C_RfQLine
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_RfQLine")
 public class X_TCS_C_RfQLine extends PO implements I_TCS_C_RfQLine, I_Persistent 
 {
 

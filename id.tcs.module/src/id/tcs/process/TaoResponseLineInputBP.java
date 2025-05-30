@@ -12,6 +12,7 @@ import org.compiere.util.Env;
  * @albert
  */
 
+@org.adempiere.base.annotation.Process
 public class TaoResponseLineInputBP extends SvrProcess{
 
 	int p_c_rfqresponse_id = 0;

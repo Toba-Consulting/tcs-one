@@ -26,6 +26,8 @@ import org.compiere.util.Env;
 /** Generated Model for TCS_Match_Allocation
  *  @author iDempiere (generated) 
  *  @version Release 5.1 - $Id$ */
+
+@org.adempiere.base.Model(table="TCS_Match_Allocation")
 public class X_TCS_Match_Allocation extends PO implements I_TCS_Match_Allocation, I_Persistent 
 {
 

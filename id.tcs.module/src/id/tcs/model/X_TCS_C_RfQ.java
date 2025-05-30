@@ -32,6 +32,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for C_RfQ
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_RfQ")
 public class X_TCS_C_RfQ extends PO implements I_TCS_C_RfQ, I_Persistent 
 {
 

@@ -12,6 +12,7 @@ import org.compiere.model.MProductionLine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
+@org.adempiere.base.annotation.Process
 public class HWHCreateMCostDetailForAvgPO extends SvrProcess {
 
 	int p_C_Period_ID = 0;

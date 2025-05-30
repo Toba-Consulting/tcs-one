@@ -31,6 +31,8 @@ import org.compiere.util.Ini;
  * @author stephan
  * stock card report
  */
+
+@org.adempiere.base.annotation.Process
 public class TCS_StockCard extends SvrProcess{
  
     private long m_start = System.currentTimeMillis();

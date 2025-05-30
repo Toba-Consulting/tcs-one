@@ -29,6 +29,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for C_RfQ_Topic
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_RfQ_Topic")
 public class X_TCS_C_RfQ_Topic extends PO implements I_TCS_C_RfQ_Topic, I_Persistent 
 {
 

@@ -846,7 +846,7 @@ public class TCS_CalloutQuotationLine extends CalloutEngine implements IColumnCa
 		//
 		int C_Tax_ID = Tax.get (ctx, M_Product_ID, C_Charge_ID, billDate, shipDate,
 				AD_Org_ID, M_Warehouse_ID, billC_BPartner_Location_ID, shipC_BPartner_Location_ID,
-				"Y".equals(Env.getContext(ctx, WindowNo, "IsSOTrx")), null);
+				"Y".equals(Env.getContext(ctx, WindowNo, "IsSOTrx")), "",  null);
 		if (log.isLoggable(Level.INFO)) log.info("Tax ID=" + C_Tax_ID);
 		//
 		if (C_Tax_ID == 0)

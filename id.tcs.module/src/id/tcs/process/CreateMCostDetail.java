@@ -21,6 +21,7 @@ import org.compiere.util.TimeUtil;
  * @param C_AcctSchema_ID
  * 
  */
+@org.adempiere.base.annotation.Process
 public class CreateMCostDetail extends SvrProcess{
 	int p_C_Period_ID = 0;
 	int p_C_AcctSchema_ID = 0;

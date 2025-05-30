@@ -39,6 +39,7 @@ import org.compiere.util.Trx;
  *  @author Jorg Janke
  *  @version $Id: AllocationReset.java,v 1.2 2006/07/30 00:51:01 jjanke Exp $
  */
+@org.adempiere.base.annotation.Process
 public class TCS_AllocationReset extends SvrProcess
 {
 	/** BP Group				*/

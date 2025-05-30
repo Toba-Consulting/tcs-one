@@ -25,6 +25,7 @@ import id.tcs.model.X_C_OrderPayment;
 import org.compiere.model.TCS_MPayment;
 import org.compiere.model.TCS_MRMA;
 
+@org.adempiere.base.annotation.Process
 public class TCS_GeneratePaymentFromRMA extends SvrProcess {
 
 	int p_M_RMA_ID = 0;

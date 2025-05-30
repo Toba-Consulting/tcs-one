@@ -62,6 +62,8 @@ import id.tcs.model.X_M_MatchPR;
  *  		<li>FR [ 2844074  ] Requisition PO Create - more selection fields
  *  			https://sourceforge.net/tracker/?func=detail&aid=2844074&group_id=176962&atid=879335
  */
+
+@org.adempiere.base.annotation.Process
 public class TCS_RequisitionPOCreate extends SvrProcess
 {
 	/** Org					*/

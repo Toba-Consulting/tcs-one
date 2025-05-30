@@ -26,6 +26,7 @@ import id.tcs.model.MQuotation;
 import id.tcs.model.MQuotationLine;
 import id.tcs.model.X_M_MatchQuotation;
 
+@org.adempiere.base.annotation.Process 
 public class TaoInquiryToQuotation extends SvrProcess{
 
 	int C_Inquiry_ID = 0;

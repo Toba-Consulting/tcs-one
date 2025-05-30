@@ -10,6 +10,7 @@ import org.compiere.model.MProduct;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
+@org.adempiere.base.annotation.Process
 public class HWHCreateMCostForAvgPO extends SvrProcess {
 
 	private int acctSchema_ID=0;

@@ -31,6 +31,8 @@ import org.compiere.util.Env;
 /** Generated Model for C_RfQResponse
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_RfQResponse")
 public class X_TCS_C_RfQResponse extends PO implements I_TCS_C_RfQResponse, I_Persistent 
 {
 

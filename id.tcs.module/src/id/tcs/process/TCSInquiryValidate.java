@@ -10,6 +10,7 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import id.tcs.model.MInquiry;
 
+@org.adempiere.base.annotation.Process
 public class TCSInquiryValidate extends SvrProcess {
 
 	private int p_C_Inquiry_ID=0;

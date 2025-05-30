@@ -7,6 +7,7 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import id.tcs.model.MInquiry;
 
+@org.adempiere.base.annotation.Process
 public class TCSInquiryCopyFrom extends SvrProcess {
 
 	private int m_C_Inquiry_ID = 0;

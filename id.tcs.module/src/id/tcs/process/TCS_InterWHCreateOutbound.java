@@ -29,6 +29,7 @@ import org.eevolution.model.MDDOrderLine;
 
 import org.compiere.model.TCS_MMovement;
 
+@org.adempiere.base.annotation.Process
 public class TCS_InterWHCreateOutbound extends SvrProcess {
 
 	private int p_C_DocType_ID = 0;

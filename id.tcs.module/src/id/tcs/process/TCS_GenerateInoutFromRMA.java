@@ -30,6 +30,7 @@ import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Trx;
 
+@org.adempiere.base.annotation.Process
 public class TCS_GenerateInoutFromRMA extends SvrProcess {
 	
 	int p_M_RMA_ID = 0;

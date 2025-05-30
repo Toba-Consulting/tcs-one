@@ -40,6 +40,7 @@ import org.compiere.model.TCS_MPayment;
  *	@author victor.perez@e-evoltuion.com
  *	
  **/
+@org.adempiere.base.annotation.Process
 public class TCS_BankTransfer extends SvrProcess
 {
 	private String 		p_DocumentNo= "";				// Document No

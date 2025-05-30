@@ -32,6 +32,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for M_MatchQuotation
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="M_MatchQuotation")
 public class X_M_MatchQuotation extends PO implements I_M_MatchQuotation, I_Persistent 
 {
 

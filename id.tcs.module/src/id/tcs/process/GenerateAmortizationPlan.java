@@ -13,6 +13,7 @@ import org.compiere.util.CLogger;
  * @author Stephan
  * copy from amortization line to amortization run
  */
+@org.adempiere.base.annotation.Process
 public class GenerateAmortizationPlan extends SvrProcess{
 
 	private CLogger log = CLogger.getCLogger(GenerateAmortizationPlan.class);

@@ -17,6 +17,7 @@ import org.compiere.util.Env;
 import org.compiere.util.TimeUtil;
 import org.compiere.model.X_M_Periodic_Cost;
 
+@org.adempiere.base.annotation.Process
 public class CalcInitialPeriodicCost extends SvrProcess{
 
 	private int p_AD_Client_ID = 0;

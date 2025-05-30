@@ -12,6 +12,7 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 
+@org.adempiere.base.annotation.Process 
 public class SetTaxInvoiceLine extends SvrProcess{
 
 	int p_C_Tax_ID = 0;

@@ -28,6 +28,8 @@ import org.compiere.model.POInfo;
 /** Generated Model for AD_Role_WHAccess
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="AD_Role_WHAccess")
 public class X_AD_Role_WHAccess extends PO implements I_AD_Role_WHAccess, I_Persistent 
 {
 

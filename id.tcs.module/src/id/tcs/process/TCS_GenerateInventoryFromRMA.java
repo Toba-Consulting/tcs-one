@@ -20,6 +20,7 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
+@org.adempiere.base.annotation.Process
 public class TCS_GenerateInventoryFromRMA extends SvrProcess {
 	
 	int p_M_RMA_ID = 0;

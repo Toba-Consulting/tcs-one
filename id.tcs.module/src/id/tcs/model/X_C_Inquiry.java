@@ -26,6 +26,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for C_Inquiry
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_Inquiry")
 public class X_C_Inquiry extends PO implements I_C_Inquiry, I_Persistent 
 {
 

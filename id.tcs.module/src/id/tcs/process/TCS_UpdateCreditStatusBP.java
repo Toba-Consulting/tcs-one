@@ -8,6 +8,7 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 
+@org.adempiere.base.annotation.Process
 public class TCS_UpdateCreditStatusBP extends SvrProcess {
 
 	private String SOCreditStatus = "";

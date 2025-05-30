@@ -26,6 +26,8 @@ import org.compiere.util.Env;
 /** Generated Model for C_OrderPayment
  *  @author iDempiere (generated) 
  *  @version Release 8.2 - $Id$ */
+
+@org.adempiere.base.Model(table="C_OrderPayment")
 public class X_C_OrderPayment extends PO implements I_C_OrderPayment, I_Persistent 
 {
 

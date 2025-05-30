@@ -14,6 +14,7 @@ import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 
+@org.adempiere.base.annotation.Process
 public class TCS_CreateMCostForProductWithIncompleteCostElement extends SvrProcess{
 
 	/* Create M_Cost for product that don't have one of existing cost element (Cost Element Type : Material)

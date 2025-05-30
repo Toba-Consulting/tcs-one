@@ -9,6 +9,7 @@ import org.compiere.util.Msg;
 import id.tcs.model.MInquiry;
 import id.tcs.model.MInquiryLine;
 
+@org.adempiere.base.annotation.Process
 public class TCSInquiryComplete extends SvrProcess {
 
 	int p_C_Inquiry_ID = 0;

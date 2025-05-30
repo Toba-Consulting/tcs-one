@@ -31,6 +31,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for R_RequestLine
  *  @author iDempiere (generated) 
  *  @version Release 3.1 - $Id$ */
+
+@org.adempiere.base.Model(table="R_RequestLine")
 public class X_TCS_R_RequestLine extends PO implements I_TCS_R_RequestLine, I_Persistent 
 {
 

@@ -18,6 +18,7 @@ import org.compiere.util.Env;
 import id.tcs.model.MTCSMatchAllocation;
 import id.tcs.model.X_TCS_Match_Allocation;
 
+@org.adempiere.base.annotation.Process 
 public class NewGenerateMatchAllocation extends SvrProcess {
 
 	int p_Alloc_ID = 0;

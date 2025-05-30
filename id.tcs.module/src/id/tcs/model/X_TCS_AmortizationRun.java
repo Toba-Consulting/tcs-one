@@ -32,6 +32,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for TCS_AmortizationRun
  *  @author iDempiere (generated) 
  *  @version Release 3.1 - $Id$ */
+
+@org.adempiere.base.Model(table="TCS_AmortizationRun")
 public class X_TCS_AmortizationRun extends PO implements I_TCS_AmortizationRun, I_Persistent 
 {
 

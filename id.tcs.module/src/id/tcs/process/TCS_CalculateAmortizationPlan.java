@@ -19,6 +19,7 @@ import id.tcs.model.MTCSAmortizationPlan;
  * @author Stephan
  * Generate plan detail amortization
  */
+@org.adempiere.base.annotation.Process
 public class TCS_CalculateAmortizationPlan extends SvrProcess{
 
 	@Override

@@ -19,6 +19,7 @@ import org.compiere.util.TimeUtil;
  * Calculate cost per periodic
  * Next : Run process Update Cost Detail
  */
+@org.adempiere.base.annotation.Process
 public class CalcPeriodicAvgCost extends SvrProcess{
 
 	private int p_AD_Client_ID = 0;

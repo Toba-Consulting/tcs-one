@@ -24,6 +24,7 @@ import org.compiere.util.DB;
 import org.compiere.wf.MWorkflow;
 import org.compiere.wf.MWorkflowAccess;
 
+@org.adempiere.base.annotation.Process
 public class TCS_CopyClientRole extends SvrProcess{
 
 	int p_AD_Client_From_ID=0;

@@ -35,6 +35,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for M_MatchRequest
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="M_MatchRequest")
 public class X_M_MatchRequest extends PO implements I_M_MatchRequest, I_Persistent 
 {
 

@@ -22,6 +22,7 @@ import id.tcs.model.MInquiry;
 import id.tcs.model.MInquiryLine;
 import id.tcs.model.X_M_MatchInquiry;
 
+@org.adempiere.base.annotation.Process
 public class TCSInquiryToRfQ extends SvrProcess{
 
 	int p_C_Inquiry_ID = 0;

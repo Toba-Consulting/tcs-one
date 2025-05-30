@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import org.compiere.model.MProduct;
 import org.compiere.model.Query;
 
-
+@org.adempiere.base.annotation.Process
 public class HWH_BOMExplosion extends SvrProcess{
 
 	private int p_AD_Client_ID = 0;

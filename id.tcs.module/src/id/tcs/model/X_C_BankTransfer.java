@@ -27,6 +27,8 @@ import org.compiere.util.Env;
 /** Generated Model for C_BankTransfer
  *  @author iDempiere (generated) 
  *  @version Release 5.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_BankTransfer")
 public class X_C_BankTransfer extends PO implements I_C_BankTransfer, I_Persistent 
 {
 

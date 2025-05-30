@@ -26,6 +26,8 @@ import org.compiere.util.Env;
 /** Generated Model for TCS_WF_Approval_Line
  *  @author iDempiere (generated) 
  *  @version Release 5.1 - $Id$ */
+
+@org.adempiere.base.Model(table="TCS_WF_Approval_Line")
 public class X_TCS_WF_Approval_Line extends PO implements I_TCS_WF_Approval_Line, I_Persistent 
 {
 

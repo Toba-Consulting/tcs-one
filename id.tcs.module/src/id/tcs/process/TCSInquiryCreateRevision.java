@@ -7,6 +7,7 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.Msg;
 import id.tcs.model.MInquiry;
 
+@org.adempiere.base.annotation.Process
 public class TCSInquiryCreateRevision extends SvrProcess {
 
 	int p_C_Inquiry_ID = 0;

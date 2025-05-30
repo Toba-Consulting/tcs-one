@@ -27,6 +27,8 @@ import org.compiere.util.Env;
 /** Generated Model for TCS_AmortizationPlan
  *  @author iDempiere (generated) 
  *  @version Release 5.1 - $Id$ */
+
+@org.adempiere.base.Model(table="TCS_AmortizationPlan")
 public class X_TCS_AmortizationPlan extends PO implements I_TCS_AmortizationPlan, I_Persistent 
 {
 

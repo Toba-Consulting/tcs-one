@@ -15,6 +15,8 @@ import org.compiere.util.Env;
  * @author stephan
  * inventory transaction report with param date and locator
  */
+
+@org.adempiere.base.annotation.Process
 public class TCS_InventoryTrxReport extends SvrProcess{
 
 	private Timestamp p_movementDate = null;

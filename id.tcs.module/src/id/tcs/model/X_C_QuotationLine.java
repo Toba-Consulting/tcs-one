@@ -32,6 +32,8 @@ import org.compiere.util.Env;
 /** Generated Model for C_QuotationLine
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_QuotationLine")
 public class X_C_QuotationLine extends PO implements I_C_QuotationLine, I_Persistent 
 {
 

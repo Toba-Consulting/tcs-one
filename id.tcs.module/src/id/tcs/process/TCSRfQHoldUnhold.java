@@ -11,6 +11,7 @@ import org.compiere.process.SvrProcess;
  * @albert
  */
 
+@org.adempiere.base.annotation.Process
 public class TCSRfQHoldUnhold extends SvrProcess {
 	
 	int p_C_RfQ_ID = 0;

@@ -30,6 +30,8 @@ import org.compiere.util.Env;
 /** Generated Model for C_QuotationTax
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_QuotationTax")
 public class X_C_QuotationTax extends PO implements I_C_QuotationTax, I_Persistent 
 {
 

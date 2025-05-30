@@ -20,6 +20,7 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.TimeUtil;
 
+@org.adempiere.base.annotation.Process
 public class CalcCostProduction extends SvrProcess{
 
 	private int p_C_Period_ID = 0;

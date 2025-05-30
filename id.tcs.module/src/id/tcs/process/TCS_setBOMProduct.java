@@ -10,6 +10,7 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
+@org.adempiere.base.annotation.Process
 public class TCS_setBOMProduct extends SvrProcess{
 
 	@Override

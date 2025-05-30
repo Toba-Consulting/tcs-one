@@ -26,6 +26,7 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
+@org.adempiere.base.annotation.Process
 public class TCSQuotationToOrder extends SvrProcess{
 
 	int C_Quotation_ID = 0;

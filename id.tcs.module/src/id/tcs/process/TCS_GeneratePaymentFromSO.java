@@ -19,6 +19,7 @@ import id.tcs.model.X_C_OrderPayment;
 
 import org.compiere.model.TCS_MPayment;
 
+@org.adempiere.base.annotation.Process
 public class TCS_GeneratePaymentFromSO extends SvrProcess {
 
 	int p_C_Order_ID = 0;

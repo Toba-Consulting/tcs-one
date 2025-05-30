@@ -15,6 +15,8 @@ import org.compiere.util.TimeUtil;
  * @author TommyAng
  * TCSBankRegister Report&View Process
  */
+
+@org.adempiere.base.annotation.Process
 public class TCSBankRegisterNoRecon extends SvrProcess{
 	
 	private int p_C_BankAccount_ID = 0;										//C_BankAccount_ID	First Parameter

@@ -28,6 +28,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for M_MatchInquiry
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="M_MatchInquiry")
 public class X_M_MatchInquiry extends PO implements I_M_MatchInquiry, I_Persistent 
 {
 

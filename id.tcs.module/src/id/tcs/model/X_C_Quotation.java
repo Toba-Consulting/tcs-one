@@ -32,6 +32,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for C_Quotation
  *  @author iDempiere (generated) 
  *  @version Release 3.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_Quotation")
 public class X_C_Quotation extends PO implements I_C_Quotation, I_Persistent 
 {
 

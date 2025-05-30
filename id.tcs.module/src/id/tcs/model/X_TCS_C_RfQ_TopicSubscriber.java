@@ -30,6 +30,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for C_RfQ_TopicSubscriber
  *  @author iDempiere (generated) 
  *  @version Release 2.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_RfQ_TopicSubscriber")
 public class X_TCS_C_RfQ_TopicSubscriber extends PO implements I_TCS_C_RfQ_TopicSubscriber, I_Persistent 
 {
 

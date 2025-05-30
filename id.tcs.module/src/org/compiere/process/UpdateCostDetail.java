@@ -19,6 +19,7 @@ import org.compiere.util.TimeUtil;
  * @author Phie Albert
  * Run process Calculate Costing Periodic before run this process
  */
+@org.adempiere.base.annotation.Process
 public class UpdateCostDetail extends SvrProcess{
 
 	private int p_AD_Client_ID = 0;

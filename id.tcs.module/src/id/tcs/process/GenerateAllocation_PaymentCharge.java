@@ -12,6 +12,7 @@ import org.compiere.util.Msg;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.TCS_MPayment;
 
+@org.adempiere.base.annotation.Process
 public class GenerateAllocation_PaymentCharge extends SvrProcess{
 
 	@Override

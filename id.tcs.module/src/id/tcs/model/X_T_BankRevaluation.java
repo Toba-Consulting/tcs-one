@@ -27,6 +27,8 @@ import org.compiere.util.Env;
 /** Generated Model for T_BankRevaluation
  *  @author iDempiere (generated) 
  *  @version Release 5.1 - $Id$ */
+
+@org.adempiere.base.Model(table="T_BankRevaluation")
 public class X_T_BankRevaluation extends PO implements I_T_BankRevaluation, I_Persistent 
 {
 

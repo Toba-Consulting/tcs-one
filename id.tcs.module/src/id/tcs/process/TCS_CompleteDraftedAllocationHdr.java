@@ -7,6 +7,7 @@ import org.compiere.model.Query;
 import org.compiere.process.DocAction;
 import org.compiere.process.SvrProcess;
 
+@org.adempiere.base.annotation.Process
 public class TCS_CompleteDraftedAllocationHdr extends SvrProcess{
 
 	private int p_AD_Client_ID = 0;

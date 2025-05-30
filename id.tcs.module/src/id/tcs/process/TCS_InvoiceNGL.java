@@ -33,6 +33,8 @@ import org.compiere.util.Msg;
  *  @version $Id: InvoiceNGL.java,v 1.3 2006/08/04 03:53:59 jjanke Exp $
  *  FR: [ 2214883 ] Remove SQL code and Replace for Query - red1
  */
+
+@org.adempiere.base.annotation.Process
 public class TCS_InvoiceNGL extends SvrProcess
 {
 	/**	Mandatory Acct Schema			*/

@@ -30,6 +30,7 @@ import org.compiere.util.Env;
 
 import id.tcs.model.X_T_BankRevaluation;
 
+@org.adempiere.base.annotation.Process
 public class TCS_ForeignBankRevaluationNoBankStatement extends SvrProcess {
 
 	/**	Mandatory Acct Schema			*/

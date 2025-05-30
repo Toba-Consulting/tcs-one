@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 
+@org.adempiere.base.annotation.Process
 public class CreateAssetFromAssetAddition extends SvrProcess{
 	
 	private int p_A_Asset_Addition;

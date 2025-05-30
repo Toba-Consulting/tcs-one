@@ -31,6 +31,8 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for C_RfQResponseLineQty
  *  @author iDempiere (generated) 
  *  @version Release 3.1 - $Id$ */
+
+@org.adempiere.base.Model(table="C_RfQResponseLineQty")
 public class X_TCS_C_RfQResponseLineQty extends PO implements I_TCS_C_RfQResponseLineQty, I_Persistent 
 {
 

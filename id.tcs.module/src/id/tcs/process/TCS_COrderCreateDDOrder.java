@@ -15,6 +15,7 @@ import org.compiere.util.Msg;
 import org.eevolution.model.MDDOrder;
 import org.eevolution.model.MDDOrderLine;
 
+@org.adempiere.base.annotation.Process
 public class TCS_COrderCreateDDOrder extends SvrProcess{
 
 	//Create DD_Order with lines from C_Order

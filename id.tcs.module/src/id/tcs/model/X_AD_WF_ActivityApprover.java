@@ -26,6 +26,8 @@ import org.compiere.util.Env;
 /** Generated Model for AD_WF_ActivityApprover
  *  @author iDempiere (generated) 
  *  @version Release 5.1 - $Id$ */
+
+@org.adempiere.base.Model(table="AD_WF_ActivityApprover")
 public class X_AD_WF_ActivityApprover extends PO implements I_AD_WF_ActivityApprover, I_Persistent 
 {
 

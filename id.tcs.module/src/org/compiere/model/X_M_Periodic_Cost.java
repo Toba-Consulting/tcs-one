@@ -25,6 +25,8 @@ import org.compiere.util.Env;
 /** Generated Model for M_Periodic_Cost
  *  @author iDempiere (generated) 
  *  @version Release 5.1 - $Id$ */
+
+@org.adempiere.base.Model(table="M_Periodic_Cost")
 public class X_M_Periodic_Cost extends PO implements I_M_Periodic_Cost, I_Persistent 
 {
 

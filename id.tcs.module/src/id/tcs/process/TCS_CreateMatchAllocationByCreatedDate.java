@@ -22,6 +22,7 @@ import org.compiere.model.MTCS_AllocateCharge;
 import org.compiere.model.X_TCS_AllocateCharge;
 import org.compiere.model.X_T_MatchAllocation;
 
+@org.adempiere.base.annotation.Process
 public class TCS_CreateMatchAllocationByCreatedDate extends SvrProcess {
 
 	private Timestamp p_DateFrom = null;
