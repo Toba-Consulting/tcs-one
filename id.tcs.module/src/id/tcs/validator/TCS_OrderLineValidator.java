@@ -93,9 +93,11 @@ public class TCS_OrderLineValidator {
 	
 	private static String updateLineReferences(MOrderLine orderLine) {
 		if(orderLine.get_ValueAsBoolean("IsBOMDrop")) {
-			MOrderLine ol = new MOrderLine(Env.getCtx(), orderLine.get_ValueAsInt("BOMDrop_Line_ID"), orderLine.get_TrxName());
-			ol.set_ValueNoCheck("IsGeneratedBOMDrop", false);
-			ol.saveEx();
+			if (orderLine.get_ValueAsInt("BOMDrop_Line_ID") > 0) {
+				MOrderLine ol = new MOrderLine(Env.getCtx(), orderLine.get_ValueAsInt("BOMDrop_Line_ID"), orderLine.get_TrxName());
+				ol.set_ValueNoCheck("IsGeneratedBOMDrop", false);
+				ol.saveEx();
+			}
 		}
 		return "";
 	}
