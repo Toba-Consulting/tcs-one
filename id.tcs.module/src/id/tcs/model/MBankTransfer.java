@@ -512,19 +512,23 @@ public class MBankTransfer extends X_C_BankTransfer implements DocAction, DocOpt
 			if(getC_Currency_From_ID() != getC_Currency_To_ID()) {
 				
 				MAllocationLine alloclineLossvsGain = new MAllocationLine(allocHdr);
+
+				BigDecimal amount = alloclineAP.getAmount().negate().subtract(alloclineAR.getAmount());
 				
-				alloclineLossvsGain.setAD_Org_ID(allocHdr.getAD_Org_ID());
-				alloclineLossvsGain.setC_BPartner_ID(getC_BPartner_ID());
-				alloclineLossvsGain.setAmount(alloclineAP.getAmount().negate().subtract(alloclineAR.getAmount()));
-				
-				if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1) {
-					alloclineLossvsGain.setC_Charge_ID(MSysConfig.getIntValue("currency_loss_charge", 0, paymentFrom.getAD_Client_ID()));
+				if (amount.compareTo(Env.ZERO) != 0) {
+					alloclineLossvsGain.setAD_Org_ID(allocHdr.getAD_Org_ID());
+					alloclineLossvsGain.setC_BPartner_ID(getC_BPartner_ID());
+					alloclineLossvsGain.setAmount(amount);
+					
+					if(alloclineAP.getAmount().negate().compareTo(alloclineAR.getAmount())==1) {
+						alloclineLossvsGain.setC_Charge_ID(MSysConfig.getIntValue("currency_loss_charge", 0, paymentFrom.getAD_Client_ID()));
+					}
+					else if(alloclineAR.getAmount().compareTo(alloclineAP.getAmount().negate())==1)
+					{
+						alloclineLossvsGain.setC_Charge_ID(MSysConfig.getIntValue("currency_gain_charge", 0, paymentFrom.getAD_Client_ID()));
+					}
+					alloclineLossvsGain.saveEx();
 				}
-				else if(alloclineAR.getAmount().compareTo(alloclineAP.getAmount().negate())==1)
-				{
-					alloclineLossvsGain.setC_Charge_ID(MSysConfig.getIntValue("currency_gain_charge", 0, paymentFrom.getAD_Client_ID()));
-				}
-				alloclineLossvsGain.saveEx();
 			}				
 			
 			allocHdr.processIt(DocAction.ACTION_Complete);
