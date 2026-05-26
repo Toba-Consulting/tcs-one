@@ -41,6 +41,20 @@ public class TCS_MPayment extends MPayment {
 	/**	Just Prepared Flag			*/
 	private boolean		m_justPrepared = false;
 	
+	
+	/**
+	 * 	Get Process Message
+	 *	@return clear text error message
+	 */
+	public String getProcessMsg()
+	{
+		if(m_processMsg == null)
+			m_processMsg = super.getProcessMsg();
+		
+		return m_processMsg;
+	}	//	getProcessMsg
+	
+	
 	/**************************************************************************
 	 * 	Complete Document
 	 * 	@return new status (Complete, In Progress, Invalid, Waiting ..)
